@@ -140,7 +140,6 @@ const moduleResolution = [
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/gitnotes/',
   optimizeDeps: {
     esbuildOptions: {
       plugins: [esbuildFlowPlugin()],
