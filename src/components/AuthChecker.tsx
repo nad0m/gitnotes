@@ -6,7 +6,7 @@ import { useLocalStorage } from 'react-use'
 import { LOCAL_STORAGE_KEY_GITHUB_TOKEN } from '../configs'
 
 interface Props {
-  children: React.ReactNode
+  children
 }
 
 export const AuthChecker = ({ children }: Props) => {
