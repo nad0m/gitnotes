@@ -1,0 +1,11 @@
+overwrite: true
+documents:
+  - ./src/**/*.graphql
+  - ./src/**/**/*.graphql.ts
+generates:
+  src/generated/graphql.tsx:
+    plugins:
+      - 'typescript'
+    config:
+      preResolveTypes: true
+      maybeValue: 'T'

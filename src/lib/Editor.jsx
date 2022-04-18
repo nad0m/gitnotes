@@ -13,6 +13,7 @@ import AutoFocusPlugin from '@lexical/react/LexicalAutoFocusPlugin'
 import AutoScrollPlugin from '@lexical/react/LexicalAutoScrollPlugin'
 import CharacterLimitPlugin from '@lexical/react/LexicalCharacterLimitPlugin'
 import LexicalClearEditorPlugin from '@lexical/react/LexicalClearEditorPlugin'
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import HashtagsPlugin from '@lexical/react/LexicalHashtagPlugin'
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
 import LinkPlugin from '@lexical/react/LexicalLinkPlugin'
@@ -52,6 +53,7 @@ import TwitterPlugin from '../plugins/TwitterPlugin'
 import YouTubePlugin from '../plugins/YouTubePlugin'
 import ContentEditable from '../ui/ContentEditable'
 import Placeholder from '../ui/Placeholder'
+import { editorState } from '../mock/editorState'
 
 function prepopulatedRichText() {
   const root = $getRoot()
@@ -128,6 +130,7 @@ function prepopulatedRichText() {
 
 export default function Editor(): React$Node {
   const { historyState } = useSharedHistoryContext()
+  const [editor] = useLexicalComposerContext()
   const {
     settings: {
       isCollab,
@@ -146,6 +149,9 @@ export default function Editor(): React$Node {
     : 'Enter some plain text...'
   const placeholder = <Placeholder>{text}</Placeholder>
   const scrollRef = useRef(null)
+
+  const state = editor.parseEditorState(JSON.stringify(editorState))
+  console.log(editor.setEditorState(state))
 
   return (
     <>

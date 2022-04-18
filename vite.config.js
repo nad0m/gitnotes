@@ -8,12 +8,12 @@
 
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { resolve } from 'path'
 import { flowPlugin, esbuildFlowPlugin } from '@bunchtogether/vite-plugin-flow'
 import path from 'path'
 import fs from 'fs'
 import { replaceCodePlugin } from 'vite-plugin-replace'
 import babel from '@rollup/plugin-babel'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 const moduleResolution = [
   {
@@ -98,7 +98,8 @@ const moduleResolution = [
   },
   { find: 'shared', replacement: path.resolve('./shared') },
   { find: 'configs', replacement: path.resolve('./src/configs') },
-  { find: 'lib', replacement: path.resolve('./src/lib') }
+  { find: 'lib', replacement: path.resolve('./src/lib') },
+  { find: '@', replacement: '/src' }
 ]
 
 // Lexical React
@@ -152,9 +153,7 @@ export default defineConfig({
     }
   },
   resolve: {
-    alias: {
-      src: path.resolve(__dirname, './src')
-    }
+    alias: moduleResolution
   },
   plugins: [
     replaceCodePlugin({
@@ -184,11 +183,9 @@ export default defineConfig({
       presets: ['@babel/preset-react', '@babel/preset-env']
     }),
     flowPlugin(),
-    react()
+    react(),
+    tsconfigPaths()
   ],
-  resolve: {
-    alias: moduleResolution
-  },
   build: {
     outDir: 'dist',
     rollupOptions: {

@@ -7,9 +7,11 @@
   "scripts": {
     "dev": "vite --host",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
+    "@apollo/client": "^3.5.10",
     "@excalidraw/excalidraw": "0.11.0",
     "@lexical/clipboard": "0.2.1",
     "@lexical/code": "0.2.1",
@@ -25,6 +27,7 @@
     "@lexical/table": "0.2.1",
     "@lexical/utils": "0.2.1",
     "firebase": "^9.6.11",
+    "graphql": "^16.3.0",
     "katex": "^0.15.2",
     "lexical": "0.2.1",
     "link-preview-generator": "1.0.7",
@@ -85,6 +88,7 @@
     "rollup-plugin-svg": "^2.0.0",
     "rollup-plugin-terser": "^7.0.2",
     "vite": "^2.8.0",
-    "vite-plugin-replace": "0.1.1"
+    "vite-plugin-replace": "0.1.1",
+    "vite-tsconfig-paths": "^3.4.1"
   }
 }
