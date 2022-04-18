@@ -7,50 +7,50 @@
  * @flow strict
  */
 
-import type {LexicalCommand} from 'lexical';
+import type { LexicalCommand } from 'lexical'
 
 // $FlowFixMe
-import 'katex/dist/katex.css';
+import 'katex/dist/katex.css'
 
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import {
   $getSelection,
   $isRangeSelection,
   COMMAND_PRIORITY_EDITOR,
-  createCommand,
-} from 'lexical';
-import {useEffect} from 'react';
+  createCommand
+} from 'lexical'
+import { useEffect } from 'react'
 
-import {$createEquationNode, EquationNode} from '../nodes/EquationNode';
+import { $createEquationNode, EquationNode } from '../nodes/EquationNode'
 
 export const INSERT_EQUATION_COMMAND: LexicalCommand<{
   equation: string,
-  inline: boolean,
-}> = createCommand();
+  inline: boolean
+}> = createCommand()
 
 export default function EquationsPlugin(): React$Node {
-  const [editor] = useLexicalComposerContext();
+  const [editor] = useLexicalComposerContext()
 
   useEffect(() => {
     if (!editor.hasNodes([EquationNode])) {
       throw new Error(
-        'ExcalidrawPlugin: ExcalidrawNode not registered on editor',
-      );
+        'ExcalidrawPlugin: ExcalidrawNode not registered on editor'
+      )
     }
 
     return editor.registerCommand(
       INSERT_EQUATION_COMMAND,
       (payload) => {
-        const {equation, inline} = payload;
-        const selection = $getSelection();
+        const { equation, inline } = payload
+        const selection = $getSelection()
         if ($isRangeSelection(selection)) {
-          const equationNode = $createEquationNode(equation, inline);
-          selection.insertNodes([equationNode]);
+          const equationNode = $createEquationNode(equation, inline)
+          selection.insertNodes([equationNode])
         }
-        return true;
+        return true
       },
-      COMMAND_PRIORITY_EDITOR,
-    );
-  }, [editor]);
-  return null;
+      COMMAND_PRIORITY_EDITOR
+    )
+  }, [editor])
+  return null
 }

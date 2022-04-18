@@ -7,21 +7,20 @@
  *
  */
 
-import Link from '@docusaurus/Link';
-import Translate from '@docusaurus/Translate';
-import clsx from 'clsx';
-import React from 'react';
+import Link from '@docusaurus/Link'
+import Translate from '@docusaurus/Translate'
+import clsx from 'clsx'
+import React from 'react'
 
-import ImageSwitcher from '../ImageSwitcher';
-import styles from './styles.module.css';
+import ImageSwitcher from '../ImageSwitcher'
+import styles from './styles.module.css'
 
 const links = [
   {
     description: (
       <Translate
         id="pages.community.links.github.description"
-        description="Description of Github community"
-      >
+        description="Description of Github community">
         Some copy about stack overflow Some copy about stack overflowSome copy
         about stack overflow
       </Translate>
@@ -35,19 +34,17 @@ const links = [
     title: (
       <Translate
         id="pages.community.links.github.title"
-        description="Hyperlink to Github"
-      >
+        description="Hyperlink to Github">
         GitHub
       </Translate>
     ),
-    url: 'https://github.com/facebook/lexical',
+    url: 'https://github.com/facebook/lexical'
   },
   {
     description: (
       <Translate
         id="pages.community.links.stackoverflow.description"
-        description="Description of StackOverflow community"
-      >
+        description="Description of StackOverflow community">
         Some copy about stack overflow Some copy about stack overflowSome copy
         about stack overflow
       </Translate>
@@ -61,19 +58,17 @@ const links = [
     title: (
       <Translate
         id="pages.community.links.stackoverflow.title"
-        description="Hyperlink to Stack Overflow"
-      >
+        description="Hyperlink to Stack Overflow">
         Stack Overflow
       </Translate>
     ),
-    url: 'https://stackoverflow.com/questions/tagged/lexicaljs',
+    url: 'https://stackoverflow.com/questions/tagged/lexicaljs'
   },
   {
     description: (
       <Translate
         id="pages.community.links.discord.description"
-        description="Description of Discord community"
-      >
+        description="Description of Discord community">
         Some copy about stack overflow Some copy about stack overflowSome copy
         about stack overflow
       </Translate>
@@ -87,16 +82,15 @@ const links = [
     title: (
       <Translate
         id="pages.community.links.discord.title"
-        description="Hyperlink to Discord"
-      >
+        description="Hyperlink to Discord">
         Discord
       </Translate>
     ),
-    url: 'https://discord.gg/KmG4wQnnD9',
-  },
-];
+    url: 'https://discord.gg/KmG4wQnnD9'
+  }
+]
 
-function CommunityLink({title, url, description, image}) {
+function CommunityLink({ title, url, description, image }) {
   return (
     <div className="row">
       <div className={clsx('col col--4', styles.image)}>{image}</div>
@@ -107,7 +101,7 @@ function CommunityLink({title, url, description, image}) {
         <p>{description}</p>
       </div>
     </div>
-  );
+  )
 }
 
 export default function CommunityLinks() {
@@ -119,5 +113,5 @@ export default function CommunityLinks() {
         </div>
       ))}
     </div>
-  );
+  )
 }

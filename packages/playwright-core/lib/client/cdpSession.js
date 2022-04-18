@@ -1,11 +1,11 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.CDPSession = void 0;
+})
+exports.CDPSession = void 0
 
-var _channelOwner = require("./channelOwner");
+var _channelOwner = require('./channelOwner')
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -24,42 +24,38 @@ var _channelOwner = require("./channelOwner");
  */
 class CDPSession extends _channelOwner.ChannelOwner {
   static from(cdpSession) {
-    return cdpSession._object;
+    return cdpSession._object
   }
 
   constructor(parent, type, guid, initializer) {
-    super(parent, type, guid, initializer);
+    super(parent, type, guid, initializer)
 
-    this._channel.on('event', ({
-      method,
-      params
-    }) => {
-      this.emit(method, params);
-    });
+    this._channel.on('event', ({ method, params }) => {
+      this.emit(method, params)
+    })
 
-    this.on = super.on;
-    this.addListener = super.addListener;
-    this.off = super.removeListener;
-    this.removeListener = super.removeListener;
-    this.once = super.once;
+    this.on = super.on
+    this.addListener = super.addListener
+    this.off = super.removeListener
+    this.removeListener = super.removeListener
+    this.once = super.once
   }
 
   async send(method, params) {
-    return this._wrapApiCall(async channel => {
+    return this._wrapApiCall(async (channel) => {
       const result = await channel.send({
         method,
         params
-      });
-      return result.result;
-    });
+      })
+      return result.result
+    })
   }
 
   async detach() {
-    return this._wrapApiCall(async channel => {
-      return channel.detach();
-    });
+    return this._wrapApiCall(async (channel) => {
+      return channel.detach()
+    })
   }
-
 }
 
-exports.CDPSession = CDPSession;
+exports.CDPSession = CDPSession

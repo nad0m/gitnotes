@@ -1,13 +1,13 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.PipeTransport = void 0;
+})
+exports.PipeTransport = void 0
 
-var _utils = require("../utils/utils");
+var _utils = require('../utils/utils')
 
-var _debugLogger = require("../utils/debugLogger");
+var _debugLogger = require('../utils/debugLogger')
 
 /**
  * Copyright 2018 Google Inc. All rights reserved.
@@ -27,67 +27,66 @@ var _debugLogger = require("../utils/debugLogger");
  */
 class PipeTransport {
   constructor(pipeWrite, pipeRead) {
-    this._pipeWrite = void 0;
-    this._pendingMessage = '';
-    this._waitForNextTask = (0, _utils.makeWaitForNextTask)();
-    this._closed = false;
-    this.onmessage = void 0;
-    this.onclose = void 0;
-    this._pipeWrite = pipeWrite;
-    pipeRead.on('data', buffer => this._dispatch(buffer));
+    this._pipeWrite = void 0
+    this._pendingMessage = ''
+    this._waitForNextTask = (0, _utils.makeWaitForNextTask)()
+    this._closed = false
+    this.onmessage = void 0
+    this.onclose = void 0
+    this._pipeWrite = pipeWrite
+    pipeRead.on('data', (buffer) => this._dispatch(buffer))
     pipeRead.on('close', () => {
-      this._closed = true;
-      if (this.onclose) this.onclose.call(null);
-    });
-    pipeRead.on('error', e => _debugLogger.debugLogger.log('error', e));
-    pipeWrite.on('error', e => _debugLogger.debugLogger.log('error', e));
-    this.onmessage = undefined;
-    this.onclose = undefined;
+      this._closed = true
+      if (this.onclose) this.onclose.call(null)
+    })
+    pipeRead.on('error', (e) => _debugLogger.debugLogger.log('error', e))
+    pipeWrite.on('error', (e) => _debugLogger.debugLogger.log('error', e))
+    this.onmessage = undefined
+    this.onclose = undefined
   }
 
   send(message) {
-    if (this._closed) throw new Error('Pipe has been closed');
+    if (this._closed) throw new Error('Pipe has been closed')
 
-    this._pipeWrite.write(JSON.stringify(message));
+    this._pipeWrite.write(JSON.stringify(message))
 
-    this._pipeWrite.write('\0');
+    this._pipeWrite.write('\0')
   }
 
   close() {
-    throw new Error('unimplemented');
+    throw new Error('unimplemented')
   }
 
   _dispatch(buffer) {
-    let end = buffer.indexOf('\0');
+    let end = buffer.indexOf('\0')
 
     if (end === -1) {
-      this._pendingMessage += buffer.toString();
-      return;
+      this._pendingMessage += buffer.toString()
+      return
     }
 
-    const message = this._pendingMessage + buffer.toString(undefined, 0, end);
+    const message = this._pendingMessage + buffer.toString(undefined, 0, end)
 
     this._waitForNextTask(() => {
-      if (this.onmessage) this.onmessage.call(null, JSON.parse(message));
-    });
+      if (this.onmessage) this.onmessage.call(null, JSON.parse(message))
+    })
 
-    let start = end + 1;
-    end = buffer.indexOf('\0', start);
+    let start = end + 1
+    end = buffer.indexOf('\0', start)
 
     while (end !== -1) {
-      const message = buffer.toString(undefined, start, end);
+      const message = buffer.toString(undefined, start, end)
 
       this._waitForNextTask(() => {
-        if (this.onmessage) this.onmessage.call(null, JSON.parse(message));
-      });
+        if (this.onmessage) this.onmessage.call(null, JSON.parse(message))
+      })
 
-      start = end + 1;
-      end = buffer.indexOf('\0', start);
+      start = end + 1
+      end = buffer.indexOf('\0', start)
     }
 
-    this._pendingMessage = buffer.toString(undefined, start);
+    this._pendingMessage = buffer.toString(undefined, start)
   }
-
 }
 
-exports.PipeTransport = PipeTransport;
+exports.PipeTransport = PipeTransport

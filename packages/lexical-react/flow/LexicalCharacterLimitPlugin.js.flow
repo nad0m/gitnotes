@@ -8,5 +8,5 @@
  */
 
 declare export default function LexicalCharacterLimitPlugin(props: {
-  charset: 'UTF-8' | 'UTF-16',
-}): React$Node;
+  charset: 'UTF-8' | 'UTF-16'
+}): React$Node

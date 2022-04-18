@@ -6,11 +6,11 @@
 
 Playwright is a Node.js library to automate [Chromium](https://www.chromium.org/Home), [Firefox](https://www.mozilla.org/en-US/firefox/new/) and [WebKit](https://webkit.org/) with a single API. Playwright is built to enable cross-browser web automation that is **ever-green**, **capable**, **reliable** and **fast**.
 
-|          | Linux | macOS | Windows |
-|   :---   | :---: | :---: | :---:   |
+|                                                                    |       Linux        |       macOS        |      Windows       |
+| :----------------------------------------------------------------- | :----------------: | :----------------: | :----------------: |
 | Chromium <!-- GEN:chromium-version -->97.0.4666.0<!-- GEN:stop --> | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| WebKit <!-- GEN:webkit-version -->15.4<!-- GEN:stop --> | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| Firefox <!-- GEN:firefox-version -->93.0<!-- GEN:stop --> | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| WebKit <!-- GEN:webkit-version -->15.4<!-- GEN:stop -->            | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Firefox <!-- GEN:firefox-version -->93.0<!-- GEN:stop -->          | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 Headless execution is supported for all the browsers on all platforms. Check out [system requirements](https://playwright.dev/docs/intro/#system-requirements) for details.
 
@@ -22,21 +22,21 @@ npm i -D playwright
 
 This installs Playwright and browser binaries for Chromium, Firefox and WebKit. Once installed, you can `require` Playwright in a Node.js script and automate web browser interactions.
 
-* [Getting started](https://playwright.dev/docs/intro)
-* [Installation configuration](https://playwright.dev/docs/installation)
-* [API reference](https://playwright.dev/docs/api/class-playwright)
+- [Getting started](https://playwright.dev/docs/intro)
+- [Installation configuration](https://playwright.dev/docs/installation)
+- [API reference](https://playwright.dev/docs/api/class-playwright)
 
 ## Capabilities
 
 Playwright is built to automate the broad and growing set of web browser capabilities used by Single Page Apps and Progressive Web Apps.
 
-* Scenarios that span multiple page, domains and iframes
-* Auto-wait for elements to be ready before executing actions (like click, fill)
-* Intercept network activity for stubbing and mocking network requests
-* Emulate mobile devices, geolocation, permissions
-* Support for web components via shadow-piercing selectors
-* Native input events for mouse and keyboard
-* Upload and download files
+- Scenarios that span multiple page, domains and iframes
+- Auto-wait for elements to be ready before executing actions (like click, fill)
+- Intercept network activity for stubbing and mocking network requests
+- Emulate mobile devices, geolocation, permissions
+- Support for web components via shadow-piercing selectors
+- Native input events for mouse and keyboard
+- Upload and download files
 
 ## Examples
 
@@ -45,18 +45,18 @@ Playwright is built to automate the broad and growing set of web browser capabil
 This code snippet navigates to whatsmyuseragent.org in Chromium, Firefox and WebKit, and saves 3 screenshots.
 
 ```js
-const playwright = require('playwright');
+const playwright = require('playwright')
 
-(async () => {
+;(async () => {
   for (const browserType of ['chromium', 'firefox', 'webkit']) {
-    const browser = await playwright[browserType].launch();
-    const context = await browser.newContext();
-    const page = await context.newPage();
-    await page.goto('http://whatsmyuseragent.org/');
-    await page.screenshot({ path: `example-${browserType}.png` });
-    await browser.close();
+    const browser = await playwright[browserType].launch()
+    const context = await browser.newContext()
+    const page = await context.newPage()
+    await page.goto('http://whatsmyuseragent.org/')
+    await page.screenshot({ path: `example-${browserType}.png` })
+    await browser.close()
   }
-})();
+})()
 ```
 
 #### Mobile and geolocation
@@ -64,24 +64,24 @@ const playwright = require('playwright');
 This snippet emulates Mobile Safari on a device at a given geolocation, navigates to maps.google.com, performs action and takes a screenshot.
 
 ```js
-const { webkit, devices } = require('playwright');
-const iPhone11 = devices['iPhone 11 Pro'];
+const { webkit, devices } = require('playwright')
+const iPhone11 = devices['iPhone 11 Pro']
 
-(async () => {
-  const browser = await webkit.launch();
+;(async () => {
+  const browser = await webkit.launch()
   const context = await browser.newContext({
     ...iPhone11,
     locale: 'en-US',
     geolocation: { longitude: 12.492507, latitude: 41.889938 },
     permissions: ['geolocation']
-  });
-  const page = await context.newPage();
-  await page.goto('https://maps.google.com');
-  await page.click('text="Your location"');
-  await page.waitForRequest(/.*preview\/pwa/);
-  await page.screenshot({ path: 'colosseum-iphone.png' });
-  await browser.close();
-})();
+  })
+  const page = await context.newPage()
+  await page.goto('https://maps.google.com')
+  await page.click('text="Your location"')
+  await page.waitForRequest(/.*preview\/pwa/)
+  await page.screenshot({ path: 'colosseum-iphone.png' })
+  await browser.close()
+})()
 ```
 
 #### Evaluate in browser context
@@ -89,24 +89,24 @@ const iPhone11 = devices['iPhone 11 Pro'];
 This code snippet navigates to example.com in Firefox, and executes a script in the page context.
 
 ```js
-const { firefox } = require('playwright');
+const { firefox } = require('playwright')
 
-(async () => {
-  const browser = await firefox.launch();
-  const context = await browser.newContext();
-  const page = await context.newPage();
-  await page.goto('https://www.example.com/');
+;(async () => {
+  const browser = await firefox.launch()
+  const context = await browser.newContext()
+  const page = await context.newPage()
+  await page.goto('https://www.example.com/')
   const dimensions = await page.evaluate(() => {
     return {
       width: document.documentElement.clientWidth,
       height: document.documentElement.clientHeight,
       deviceScaleFactor: window.devicePixelRatio
     }
-  });
-  console.log(dimensions);
+  })
+  console.log(dimensions)
 
-  await browser.close();
-})();
+  await browser.close()
+})()
 ```
 
 #### Intercept network requests
@@ -114,28 +114,28 @@ const { firefox } = require('playwright');
 This code snippet sets up request routing for a WebKit page to log all network requests.
 
 ```js
-const { webkit } = require('playwright');
+const { webkit } = require('playwright')
 
-(async () => {
-  const browser = await webkit.launch();
-  const context = await browser.newContext();
-  const page = await context.newPage();
+;(async () => {
+  const browser = await webkit.launch()
+  const context = await browser.newContext()
+  const page = await context.newPage()
 
   // Log and continue all network requests
-  page.route('**', route => {
-    console.log(route.request().url());
-    route.continue();
-  });
+  page.route('**', (route) => {
+    console.log(route.request().url())
+    route.continue()
+  })
 
-  await page.goto('http://todomvc.com');
-  await browser.close();
-})();
+  await page.goto('http://todomvc.com')
+  await browser.close()
+})()
 ```
 
 ## Resources
 
-* [Documentation](https://playwright.dev/docs/intro/)
-* [API reference](https://playwright.dev/docs/api/class-playwright/)
-* [Community showcase](https://playwright.dev/docs/showcase/)
-* [Contribution guide](CONTRIBUTING.md)
-* [Changelog](https://github.com/microsoft/playwright/releases)
+- [Documentation](https://playwright.dev/docs/intro/)
+- [API reference](https://playwright.dev/docs/api/class-playwright/)
+- [Community showcase](https://playwright.dev/docs/showcase/)
+- [Contribution guide](CONTRIBUTING.md)
+- [Changelog](https://github.com/microsoft/playwright/releases)

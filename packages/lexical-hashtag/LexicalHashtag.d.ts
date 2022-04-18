@@ -6,16 +6,16 @@
  *
  */
 
-import type {EditorConfig, LexicalNode, NodeKey} from 'lexical';
-import {TextNode} from 'lexical';
+import type { EditorConfig, LexicalNode, NodeKey } from 'lexical'
+import { TextNode } from 'lexical'
 
 export declare class HashtagNode extends TextNode {
-  getType(): string;
-  clone(node: HashtagNode): HashtagNode;
-  constructor(text: string, key?: NodeKey);
-  createDOM<EditorContext>(config: EditorConfig<EditorContext>): HTMLElement;
-  canInsertTextBefore(): boolean;
-  isTextEntity(): true;
+  getType(): string
+  clone(node: HashtagNode): HashtagNode
+  constructor(text: string, key?: NodeKey)
+  createDOM<EditorContext>(config: EditorConfig<EditorContext>): HTMLElement
+  canInsertTextBefore(): boolean
+  isTextEntity(): true
 }
-export function $createHashtagNode(text?: string): TextNode;
-export function $isHashtagNode(node: LexicalNode | null | undefined): boolean;
+export function $createHashtagNode(text?: string): TextNode
+export function $isHashtagNode(node: LexicalNode | null | undefined): boolean

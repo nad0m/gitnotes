@@ -7,32 +7,32 @@
  * @flow strict
  */
 
-import type {LexicalEditor} from 'lexical';
+import type { LexicalEditor } from 'lexical'
 
-import {$getSelection, $isRangeSelection, $isTextNode} from 'lexical';
+import { $getSelection, $isRangeSelection, $isTextNode } from 'lexical'
 
 export function registerDragonSupport(editor: LexicalEditor): () => void {
   const handler = (event) => {
-    const rootElement = editor.getRootElement();
+    const rootElement = editor.getRootElement()
     if (document.activeElement !== rootElement) {
-      return;
+      return
     }
-    const data = event.data;
+    const data = event.data
     if (typeof data === 'string') {
-      let parsedData;
+      let parsedData
       try {
-        parsedData = JSON.parse(data);
+        parsedData = JSON.parse(data)
       } catch (e) {
-        return;
+        return
       }
       if (
         parsedData &&
         parsedData.protocol === 'nuanria_messaging' &&
         parsedData.type === 'request'
       ) {
-        const payload = parsedData.payload;
+        const payload = parsedData.payload
         if (payload && payload.functionId === 'makeChanges') {
-          const args = payload.args;
+          const args = payload.args
           if (args) {
             const [
               elementStart,
@@ -40,69 +40,69 @@ export function registerDragonSupport(editor: LexicalEditor): () => void {
               text,
               selStart,
               selLength,
-              formatCommand,
-            ] = args;
+              formatCommand
+            ] = args
             // TODO: we should probably handle formatCommand somehow?
             // eslint-disable-next-line no-unused-expressions
-            formatCommand;
+            formatCommand
             editor.update(() => {
-              const selection = $getSelection();
+              const selection = $getSelection()
               if ($isRangeSelection(selection)) {
-                const anchor = selection.anchor;
-                let anchorNode = anchor.getNode();
-                let setSelStart = 0;
-                let setSelEnd = 0;
+                const anchor = selection.anchor
+                let anchorNode = anchor.getNode()
+                let setSelStart = 0
+                let setSelEnd = 0
                 if ($isTextNode(anchorNode)) {
                   // set initial selection
                   if (elementStart >= 0 && elementLength >= 0) {
-                    setSelStart = elementStart;
-                    setSelEnd = elementStart + elementLength;
+                    setSelStart = elementStart
+                    setSelEnd = elementStart + elementLength
                     // If the offset is more than the end, make it the end
                     selection.setTextNodeRange(
                       anchorNode,
                       setSelStart,
                       anchorNode,
-                      setSelEnd,
-                    );
+                      setSelEnd
+                    )
                   }
                 }
                 if (setSelStart !== setSelEnd || text !== '') {
-                  selection.insertRawText(text);
-                  anchorNode = anchor.getNode();
+                  selection.insertRawText(text)
+                  anchorNode = anchor.getNode()
                 }
                 if ($isTextNode(anchorNode)) {
                   // set final selection
-                  setSelStart = selStart;
-                  setSelEnd = selStart + selLength;
-                  const anchorNodeTextLength = anchorNode.getTextContentSize();
+                  setSelStart = selStart
+                  setSelEnd = selStart + selLength
+                  const anchorNodeTextLength = anchorNode.getTextContentSize()
                   // If the offset is more than the end, make it the end
                   setSelStart =
                     setSelStart > anchorNodeTextLength
                       ? anchorNodeTextLength
-                      : setSelStart;
+                      : setSelStart
                   setSelEnd =
                     setSelEnd > anchorNodeTextLength
                       ? anchorNodeTextLength
-                      : setSelEnd;
+                      : setSelEnd
                   selection.setTextNodeRange(
                     anchorNode,
                     setSelStart,
                     anchorNode,
-                    setSelEnd,
-                  );
+                    setSelEnd
+                  )
                 }
                 // block the chrome extension from handling this event
-                event.stopImmediatePropagation();
+                event.stopImmediatePropagation()
               }
-            });
+            })
           }
         }
       }
     }
-  };
-  window.addEventListener('message', handler, true);
+  }
+  window.addEventListener('message', handler, true)
 
   return () => {
-    window.removeEventListener('message', handler, true);
-  };
+    window.removeEventListener('message', handler, true)
+  }
 }

@@ -7,58 +7,58 @@
  * @flow strict
  */
 
-import type {LexicalNode, NodeKey} from 'lexical';
+import type { LexicalNode, NodeKey } from 'lexical'
 
-import './PollNode.css';
+import './PollNode.css'
 
-import {useCollaborationContext} from '@lexical/react/LexicalCollaborationPlugin';
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {$getNodeByKey, DecoratorNode} from 'lexical';
-import * as React from 'react';
-import {useCallback, useMemo, useRef} from 'react';
+import { useCollaborationContext } from '@lexical/react/LexicalCollaborationPlugin'
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { $getNodeByKey, DecoratorNode } from 'lexical'
+import * as React from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 
-import Button from '../ui/Button';
-import joinClasses from '../utils/join-classes';
+import Button from '../ui/Button'
+import joinClasses from '../utils/join-classes'
 
-type Options = $ReadOnlyArray<Option>;
+type Options = $ReadOnlyArray<Option>
 
 type Option = $ReadOnly<{
   text: string,
   uid: string,
-  votes: Array<number>,
-}>;
+  votes: Array<number>
+}>
 
 function createUID(): string {
   return Math.random()
     .toString(36)
     .replace(/[^a-z]+/g, '')
-    .substr(0, 5);
+    .substr(0, 5)
 }
 
 function createPollOption(text?: string = ''): Option {
   return {
     text,
     uid: createUID(),
-    votes: [],
-  };
+    votes: []
+  }
 }
 
 function cloneOption(
   option: Option,
   text: string,
-  votes?: Array<number>,
+  votes?: Array<number>
 ): Option {
   return {
     text,
     uid: option.uid,
-    votes: votes || Array.from(option.votes),
-  };
+    votes: votes || Array.from(option.votes)
+  }
 }
 
 function getTotalVotes(options: Options): number {
   return options.reduce((totalVotes, next) => {
-    return totalVotes + next.votes.length;
-  }, 0);
+    return totalVotes + next.votes.length
+  }, 0)
 }
 
 function PollOptionComponent({
@@ -66,38 +66,37 @@ function PollOptionComponent({
   index,
   options,
   totalVotes,
-  withPollNode,
+  withPollNode
 }: {
   index: number,
   option: Option,
   options: Options,
   totalVotes: number,
-  withPollNode: ((PollNode) => void) => void,
+  withPollNode: ((PollNode) => void) => void
 }): React$Node {
-  const {clientID} = useCollaborationContext();
-  const checkboxRef = useRef(null);
-  const votesArray = option.votes;
-  const checkedIndex = votesArray.indexOf(clientID);
-  const checked = checkedIndex !== -1;
-  const votes = votesArray.length;
-  const text = option.text;
+  const { clientID } = useCollaborationContext()
+  const checkboxRef = useRef(null)
+  const votesArray = option.votes
+  const checkedIndex = votesArray.indexOf(clientID)
+  const checked = checkedIndex !== -1
+  const votes = votesArray.length
+  const text = option.text
 
   return (
     <div className="PollNode__optionContainer">
       <div
         className={joinClasses(
           'PollNode__optionCheckboxWrapper',
-          checked && 'PollNode__optionCheckboxChecked',
-        )}
-      >
+          checked && 'PollNode__optionCheckboxChecked'
+        )}>
         <input
           ref={checkboxRef}
           className="PollNode__optionCheckbox"
           type="checkbox"
           onChange={(e) => {
             withPollNode((node) => {
-              node.toggleVote(option, clientID);
-            });
+              node.toggleVote(option, clientID)
+            })
           }}
           checked={checked}
         />
@@ -105,7 +104,7 @@ function PollOptionComponent({
       <div className="PollNode__optionInputWrapper">
         <div
           className="PollNode__optionInputVotes"
-          style={{width: `${votes === 0 ? 0 : (votes / totalVotes) * 100}%`}}
+          style={{ width: `${votes === 0 ? 0 : (votes / totalVotes) * 100}%` }}
         />
         <span className="PollNode__optionInputVotesCount">
           {votes > 0 && (votes === 1 ? '1 vote' : `${votes} votes`)}
@@ -116,8 +115,8 @@ function PollOptionComponent({
           value={text}
           onChange={(e) => {
             withPollNode((node) => {
-              node.setOptionText(option, e.target.value);
-            });
+              node.setOptionText(option, e.target.value)
+            })
           }}
           placeholder={`Option ${index + 1}`}
         />
@@ -126,54 +125,54 @@ function PollOptionComponent({
         disabled={options.length < 3}
         className={joinClasses(
           'PollNode__optionDelete',
-          options.length < 3 && 'PollNode__optionDeleteDisabled',
+          options.length < 3 && 'PollNode__optionDeleteDisabled'
         )}
         arial-label="Remove"
         onClick={() => {
           withPollNode((node) => {
-            node.deleteOption(option);
-          });
+            node.deleteOption(option)
+          })
         }}
       />
     </div>
-  );
+  )
 }
 
 function PollComponent({
   question,
   options,
-  nodeKey,
+  nodeKey
 }: {
   nodeKey: NodeKey,
   options: Options,
-  question: string,
+  question: string
 }): React$Node {
-  const [editor] = useLexicalComposerContext();
-  const totalVotes = useMemo(() => getTotalVotes(options), [options]);
+  const [editor] = useLexicalComposerContext()
+  const totalVotes = useMemo(() => getTotalVotes(options), [options])
 
   const withPollNode = useCallback(
     (cb: (node: PollNode) => void): void => {
       editor.update(() => {
-        const node = $getNodeByKey(nodeKey);
+        const node = $getNodeByKey(nodeKey)
         if ($isPollNode(node)) {
-          cb(node);
+          cb(node)
         }
-      });
+      })
     },
-    [editor, nodeKey],
-  );
+    [editor, nodeKey]
+  )
 
   const addOption = useCallback(() => {
     withPollNode((node) => {
-      node.addOption(createPollOption());
-    });
-  }, [withPollNode]);
+      node.addOption(createPollOption())
+    })
+  }, [withPollNode])
 
   return (
     <div className="PollNode__container">
       <h2 className="PollNode__heading">{question}</h2>
       {options.map((option, index) => {
-        const key = option.uid;
+        const key = option.uid
         return (
           <PollOptionComponent
             key={key}
@@ -183,7 +182,7 @@ function PollComponent({
             options={options}
             totalVotes={totalVotes}
           />
-        );
+        )
       })}
       <div className="PollNode__footer">
         <Button onClick={addOption} small={true}>
@@ -191,76 +190,76 @@ function PollComponent({
         </Button>
       </div>
     </div>
-  );
+  )
 }
 
 export class PollNode extends DecoratorNode<React$Node> {
-  __question: string;
-  __options: Options;
+  __question: string
+  __options: Options
 
   static getType(): string {
-    return 'poll';
+    return 'poll'
   }
 
   static clone(node: PollNode): PollNode {
-    return new PollNode(node.__question, node.__options, node.__key);
+    return new PollNode(node.__question, node.__options, node.__key)
   }
 
   constructor(question: string, options?: Options, key?: NodeKey) {
-    super(key);
-    this.__question = question;
-    this.__options = options || [createPollOption(), createPollOption()];
+    super(key)
+    this.__question = question
+    this.__options = options || [createPollOption(), createPollOption()]
   }
 
   addOption(option: Option): void {
-    const self = this.getWritable();
-    const options = Array.from(self.__options);
-    options.push(option);
-    self.__options = options;
+    const self = this.getWritable()
+    const options = Array.from(self.__options)
+    options.push(option)
+    self.__options = options
   }
 
   deleteOption(option: Option): void {
-    const self = this.getWritable();
-    const options = Array.from(self.__options);
-    const index = options.indexOf(option);
-    options.splice(index, 1);
-    self.__options = options;
+    const self = this.getWritable()
+    const options = Array.from(self.__options)
+    const index = options.indexOf(option)
+    options.splice(index, 1)
+    self.__options = options
   }
 
   setOptionText(option: Option, text: string): void {
-    const self = this.getWritable();
-    const clonedOption = cloneOption(option, text);
-    const options = Array.from(self.__options);
-    const index = options.indexOf(option);
-    options[index] = clonedOption;
-    self.__options = options;
+    const self = this.getWritable()
+    const clonedOption = cloneOption(option, text)
+    const options = Array.from(self.__options)
+    const index = options.indexOf(option)
+    options[index] = clonedOption
+    self.__options = options
   }
 
   toggleVote(option: Option, clientID: number): void {
-    const self = this.getWritable();
-    const votes = option.votes;
-    const votesClone = Array.from(votes);
-    const voteIndex = votes.indexOf(clientID);
+    const self = this.getWritable()
+    const votes = option.votes
+    const votesClone = Array.from(votes)
+    const voteIndex = votes.indexOf(clientID)
     if (voteIndex === -1) {
-      votesClone.push(clientID);
+      votesClone.push(clientID)
     } else {
-      votesClone.splice(voteIndex, 1);
+      votesClone.splice(voteIndex, 1)
     }
-    const clonedOption = cloneOption(option, option.text, votesClone);
-    const options = Array.from(self.__options);
-    const index = options.indexOf(option);
-    options[index] = clonedOption;
-    self.__options = options;
+    const clonedOption = cloneOption(option, option.text, votesClone)
+    const options = Array.from(self.__options)
+    const index = options.indexOf(option)
+    options[index] = clonedOption
+    self.__options = options
   }
 
   createDOM(): HTMLElement {
-    const elem = document.createElement('span');
-    elem.style.display = 'inline-block';
-    return elem;
+    const elem = document.createElement('span')
+    elem.style.display = 'inline-block'
+    return elem
   }
 
   updateDOM(): false {
-    return false;
+    return false
   }
 
   decorate(): React$Node {
@@ -270,14 +269,14 @@ export class PollNode extends DecoratorNode<React$Node> {
         options={this.__options}
         nodeKey={this.__key}
       />
-    );
+    )
   }
 }
 
 export function $createPollNode(question: string): PollNode {
-  return new PollNode(question);
+  return new PollNode(question)
 }
 
 export function $isPollNode(node: ?LexicalNode): boolean %checks {
-  return node instanceof PollNode;
+  return node instanceof PollNode
 }

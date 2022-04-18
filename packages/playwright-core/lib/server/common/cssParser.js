@@ -1,16 +1,54 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.parseCSS = parseCSS;
-exports.serializeSelector = serializeSelector;
+})
+exports.parseCSS = parseCSS
+exports.serializeSelector = serializeSelector
 
-var css = _interopRequireWildcard(require("./cssTokenizer"));
+var css = _interopRequireWildcard(require('./cssTokenizer'))
 
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+function _getRequireWildcardCache(nodeInterop) {
+  if (typeof WeakMap !== 'function') return null
+  var cacheBabelInterop = new WeakMap()
+  var cacheNodeInterop = new WeakMap()
+  return (_getRequireWildcardCache = function (nodeInterop) {
+    return nodeInterop ? cacheNodeInterop : cacheBabelInterop
+  })(nodeInterop)
+}
 
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+function _interopRequireWildcard(obj, nodeInterop) {
+  if (!nodeInterop && obj && obj.__esModule) {
+    return obj
+  }
+  if (obj === null || (typeof obj !== 'object' && typeof obj !== 'function')) {
+    return { default: obj }
+  }
+  var cache = _getRequireWildcardCache(nodeInterop)
+  if (cache && cache.has(obj)) {
+    return cache.get(obj)
+  }
+  var newObj = {}
+  var hasPropertyDescriptor =
+    Object.defineProperty && Object.getOwnPropertyDescriptor
+  for (var key in obj) {
+    if (key !== 'default' && Object.prototype.hasOwnProperty.call(obj, key)) {
+      var desc = hasPropertyDescriptor
+        ? Object.getOwnPropertyDescriptor(obj, key)
+        : null
+      if (desc && (desc.get || desc.set)) {
+        Object.defineProperty(newObj, key, desc)
+      } else {
+        newObj[key] = obj[key]
+      }
+    }
+  }
+  newObj.default = obj
+  if (cache) {
+    cache.set(obj, newObj)
+  }
+  return newObj
+}
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -28,228 +66,275 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
  * limitations under the License.
  */
 function parseCSS(selector, customNames) {
-  let tokens;
+  let tokens
 
   try {
-    tokens = css.tokenize(selector);
-    if (!(tokens[tokens.length - 1] instanceof css.EOFToken)) tokens.push(new css.EOFToken());
+    tokens = css.tokenize(selector)
+    if (!(tokens[tokens.length - 1] instanceof css.EOFToken))
+      tokens.push(new css.EOFToken())
   } catch (e) {
-    const newMessage = e.message + ` while parsing selector "${selector}"`;
-    const index = (e.stack || '').indexOf(e.message);
-    if (index !== -1) e.stack = e.stack.substring(0, index) + newMessage + e.stack.substring(index + e.message.length);
-    e.message = newMessage;
-    throw e;
+    const newMessage = e.message + ` while parsing selector "${selector}"`
+    const index = (e.stack || '').indexOf(e.message)
+    if (index !== -1)
+      e.stack =
+        e.stack.substring(0, index) +
+        newMessage +
+        e.stack.substring(index + e.message.length)
+    e.message = newMessage
+    throw e
   }
 
-  const unsupportedToken = tokens.find(token => {
-    return token instanceof css.AtKeywordToken || token instanceof css.BadStringToken || token instanceof css.BadURLToken || token instanceof css.ColumnToken || token instanceof css.CDOToken || token instanceof css.CDCToken || token instanceof css.SemicolonToken || token instanceof css.OpenCurlyToken || token instanceof css.CloseCurlyToken || token instanceof css.URLToken || token instanceof css.PercentageToken;
-  });
-  if (unsupportedToken) throw new Error(`Unsupported token "${unsupportedToken.toSource()}" while parsing selector "${selector}"`);
-  let pos = 0;
-  const names = new Set();
+  const unsupportedToken = tokens.find((token) => {
+    return (
+      token instanceof css.AtKeywordToken ||
+      token instanceof css.BadStringToken ||
+      token instanceof css.BadURLToken ||
+      token instanceof css.ColumnToken ||
+      token instanceof css.CDOToken ||
+      token instanceof css.CDCToken ||
+      token instanceof css.SemicolonToken ||
+      token instanceof css.OpenCurlyToken ||
+      token instanceof css.CloseCurlyToken ||
+      token instanceof css.URLToken ||
+      token instanceof css.PercentageToken
+    )
+  })
+  if (unsupportedToken)
+    throw new Error(
+      `Unsupported token "${unsupportedToken.toSource()}" while parsing selector "${selector}"`
+    )
+  let pos = 0
+  const names = new Set()
 
   function unexpected() {
-    return new Error(`Unexpected token "${tokens[pos].toSource()}" while parsing selector "${selector}"`);
+    return new Error(
+      `Unexpected token "${tokens[
+        pos
+      ].toSource()}" while parsing selector "${selector}"`
+    )
   }
 
   function skipWhitespace() {
-    while (tokens[pos] instanceof css.WhitespaceToken) pos++;
+    while (tokens[pos] instanceof css.WhitespaceToken) pos++
   }
 
   function isIdent(p = pos) {
-    return tokens[p] instanceof css.IdentToken;
+    return tokens[p] instanceof css.IdentToken
   }
 
   function isString(p = pos) {
-    return tokens[p] instanceof css.StringToken;
+    return tokens[p] instanceof css.StringToken
   }
 
   function isNumber(p = pos) {
-    return tokens[p] instanceof css.NumberToken;
+    return tokens[p] instanceof css.NumberToken
   }
 
   function isComma(p = pos) {
-    return tokens[p] instanceof css.CommaToken;
+    return tokens[p] instanceof css.CommaToken
   }
 
   function isCloseParen(p = pos) {
-    return tokens[p] instanceof css.CloseParenToken;
+    return tokens[p] instanceof css.CloseParenToken
   }
 
   function isStar(p = pos) {
-    return tokens[p] instanceof css.DelimToken && tokens[p].value === '*';
+    return tokens[p] instanceof css.DelimToken && tokens[p].value === '*'
   }
 
   function isEOF(p = pos) {
-    return tokens[p] instanceof css.EOFToken;
+    return tokens[p] instanceof css.EOFToken
   }
 
   function isClauseCombinator(p = pos) {
-    return tokens[p] instanceof css.DelimToken && ['>', '+', '~'].includes(tokens[p].value);
+    return (
+      tokens[p] instanceof css.DelimToken &&
+      ['>', '+', '~'].includes(tokens[p].value)
+    )
   }
 
   function isSelectorClauseEnd(p = pos) {
-    return isComma(p) || isCloseParen(p) || isEOF(p) || isClauseCombinator(p) || tokens[p] instanceof css.WhitespaceToken;
+    return (
+      isComma(p) ||
+      isCloseParen(p) ||
+      isEOF(p) ||
+      isClauseCombinator(p) ||
+      tokens[p] instanceof css.WhitespaceToken
+    )
   }
 
   function consumeFunctionArguments() {
-    const result = [consumeArgument()];
+    const result = [consumeArgument()]
 
     while (true) {
-      skipWhitespace();
-      if (!isComma()) break;
-      pos++;
-      result.push(consumeArgument());
+      skipWhitespace()
+      if (!isComma()) break
+      pos++
+      result.push(consumeArgument())
     }
 
-    return result;
+    return result
   }
 
   function consumeArgument() {
-    skipWhitespace();
-    if (isNumber()) return tokens[pos++].value;
-    if (isString()) return tokens[pos++].value;
-    return consumeComplexSelector();
+    skipWhitespace()
+    if (isNumber()) return tokens[pos++].value
+    if (isString()) return tokens[pos++].value
+    return consumeComplexSelector()
   }
 
   function consumeComplexSelector() {
     const result = {
       simples: []
-    };
-    skipWhitespace();
+    }
+    skipWhitespace()
 
     if (isClauseCombinator()) {
       // Put implicit ":scope" at the start. https://drafts.csswg.org/selectors-4/#absolutize
       result.simples.push({
         selector: {
-          functions: [{
-            name: 'scope',
-            args: []
-          }]
+          functions: [
+            {
+              name: 'scope',
+              args: []
+            }
+          ]
         },
         combinator: ''
-      });
+      })
     } else {
       result.simples.push({
         selector: consumeSimpleSelector(),
         combinator: ''
-      });
+      })
     }
 
     while (true) {
-      skipWhitespace();
+      skipWhitespace()
 
       if (isClauseCombinator()) {
-        result.simples[result.simples.length - 1].combinator = tokens[pos++].value;
-        skipWhitespace();
+        result.simples[result.simples.length - 1].combinator =
+          tokens[pos++].value
+        skipWhitespace()
       } else if (isSelectorClauseEnd()) {
-        break;
+        break
       }
 
       result.simples.push({
         combinator: '',
         selector: consumeSimpleSelector()
-      });
+      })
     }
 
-    return result;
+    return result
   }
 
   function consumeSimpleSelector() {
-    let rawCSSString = '';
-    const functions = [];
+    let rawCSSString = ''
+    const functions = []
 
     while (!isSelectorClauseEnd()) {
       if (isIdent() || isStar()) {
-        rawCSSString += tokens[pos++].toSource();
+        rawCSSString += tokens[pos++].toSource()
       } else if (tokens[pos] instanceof css.HashToken) {
-        rawCSSString += tokens[pos++].toSource();
-      } else if (tokens[pos] instanceof css.DelimToken && tokens[pos].value === '.') {
-        pos++;
-        if (isIdent()) rawCSSString += '.' + tokens[pos++].toSource();else throw unexpected();
+        rawCSSString += tokens[pos++].toSource()
+      } else if (
+        tokens[pos] instanceof css.DelimToken &&
+        tokens[pos].value === '.'
+      ) {
+        pos++
+        if (isIdent()) rawCSSString += '.' + tokens[pos++].toSource()
+        else throw unexpected()
       } else if (tokens[pos] instanceof css.ColonToken) {
-        pos++;
+        pos++
 
         if (isIdent()) {
           if (!customNames.has(tokens[pos].value.toLowerCase())) {
-            rawCSSString += ':' + tokens[pos++].toSource();
+            rawCSSString += ':' + tokens[pos++].toSource()
           } else {
-            const name = tokens[pos++].value.toLowerCase();
+            const name = tokens[pos++].value.toLowerCase()
             functions.push({
               name,
               args: []
-            });
-            names.add(name);
+            })
+            names.add(name)
           }
         } else if (tokens[pos] instanceof css.FunctionToken) {
-          const name = tokens[pos++].value.toLowerCase();
+          const name = tokens[pos++].value.toLowerCase()
 
           if (!customNames.has(name)) {
-            rawCSSString += `:${name}(${consumeBuiltinFunctionArguments()})`;
+            rawCSSString += `:${name}(${consumeBuiltinFunctionArguments()})`
           } else {
             functions.push({
               name,
               args: consumeFunctionArguments()
-            });
-            names.add(name);
+            })
+            names.add(name)
           }
 
-          skipWhitespace();
-          if (!isCloseParen()) throw unexpected();
-          pos++;
+          skipWhitespace()
+          if (!isCloseParen()) throw unexpected()
+          pos++
         } else {
-          throw unexpected();
+          throw unexpected()
         }
       } else if (tokens[pos] instanceof css.OpenSquareToken) {
-        rawCSSString += '[';
-        pos++;
+        rawCSSString += '['
+        pos++
 
-        while (!(tokens[pos] instanceof css.CloseSquareToken) && !isEOF()) rawCSSString += tokens[pos++].toSource();
+        while (!(tokens[pos] instanceof css.CloseSquareToken) && !isEOF())
+          rawCSSString += tokens[pos++].toSource()
 
-        if (!(tokens[pos] instanceof css.CloseSquareToken)) throw unexpected();
-        rawCSSString += ']';
-        pos++;
+        if (!(tokens[pos] instanceof css.CloseSquareToken)) throw unexpected()
+        rawCSSString += ']'
+        pos++
       } else {
-        throw unexpected();
+        throw unexpected()
       }
     }
 
-    if (!rawCSSString && !functions.length) throw unexpected();
+    if (!rawCSSString && !functions.length) throw unexpected()
     return {
       css: rawCSSString || undefined,
       functions
-    };
+    }
   }
 
   function consumeBuiltinFunctionArguments() {
-    let s = '';
+    let s = ''
 
-    while (!isCloseParen() && !isEOF()) s += tokens[pos++].toSource();
+    while (!isCloseParen() && !isEOF()) s += tokens[pos++].toSource()
 
-    return s;
+    return s
   }
 
-  const result = consumeFunctionArguments();
-  if (!isEOF()) throw new Error(`Error while parsing selector "${selector}"`);
-  if (result.some(arg => typeof arg !== 'object' || !('simples' in arg))) throw new Error(`Error while parsing selector "${selector}"`);
+  const result = consumeFunctionArguments()
+  if (!isEOF()) throw new Error(`Error while parsing selector "${selector}"`)
+  if (result.some((arg) => typeof arg !== 'object' || !('simples' in arg)))
+    throw new Error(`Error while parsing selector "${selector}"`)
   return {
     selector: result,
     names: Array.from(names)
-  };
+  }
 }
 
 function serializeSelector(args) {
-  return args.map(arg => {
-    if (typeof arg === 'string') return `"${arg}"`;
-    if (typeof arg === 'number') return String(arg);
-    return arg.simples.map(({
-      selector,
-      combinator
-    }) => {
-      let s = selector.css || '';
-      s = s + selector.functions.map(func => `:${func.name}(${serializeSelector(func.args)})`).join('');
-      if (combinator) s += ' ' + combinator;
-      return s;
-    }).join(' ');
-  }).join(', ');
+  return args
+    .map((arg) => {
+      if (typeof arg === 'string') return `"${arg}"`
+      if (typeof arg === 'number') return String(arg)
+      return arg.simples
+        .map(({ selector, combinator }) => {
+          let s = selector.css || ''
+          s =
+            s +
+            selector.functions
+              .map((func) => `:${func.name}(${serializeSelector(func.args)})`)
+              .join('')
+          if (combinator) s += ' ' + combinator
+          return s
+        })
+        .join(' ')
+    })
+    .join(', ')
 }

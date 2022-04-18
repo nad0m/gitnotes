@@ -1,13 +1,15 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.CRDevTools = void 0;
+})
+exports.CRDevTools = void 0
 
-var _fs = _interopRequireDefault(require("fs"));
+var _fs = _interopRequireDefault(require('fs'))
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj }
+}
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -24,60 +26,71 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const kBindingName = '__pw_devtools__'; // This class intercepts preferences-related DevTools embedder methods
+const kBindingName = '__pw_devtools__' // This class intercepts preferences-related DevTools embedder methods
 // and stores preferences as a json file in the browser installation directory.
 
 class CRDevTools {
   constructor(preferencesPath) {
-    this._preferencesPath = void 0;
-    this._prefs = void 0;
-    this._savePromise = void 0;
-    this.__testHookOnBinding = void 0;
-    this._preferencesPath = preferencesPath;
-    this._savePromise = Promise.resolve();
+    this._preferencesPath = void 0
+    this._prefs = void 0
+    this._savePromise = void 0
+    this.__testHookOnBinding = void 0
+    this._preferencesPath = preferencesPath
+    this._savePromise = Promise.resolve()
   }
 
   install(session) {
-    session.on('Runtime.bindingCalled', async event => {
-      if (event.name !== kBindingName) return;
-      const parsed = JSON.parse(event.payload);
-      let result = undefined;
-      if (this.__testHookOnBinding) this.__testHookOnBinding(parsed);
+    session.on('Runtime.bindingCalled', async (event) => {
+      if (event.name !== kBindingName) return
+      const parsed = JSON.parse(event.payload)
+      let result = undefined
+      if (this.__testHookOnBinding) this.__testHookOnBinding(parsed)
 
       if (parsed.method === 'getPreferences') {
         if (this._prefs === undefined) {
           try {
-            const json = await _fs.default.promises.readFile(this._preferencesPath, 'utf8');
-            this._prefs = JSON.parse(json);
+            const json = await _fs.default.promises.readFile(
+              this._preferencesPath,
+              'utf8'
+            )
+            this._prefs = JSON.parse(json)
           } catch (e) {
-            this._prefs = {};
+            this._prefs = {}
           }
         }
 
-        result = this._prefs;
+        result = this._prefs
       } else if (parsed.method === 'setPreference') {
-        this._prefs[parsed.params[0]] = parsed.params[1];
+        this._prefs[parsed.params[0]] = parsed.params[1]
 
-        this._save();
+        this._save()
       } else if (parsed.method === 'removePreference') {
-        delete this._prefs[parsed.params[0]];
+        delete this._prefs[parsed.params[0]]
 
-        this._save();
+        this._save()
       } else if (parsed.method === 'clearPreferences') {
-        this._prefs = {};
+        this._prefs = {}
 
-        this._save();
+        this._save()
       }
 
-      session.send('Runtime.evaluate', {
-        expression: `window.DevToolsAPI.embedderMessageAck(${parsed.id}, ${JSON.stringify(result)})`,
-        contextId: event.executionContextId
-      }).catch(e => null);
-    });
-    Promise.all([session.send('Runtime.enable'), session.send('Runtime.addBinding', {
-      name: kBindingName
-    }), session.send('Page.enable'), session.send('Page.addScriptToEvaluateOnNewDocument', {
-      source: `
+      session
+        .send('Runtime.evaluate', {
+          expression: `window.DevToolsAPI.embedderMessageAck(${
+            parsed.id
+          }, ${JSON.stringify(result)})`,
+          contextId: event.executionContextId
+        })
+        .catch((e) => null)
+    })
+    Promise.all([
+      session.send('Runtime.enable'),
+      session.send('Runtime.addBinding', {
+        name: kBindingName
+      }),
+      session.send('Page.enable'),
+      session.send('Page.addScriptToEvaluateOnNewDocument', {
+        source: `
         (() => {
           const init = () => {
             // Lazy init happens when InspectorFrontendHost is initialized.
@@ -100,16 +113,19 @@ class CRDevTools {
           });
         })()
       `
-    }), session.send('Runtime.runIfWaitingForDebugger')]).catch(e => null);
+      }),
+      session.send('Runtime.runIfWaitingForDebugger')
+    ]).catch((e) => null)
   }
 
   _save() {
     // Serialize saves to avoid corruption.
     this._savePromise = this._savePromise.then(async () => {
-      await _fs.default.promises.writeFile(this._preferencesPath, JSON.stringify(this._prefs)).catch(e => null);
-    });
+      await _fs.default.promises
+        .writeFile(this._preferencesPath, JSON.stringify(this._prefs))
+        .catch((e) => null)
+    })
   }
-
 }
 
-exports.CRDevTools = CRDevTools;
+exports.CRDevTools = CRDevTools

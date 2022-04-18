@@ -1,13 +1,13 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.Dialog = void 0;
+})
+exports.Dialog = void 0
 
-var _utils = require("../utils/utils");
+var _utils = require('../utils/utils')
 
-var _instrumentation = require("./instrumentation");
+var _instrumentation = require('./instrumentation')
 
 /**
  * Copyright 2017 Google Inc. All rights reserved.
@@ -27,52 +27,57 @@ var _instrumentation = require("./instrumentation");
  */
 class Dialog extends _instrumentation.SdkObject {
   constructor(page, type, message, onHandle, defaultValue) {
-    super(page, 'dialog');
-    this._page = void 0;
-    this._type = void 0;
-    this._message = void 0;
-    this._onHandle = void 0;
-    this._handled = false;
-    this._defaultValue = void 0;
-    this._page = page;
-    this._type = type;
-    this._message = message;
-    this._onHandle = onHandle;
-    this._defaultValue = defaultValue || '';
+    super(page, 'dialog')
+    this._page = void 0
+    this._type = void 0
+    this._message = void 0
+    this._onHandle = void 0
+    this._handled = false
+    this._defaultValue = void 0
+    this._page = page
+    this._type = type
+    this._message = message
+    this._onHandle = onHandle
+    this._defaultValue = defaultValue || ''
 
-    this._page._frameManager.dialogDidOpen();
+    this._page._frameManager.dialogDidOpen()
   }
 
   type() {
-    return this._type;
+    return this._type
   }
 
   message() {
-    return this._message;
+    return this._message
   }
 
   defaultValue() {
-    return this._defaultValue;
+    return this._defaultValue
   }
 
   async accept(promptText) {
-    (0, _utils.assert)(!this._handled, 'Cannot accept dialog which is already handled!');
-    this._handled = true;
+    ;(0, _utils.assert)(
+      !this._handled,
+      'Cannot accept dialog which is already handled!'
+    )
+    this._handled = true
 
-    this._page._frameManager.dialogWillClose();
+    this._page._frameManager.dialogWillClose()
 
-    await this._onHandle(true, promptText);
+    await this._onHandle(true, promptText)
   }
 
   async dismiss() {
-    (0, _utils.assert)(!this._handled, 'Cannot dismiss dialog which is already handled!');
-    this._handled = true;
+    ;(0, _utils.assert)(
+      !this._handled,
+      'Cannot dismiss dialog which is already handled!'
+    )
+    this._handled = true
 
-    this._page._frameManager.dialogWillClose();
+    this._page._frameManager.dialogWillClose()
 
-    await this._onHandle(false);
+    await this._onHandle(false)
   }
-
 }
 
-exports.Dialog = Dialog;
+exports.Dialog = Dialog

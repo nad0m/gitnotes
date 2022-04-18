@@ -7,7 +7,7 @@
  * @flow strict
  */
 
-import type {LexicalEditor} from 'lexical';
+import type { LexicalEditor } from 'lexical'
 
 declare export default function TreeView(props: {
   timeTravelPanelClassName: string,
@@ -15,5 +15,5 @@ declare export default function TreeView(props: {
   timeTravelPanelButtonClassName: string,
   timeTravelButtonClassName: string,
   viewClassName: string,
-  editor: LexicalEditor,
-}): React$Node;
+  editor: LexicalEditor
+}): React$Node

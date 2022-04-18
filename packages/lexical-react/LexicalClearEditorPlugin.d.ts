@@ -7,10 +7,10 @@
  * @flow strict
  */
 
-import {$ReadOnly} from 'utility-types';
+import { $ReadOnly } from 'utility-types'
 type Props = $ReadOnly<{
-  onClear?: () => void;
-}>;
+  onClear?: () => void
+}>
 export default function LexicalClearEditorPlugin(
-  arg0: Props,
-): JSX.Element | null;
+  arg0: Props
+): JSX.Element | null

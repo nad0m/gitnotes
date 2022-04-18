@@ -13,8 +13,8 @@ import type {
   GridSelection,
   LexicalEditor,
   NodeSelection,
-  RangeSelection,
-} from 'lexical';
+  RangeSelection
+} from 'lexical'
 
 import {
   $getRoot,
@@ -22,29 +22,29 @@ import {
   $isElementNode,
   $isGridSelection,
   $isRangeSelection,
-  $isTextNode,
-} from 'lexical';
-import * as React from 'react';
-import {useEffect, useRef, useState} from 'react';
+  $isTextNode
+} from 'lexical'
+import * as React from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 const NON_SINGLE_WIDTH_CHARS_REPLACEMENT: $ReadOnly<{
-  [string]: string,
+  [string]: string
 }> = Object.freeze({
   '\t': '\\t',
-  '\n': '\\n',
-});
+  '\n': '\\n'
+})
 const NON_SINGLE_WIDTH_CHARS_REGEX = new RegExp(
   Object.keys(NON_SINGLE_WIDTH_CHARS_REPLACEMENT).join('|'),
-  'g',
-);
+  'g'
+)
 const SYMBOLS = Object.freeze({
   ancestorHasNextSibling: '|',
   ancestorIsLastChild: ' ',
   hasNextSibling: '├',
   isLastChild: '└',
   selectedChar: '^',
-  selectedLine: '>',
-});
+  selectedLine: '>'
+})
 
 export default function TreeView({
   timeTravelButtonClassName,
@@ -52,101 +52,100 @@ export default function TreeView({
   timeTravelPanelButtonClassName,
   viewClassName,
   timeTravelPanelClassName,
-  editor,
+  editor
 }: {
   editor: LexicalEditor,
   timeTravelButtonClassName: string,
   timeTravelPanelButtonClassName: string,
   timeTravelPanelClassName: string,
   timeTravelPanelSliderClassName: string,
-  viewClassName: string,
+  viewClassName: string
 }): React$Node {
-  const [timeStampedEditorStates, setTimeStampedEditorStates] = useState([]);
-  const [content, setContent] = useState<string>('');
-  const [timeTravelEnabled, setTimeTravelEnabled] = useState(false);
-  const playingIndexRef = useRef(0);
-  const treeElementRef = useRef<HTMLPreElement | null>(null);
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [timeStampedEditorStates, setTimeStampedEditorStates] = useState([])
+  const [content, setContent] = useState<string>('')
+  const [timeTravelEnabled, setTimeTravelEnabled] = useState(false)
+  const playingIndexRef = useRef(0)
+  const treeElementRef = useRef<HTMLPreElement | null>(null)
+  const inputRef = useRef<HTMLInputElement | null>(null)
+  const [isPlaying, setIsPlaying] = useState(false)
   useEffect(() => {
-    setContent(generateContent(editor.getEditorState()));
-    return editor.registerUpdateListener(({editorState}) => {
-      const compositionKey = editor._compositionKey;
-      const treeText = generateContent(editor.getEditorState());
+    setContent(generateContent(editor.getEditorState()))
+    return editor.registerUpdateListener(({ editorState }) => {
+      const compositionKey = editor._compositionKey
+      const treeText = generateContent(editor.getEditorState())
       const compositionText =
-        compositionKey !== null && `Composition key: ${compositionKey}`;
-      setContent([treeText, compositionText].filter(Boolean).join('\n\n'));
+        compositionKey !== null && `Composition key: ${compositionKey}`
+      setContent([treeText, compositionText].filter(Boolean).join('\n\n'))
       if (!timeTravelEnabled) {
         setTimeStampedEditorStates((currentEditorStates) => [
           ...currentEditorStates,
-          [Date.now(), editorState],
-        ]);
+          [Date.now(), editorState]
+        ])
       }
-    });
-  }, [timeTravelEnabled, editor]);
-  const totalEditorStates = timeStampedEditorStates.length;
+    })
+  }, [timeTravelEnabled, editor])
+  const totalEditorStates = timeStampedEditorStates.length
 
   useEffect(() => {
     if (isPlaying) {
-      let timeoutId;
+      let timeoutId
 
       const play = () => {
-        const currentIndex = playingIndexRef.current;
+        const currentIndex = playingIndexRef.current
         if (currentIndex === totalEditorStates - 1) {
-          setIsPlaying(false);
-          return;
+          setIsPlaying(false)
+          return
         }
-        const currentTime = timeStampedEditorStates[currentIndex][0];
-        const nextTime = timeStampedEditorStates[currentIndex + 1][0];
-        const timeDiff = nextTime - currentTime;
+        const currentTime = timeStampedEditorStates[currentIndex][0]
+        const nextTime = timeStampedEditorStates[currentIndex + 1][0]
+        const timeDiff = nextTime - currentTime
         timeoutId = setTimeout(() => {
-          playingIndexRef.current++;
-          const index = playingIndexRef.current;
-          const input = inputRef.current;
+          playingIndexRef.current++
+          const index = playingIndexRef.current
+          const input = inputRef.current
           if (input !== null) {
-            input.value = String(index);
+            input.value = String(index)
           }
-          editor.setEditorState(timeStampedEditorStates[index][1]);
-          play();
-        }, timeDiff);
-      };
+          editor.setEditorState(timeStampedEditorStates[index][1])
+          play()
+        }, timeDiff)
+      }
 
-      play();
+      play()
 
       return () => {
-        window.clearTimeout(timeoutId);
-      };
+        window.clearTimeout(timeoutId)
+      }
     }
-  }, [timeStampedEditorStates, isPlaying, editor, totalEditorStates]);
+  }, [timeStampedEditorStates, isPlaying, editor, totalEditorStates])
 
   useEffect(() => {
-    const element = treeElementRef.current;
+    const element = treeElementRef.current
 
     if (element !== null) {
       // $FlowExpectedError[prop-missing] Internal field
-      element.__lexicalEditor = editor;
+      element.__lexicalEditor = editor
 
       return () => {
         // $FlowExpectedError[prop-missing] Internal field
-        element.__lexicalEditor = null;
-      };
+        element.__lexicalEditor = null
+      }
     }
-  }, [editor]);
+  }, [editor])
 
   return (
     <div className={viewClassName}>
       {!timeTravelEnabled && totalEditorStates > 2 && (
         <button
           onClick={() => {
-            const rootElement = editor.getRootElement();
+            const rootElement = editor.getRootElement()
             if (rootElement !== null) {
-              rootElement.contentEditable = 'false';
-              playingIndexRef.current = totalEditorStates - 1;
-              setTimeTravelEnabled(true);
+              rootElement.contentEditable = 'false'
+              playingIndexRef.current = totalEditorStates - 1
+              setTimeTravelEnabled(true)
             }
           }}
-          className={timeTravelButtonClassName}
-        >
+          className={timeTravelButtonClassName}>
           Time Travel
         </button>
       )}
@@ -156,21 +155,20 @@ export default function TreeView({
           <button
             className={timeTravelPanelButtonClassName}
             onClick={() => {
-              setIsPlaying(!isPlaying);
-            }}
-          >
+              setIsPlaying(!isPlaying)
+            }}>
             {isPlaying ? 'Pause' : 'Play'}
           </button>
           <input
             className={timeTravelPanelSliderClassName}
             ref={inputRef}
             onChange={(event) => {
-              const editorStateIndex = Number(event.target.value);
+              const editorStateIndex = Number(event.target.value)
               const timeStampedEditorState =
-                timeStampedEditorStates[editorStateIndex];
+                timeStampedEditorStates[editorStateIndex]
               if (timeStampedEditorState) {
-                playingIndexRef.current = editorStateIndex;
-                editor.setEditorState(timeStampedEditorState[1]);
+                playingIndexRef.current = editorStateIndex
+                editor.setEditorState(timeStampedEditorState[1])
               }
             }}
             type="range"
@@ -180,72 +178,71 @@ export default function TreeView({
           <button
             className={timeTravelPanelButtonClassName}
             onClick={() => {
-              const rootElement = editor.getRootElement();
+              const rootElement = editor.getRootElement()
               if (rootElement !== null) {
-                rootElement.contentEditable = 'true';
-                const index = timeStampedEditorStates.length - 1;
-                const timeStampedEditorState = timeStampedEditorStates[index];
-                editor.setEditorState(timeStampedEditorState[1]);
-                const input = inputRef.current;
+                rootElement.contentEditable = 'true'
+                const index = timeStampedEditorStates.length - 1
+                const timeStampedEditorState = timeStampedEditorStates[index]
+                editor.setEditorState(timeStampedEditorState[1])
+                const input = inputRef.current
                 if (input !== null) {
-                  input.value = String(index);
+                  input.value = String(index)
                 }
-                setTimeTravelEnabled(false);
-                setIsPlaying(false);
+                setTimeTravelEnabled(false)
+                setIsPlaying(false)
               }
-            }}
-          >
+            }}>
             Exit
           </button>
         </div>
       )}
     </div>
-  );
+  )
 }
 
 function printRangeSelection(selection: RangeSelection): string {
-  let res = '';
+  let res = ''
 
-  const formatText = printFormatProperties(selection);
-  res += `: range ${formatText !== '' ? `{ ${formatText} }` : ''}`;
+  const formatText = printFormatProperties(selection)
+  res += `: range ${formatText !== '' ? `{ ${formatText} }` : ''}`
 
-  const anchor = selection.anchor;
-  const focus = selection.focus;
-  const anchorOffset = anchor.offset;
-  const focusOffset = focus.offset;
+  const anchor = selection.anchor
+  const focus = selection.focus
+  const anchorOffset = anchor.offset
+  const focusOffset = focus.offset
 
   res += `\n  ├ anchor { key: ${anchor.key}, offset: ${
     anchorOffset === null ? 'null' : anchorOffset
-  }, type: ${anchor.type} }`;
+  }, type: ${anchor.type} }`
   res += `\n  └ focus { key: ${focus.key}, offset: ${
     focusOffset === null ? 'null' : focusOffset
-  }, type: ${focus.type} }`;
-  return res;
+  }, type: ${focus.type} }`
+  return res
 }
 
 function printObjectSelection(selection: NodeSelection): string {
-  return `: node\n  └ [${Array.from(selection._nodes).join(', ')}]`;
+  return `: node\n  └ [${Array.from(selection._nodes).join(', ')}]`
 }
 
 function printGridSelection(selection: GridSelection): string {
-  return `: grid\n  └ { grid: ${selection.gridKey}, anchorCell: ${selection.anchorCellKey}, focusCell: ${selection.focusCellKey} }`;
+  return `: grid\n  └ { grid: ${selection.gridKey}, anchorCell: ${selection.anchorCellKey}, focusCell: ${selection.focusCellKey} }`
 }
 
 function generateContent(editorState: EditorState): string {
-  let res = ' root\n';
+  let res = ' root\n'
 
   const selectionString = editorState.read(() => {
-    const selection = $getSelection();
+    const selection = $getSelection()
 
     visitTree($getRoot(), (node, indent) => {
-      const nodeKey = node.getKey();
-      const nodeKeyDisplay = `(${nodeKey})`;
-      const typeDisplay = node.getType() || '';
-      const isSelected = node.isSelected();
+      const nodeKey = node.getKey()
+      const nodeKeyDisplay = `(${nodeKey})`
+      const typeDisplay = node.getType() || ''
+      const isSelected = node.isSelected()
 
       res += `${isSelected ? SYMBOLS.selectedLine : ' '} ${indent.join(
-        ' ',
-      )} ${nodeKeyDisplay} ${typeDisplay} ${printNode(node)}\n`;
+        ' '
+      )} ${nodeKeyDisplay} ${typeDisplay} ${printNode(node)}\n`
 
       res += printSelectedCharsLine({
         indent,
@@ -253,9 +250,9 @@ function generateContent(editorState: EditorState): string {
         node,
         nodeKeyDisplay,
         selection,
-        typeDisplay,
-      });
-    });
+        typeDisplay
+      })
+    })
 
     return selection === null
       ? ': null'
@@ -263,15 +260,15 @@ function generateContent(editorState: EditorState): string {
       ? printRangeSelection(selection)
       : $isGridSelection(selection)
       ? printGridSelection(selection)
-      : printObjectSelection(selection);
-  });
+      : printObjectSelection(selection)
+  })
 
-  return res + '\n selection' + selectionString;
+  return res + '\n selection' + selectionString
 }
 
 function visitTree(currentNode: ElementNode, visitor, indent = []) {
-  const childNodes = currentNode.getChildren();
-  const childNodesLength = childNodes.length;
+  const childNodes = currentNode.getChildren()
+  const childNodesLength = childNodes.length
 
   childNodes.forEach((childNode, i) => {
     visitor(
@@ -279,9 +276,9 @@ function visitTree(currentNode: ElementNode, visitor, indent = []) {
       indent.concat(
         i === childNodesLength - 1
           ? SYMBOLS.isLastChild
-          : SYMBOLS.hasNextSibling,
-      ),
-    );
+          : SYMBOLS.hasNextSibling
+      )
+    )
 
     if ($isElementNode(childNode)) {
       visitTree(
@@ -290,32 +287,32 @@ function visitTree(currentNode: ElementNode, visitor, indent = []) {
         indent.concat(
           i === childNodesLength - 1
             ? SYMBOLS.ancestorIsLastChild
-            : SYMBOLS.ancestorHasNextSibling,
-        ),
-      );
+            : SYMBOLS.ancestorHasNextSibling
+        )
+      )
     }
-  });
+  })
 }
 
 function normalize(text) {
   return Object.entries(NON_SINGLE_WIDTH_CHARS_REPLACEMENT).reduce(
     (acc, [key, value]) => acc.replace(new RegExp(key, 'g'), String(value)),
-    text,
-  );
+    text
+  )
 }
 
 function printNode(node) {
   if ($isTextNode(node)) {
-    const text = node.getTextContent(true);
-    const title = text.length === 0 ? '(empty)' : `"${normalize(text)}"`;
-    const properties = printAllProperties(node);
+    const text = node.getTextContent(true)
+    const title = text.length === 0 ? '(empty)' : `"${normalize(text)}"`
+    const properties = printAllProperties(node)
     return [title, properties.length !== 0 ? `{ ${properties} }` : null]
       .filter(Boolean)
       .join(' ')
-      .trim();
+      .trim()
   }
 
-  return '';
+  return ''
 }
 
 const FORMAT_PREDICATES = [
@@ -323,61 +320,61 @@ const FORMAT_PREDICATES = [
   (node) => node.hasFormat('code') && 'Code',
   (node) => node.hasFormat('italic') && 'Italic',
   (node) => node.hasFormat('strikethrough') && 'Strikethrough',
-  (node) => node.hasFormat('underline') && 'Underline',
-];
+  (node) => node.hasFormat('underline') && 'Underline'
+]
 
 const DETAIL_PREDICATES = [
   (node) => node.isDirectionless() && 'Directionless',
-  (node) => node.isUnmergeable() && 'Unmergeable',
-];
+  (node) => node.isUnmergeable() && 'Unmergeable'
+]
 
 const MODE_PREDICATES = [
   (node) => node.isToken() && 'Token',
   (node) => node.isSegmented() && 'Segmented',
-  (node) => node.isInert() && 'Inert',
-];
+  (node) => node.isInert() && 'Inert'
+]
 
 function printAllProperties(node) {
   return [
     printFormatProperties(node),
     printDetailProperties(node),
-    printModeProperties(node),
+    printModeProperties(node)
   ]
     .filter(Boolean)
-    .join(', ');
+    .join(', ')
 }
 
 function printDetailProperties(nodeOrSelection) {
   let str = DETAIL_PREDICATES.map((predicate) => predicate(nodeOrSelection))
     .filter(Boolean)
     .join(', ')
-    .toLocaleLowerCase();
+    .toLocaleLowerCase()
   if (str !== '') {
-    str = 'detail: ' + str;
+    str = 'detail: ' + str
   }
-  return str;
+  return str
 }
 
 function printModeProperties(nodeOrSelection) {
   let str = MODE_PREDICATES.map((predicate) => predicate(nodeOrSelection))
     .filter(Boolean)
     .join(', ')
-    .toLocaleLowerCase();
+    .toLocaleLowerCase()
   if (str !== '') {
-    str = 'mode: ' + str;
+    str = 'mode: ' + str
   }
-  return str;
+  return str
 }
 
 function printFormatProperties(nodeOrSelection) {
   let str = FORMAT_PREDICATES.map((predicate) => predicate(nodeOrSelection))
     .filter(Boolean)
     .join(', ')
-    .toLocaleLowerCase();
+    .toLocaleLowerCase()
   if (str !== '') {
-    str = 'format: ' + str;
+    str = 'format: ' + str
   }
-  return str;
+  return str
 }
 
 function printSelectedCharsLine({
@@ -386,7 +383,7 @@ function printSelectedCharsLine({
   node,
   nodeKeyDisplay,
   selection,
-  typeDisplay,
+  typeDisplay
 }) {
   // No selection or node is not selected.
   if (
@@ -395,98 +392,96 @@ function printSelectedCharsLine({
     !isSelected ||
     $isElementNode(node)
   ) {
-    return '';
+    return ''
   }
 
   // No selected characters.
-  const anchor = selection.anchor;
-  const focus = selection.focus;
+  const anchor = selection.anchor
+  const focus = selection.focus
   if (
     node.getTextContent() === '' ||
     (anchor.getNode() === selection.focus.getNode() &&
       anchor.offset === focus.offset)
   ) {
-    return '';
+    return ''
   }
 
-  const [start, end] = $getSelectionStartEnd(node, selection);
+  const [start, end] = $getSelectionStartEnd(node, selection)
 
   if (start === end) {
-    return '';
+    return ''
   }
 
   const selectionLastIndent =
     indent[indent.length - 1] === SYMBOLS.hasNextSibling
       ? SYMBOLS.ancestorHasNextSibling
-      : SYMBOLS.ancestorIsLastChild;
+      : SYMBOLS.ancestorIsLastChild
 
   const indentionChars = [
     ...indent.slice(0, indent.length - 1),
-    selectionLastIndent,
-  ];
-  const unselectedChars = Array(start).fill(' ');
-  const selectedChars = Array(end - start).fill(SYMBOLS.selectedChar);
-  const paddingLength = typeDisplay.length + 3; // 2 for the spaces around + 1 for the double quote.
-  const nodePrintSpaces = Array(nodeKeyDisplay.length + paddingLength).fill(
-    ' ',
-  );
+    selectionLastIndent
+  ]
+  const unselectedChars = Array(start).fill(' ')
+  const selectedChars = Array(end - start).fill(SYMBOLS.selectedChar)
+  const paddingLength = typeDisplay.length + 3 // 2 for the spaces around + 1 for the double quote.
+  const nodePrintSpaces = Array(nodeKeyDisplay.length + paddingLength).fill(' ')
 
   return (
     [
       SYMBOLS.selectedLine,
       indentionChars.join(' '),
-      [...nodePrintSpaces, ...unselectedChars, ...selectedChars].join(''),
+      [...nodePrintSpaces, ...unselectedChars, ...selectedChars].join('')
     ].join(' ') + '\n'
-  );
+  )
 }
 
 function $getSelectionStartEnd(node, selection): [number, number] {
-  const anchor = selection.anchor;
-  const focus = selection.focus;
-  const textContent = node.getTextContent(true);
-  const textLength = textContent.length;
+  const anchor = selection.anchor
+  const focus = selection.focus
+  const textContent = node.getTextContent(true)
+  const textLength = textContent.length
 
-  let start = -1;
-  let end = -1;
+  let start = -1
+  let end = -1
   // Only one node is being selected.
   if (anchor.type === 'text' && focus.type === 'text') {
-    const anchorNode = anchor.getNode();
-    const focusNode = focus.getNode();
+    const anchorNode = anchor.getNode()
+    const focusNode = focus.getNode()
     if (
       anchorNode === focusNode &&
       node === anchorNode &&
       anchor.offset !== focus.offset
     ) {
-      [start, end] =
+      ;[start, end] =
         anchor.offset < focus.offset
           ? [anchor.offset, focus.offset]
-          : [focus.offset, anchor.offset];
+          : [focus.offset, anchor.offset]
     } else if (node === anchorNode) {
-      [start, end] = anchorNode.isBefore(focusNode)
+      ;[start, end] = anchorNode.isBefore(focusNode)
         ? [anchor.offset, textLength]
-        : [0, anchor.offset];
+        : [0, anchor.offset]
     } else if (node === focusNode) {
-      [start, end] = focusNode.isBefore(anchorNode)
+      ;[start, end] = focusNode.isBefore(anchorNode)
         ? [focus.offset, textLength]
-        : [0, focus.offset];
+        : [0, focus.offset]
     } else {
       // Node is within selection but not the anchor nor focus.
-      [start, end] = [0, textLength];
+      ;[start, end] = [0, textLength]
     }
   }
 
   // Account for non-single width characters.
   const numNonSingleWidthCharBeforeSelection = (
     textContent.slice(0, start).match(NON_SINGLE_WIDTH_CHARS_REGEX) || []
-  ).length;
+  ).length
   const numNonSingleWidthCharInSelection = (
     textContent.slice(start, end).match(NON_SINGLE_WIDTH_CHARS_REGEX) || []
-  ).length;
+  ).length
 
   return [
     start + numNonSingleWidthCharBeforeSelection,
     end +
       numNonSingleWidthCharBeforeSelection +
-      numNonSingleWidthCharInSelection,
-  ];
+      numNonSingleWidthCharInSelection
+  ]
 }

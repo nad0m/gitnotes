@@ -17,14 +17,14 @@ export type SettingName =
   | 'isAutocomplete'
   | 'showTreeView'
   | 'showNestedEditorTreeView'
-  | 'emptyEditor';
+  | 'emptyEditor'
 
-export type Settings = {[SettingName]: boolean};
+export type Settings = { [SettingName]: boolean }
 
-const hostName = window.location.hostname;
+const hostName = window.location.hostname
 export const isDevPlayground: boolean =
   hostName !== 'playground.lexical.dev' &&
-  hostName !== 'lexical-playground.vercel.app';
+  hostName !== 'lexical-playground.vercel.app'
 
 export const DEFAULT_SETTINGS: Settings = {
   disableBeforeInput: false,
@@ -36,5 +36,5 @@ export const DEFAULT_SETTINGS: Settings = {
   isRichText: true,
   measureTypingPerf: false,
   showNestedEditorTreeView: false,
-  showTreeView: true,
-};
+  showTreeView: true
+}

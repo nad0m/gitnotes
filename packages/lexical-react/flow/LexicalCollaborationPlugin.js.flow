@@ -7,37 +7,37 @@
  * @flow strict
  */
 
-import type {Doc, RelativePosition} from 'yjs';
+import type { Doc, RelativePosition } from 'yjs'
 
 export type UserState = {
   anchorPos: null | RelativePosition,
   focusPos: null | RelativePosition,
   name: string,
   color: string,
-  focusing: boolean,
-};
+  focusing: boolean
+}
 
 export type ProviderAwareness = {
   getLocalState: () => UserState | null,
   setLocalState: (UserState) => void,
   getStates: () => Map<number, UserState>,
   on: (type: 'update', cb: () => void) => void,
-  off: (type: 'update', cb: () => void) => void,
-};
+  off: (type: 'update', cb: () => void) => void
+}
 
 export interface Provider {
   connect(): void | Promise<void>;
   disconnect(): void;
   awareness: ProviderAwareness;
   on(type: 'sync', cb: (isSynced: boolean) => void): void;
-  on(type: 'status', cb: ({status: string}) => void): void;
+  on(type: 'status', cb: ({ status: string }) => void): void;
   // $FlowFixMe: temp
   on(type: 'update', cb: (any) => void): void;
   on(type: 'reload', cb: (doc: Doc) => void): void;
   off(type: 'sync', cb: (isSynced: boolean) => void): void;
   // $FlowFixMe: temp
   off(type: 'update', cb: (any) => void): void;
-  off(type: 'status', cb: ({status: string}) => void): void;
+  off(type: 'status', cb: ({ status: string }) => void): void;
   off(type: 'reload', cb: (doc: Doc) => void): void;
 }
 
@@ -45,19 +45,19 @@ type CollaborationContextType = {
   clientID: number,
   color: string,
   name: string,
-  yjsDocMap: Map<string, Doc>,
-};
+  yjsDocMap: Map<string, Doc>
+}
 
 export type ProviderFactory = (
   id: string,
-  yjsDocMap: Map<string, Doc>,
-) => Provider;
+  yjsDocMap: Map<string, Doc>
+) => Provider
 
 declare export function CollaborationPlugin(arg0: {
   id: string,
   providerFactory: ProviderFactory,
   shouldBootstrap: boolean,
-  username?: string,
-}): React$Node;
-declare export var CollaborationContext: React$Context<CollaborationContextType>;
-declare export function useCollaborationContext(): CollaborationContextType;
+  username?: string
+}): React$Node
+declare export var CollaborationContext: React$Context<CollaborationContextType>
+declare export function useCollaborationContext(): CollaborationContextType

@@ -7,23 +7,23 @@
  * @flow strict
  */
 
-import type {EditorConfig, LexicalEditor, LexicalNode, NodeKey} from 'lexical';
+import type { EditorConfig, LexicalEditor, LexicalNode, NodeKey } from 'lexical'
 
-import './ImageNode.css';
+import './ImageNode.css'
 
 import {
   CollaborationPlugin,
-  useCollaborationContext,
-} from '@lexical/react/LexicalCollaborationPlugin';
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import HashtagsPlugin from '@lexical/react/LexicalHashtagPlugin';
-import {HistoryPlugin} from '@lexical/react/LexicalHistoryPlugin';
-import LinkPlugin from '@lexical/react/LexicalLinkPlugin';
-import LexicalNestedComposer from '@lexical/react/LexicalNestedComposer';
-import RichTextPlugin from '@lexical/react/LexicalRichTextPlugin';
-import TablesPlugin from '@lexical/react/LexicalTablePlugin';
-import useLexicalNodeSelection from '@lexical/react/useLexicalNodeSelection';
-import {mergeRegister} from '@lexical/utils';
+  useCollaborationContext
+} from '@lexical/react/LexicalCollaborationPlugin'
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import HashtagsPlugin from '@lexical/react/LexicalHashtagPlugin'
+import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
+import LinkPlugin from '@lexical/react/LexicalLinkPlugin'
+import LexicalNestedComposer from '@lexical/react/LexicalNestedComposer'
+import RichTextPlugin from '@lexical/react/LexicalRichTextPlugin'
+import TablesPlugin from '@lexical/react/LexicalTablePlugin'
+import useLexicalNodeSelection from '@lexical/react/useLexicalNodeSelection'
+import { mergeRegister } from '@lexical/utils'
 import {
   $getNodeByKey,
   $getSelection,
@@ -33,35 +33,35 @@ import {
   createEditor,
   DecoratorNode,
   KEY_BACKSPACE_COMMAND,
-  KEY_DELETE_COMMAND,
-} from 'lexical';
-import * as React from 'react';
-import {Suspense, useCallback, useEffect, useRef, useState} from 'react';
+  KEY_DELETE_COMMAND
+} from 'lexical'
+import * as React from 'react'
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
 
-import {createWebsocketProvider} from '../lib/collaboration';
-import {useSettings} from '../context/SettingsContext';
-import {useSharedHistoryContext} from '../context/SharedHistoryContext';
-import EmojisPlugin from '../plugins/EmojisPlugin';
-import ImagesPlugin from '../plugins/ImagesPlugin';
-import KeywordsPlugin from '../plugins/KeywordsPlugin';
-import MentionsPlugin from '../plugins/MentionsPlugin';
-import TableCellActionMenuPlugin from '../plugins/TableActionMenuPlugin';
-import TreeViewPlugin from '../plugins/TreeViewPlugin';
-import ContentEditable from '../ui/ContentEditable';
-import Placeholder from '../ui/Placeholder';
+import { createWebsocketProvider } from '../lib/collaboration'
+import { useSettings } from '../context/SettingsContext'
+import { useSharedHistoryContext } from '../context/SharedHistoryContext'
+import EmojisPlugin from '../plugins/EmojisPlugin'
+import ImagesPlugin from '../plugins/ImagesPlugin'
+import KeywordsPlugin from '../plugins/KeywordsPlugin'
+import MentionsPlugin from '../plugins/MentionsPlugin'
+import TableCellActionMenuPlugin from '../plugins/TableActionMenuPlugin'
+import TreeViewPlugin from '../plugins/TreeViewPlugin'
+import ContentEditable from '../ui/ContentEditable'
+import Placeholder from '../ui/Placeholder'
 
-const imageCache = new Set();
+const imageCache = new Set()
 
 function useSuspenseImage(src: string) {
   if (!imageCache.has(src)) {
     throw new Promise((resolve) => {
-      const img = new Image();
-      img.src = src;
+      const img = new Image()
+      img.src = src
       img.onload = () => {
-        imageCache.add(src);
-        resolve();
-      };
-    });
+        imageCache.add(src)
+        resolve()
+      }
+    })
   }
 }
 
@@ -72,17 +72,17 @@ function LazyImage({
   src,
   width,
   height,
-  maxWidth,
+  maxWidth
 }: {
   altText: string,
   className: ?string,
   height: 'inherit' | number,
-  imageRef: {current: null | HTMLElement},
+  imageRef: { current: null | HTMLElement },
   maxWidth: number,
   src: string,
-  width: 'inherit' | number,
+  width: 'inherit' | number
 }): React.Node {
-  useSuspenseImage(src);
+  useSuspenseImage(src)
   return (
     <img
       className={className}
@@ -92,10 +92,10 @@ function LazyImage({
       style={{
         height,
         maxWidth,
-        width,
+        width
       }}
     />
-  );
+  )
 }
 
 function ImageResizer({
@@ -104,16 +104,16 @@ function ImageResizer({
   imageRef,
   editor,
   showCaption,
-  setShowCaption,
+  setShowCaption
 }: {
   editor: LexicalEditor,
-  imageRef: {current: null | HTMLElement},
+  imageRef: { current: null | HTMLElement },
   onResizeEnd: ('inherit' | number, 'inherit' | number) => void,
   onResizeStart: () => void,
   setShowCaption: (boolean) => void,
-  showCaption: boolean,
+  showCaption: boolean
 }): React.Node {
-  const buttonRef = useRef(null);
+  const buttonRef = useRef(null)
   const positioningRef = useRef<{
     currentHeight: 'inherit' | number,
     currentWidth: 'inherit' | number,
@@ -123,7 +123,7 @@ function ImageResizer({
     startHeight: number,
     startWidth: number,
     startX: number,
-    startY: number,
+    startY: number
   }>({
     currentHeight: 0,
     currentWidth: 0,
@@ -133,100 +133,100 @@ function ImageResizer({
     startHeight: 0,
     startWidth: 0,
     startX: 0,
-    startY: 0,
-  });
-  const editorRootElement = editor.getRootElement();
+    startY: 0
+  })
+  const editorRootElement = editor.getRootElement()
   // Find max width, accounting for editor padding.
   const maxWidthContainer =
     editorRootElement !== null
       ? editorRootElement.getBoundingClientRect().width - 20
-      : 100;
+      : 100
 
   const handlePointerDown = (event: PointerEvent, direction: 0 | 1 | 2 | 3) => {
-    const image = imageRef.current;
+    const image = imageRef.current
     if (image !== null) {
-      const {width, height} = image.getBoundingClientRect();
-      const positioning = positioningRef.current;
-      positioning.startWidth = width;
-      positioning.startHeight = height;
-      positioning.ratio = width / height;
-      positioning.currentWidth = 'inherit';
-      positioning.currentHeight = 'inherit';
-      positioning.startX = event.clientX;
-      positioning.startY = event.clientY;
-      positioning.isResizing = true;
-      positioning.direction = direction;
-      onResizeStart();
-      document.addEventListener('pointermove', handlePointerMove);
-      document.addEventListener('pointerup', handlePointerUp);
+      const { width, height } = image.getBoundingClientRect()
+      const positioning = positioningRef.current
+      positioning.startWidth = width
+      positioning.startHeight = height
+      positioning.ratio = width / height
+      positioning.currentWidth = 'inherit'
+      positioning.currentHeight = 'inherit'
+      positioning.startX = event.clientX
+      positioning.startY = event.clientY
+      positioning.isResizing = true
+      positioning.direction = direction
+      onResizeStart()
+      document.addEventListener('pointermove', handlePointerMove)
+      document.addEventListener('pointerup', handlePointerUp)
     }
-  };
+  }
   const handlePointerMove = (event: PointerEvent) => {
-    const image = imageRef.current;
-    const positioning = positioningRef.current;
+    const image = imageRef.current
+    const positioning = positioningRef.current
 
     if (image !== null && positioning.isResizing) {
       if (positioning.direction === 3) {
-        const diff = Math.floor(positioning.startY - event.clientY) * 2;
-        const minHeight = 150 * positioning.ratio;
-        const maxHeight = maxWidthContainer / positioning.ratio;
-        let height = positioning.startHeight + diff;
+        const diff = Math.floor(positioning.startY - event.clientY) * 2
+        const minHeight = 150 * positioning.ratio
+        const maxHeight = maxWidthContainer / positioning.ratio
+        let height = positioning.startHeight + diff
         if (height < minHeight) {
-          height = minHeight;
+          height = minHeight
         } else if (height > maxHeight) {
-          height = maxHeight;
+          height = maxHeight
         }
-        image.style.width = `inherit`;
-        image.style.height = `${height}px`;
-        positioning.currentHeight = height;
+        image.style.width = `inherit`
+        image.style.height = `${height}px`
+        positioning.currentHeight = height
       } else if (positioning.direction === 2) {
-        const diff = Math.floor(event.clientY - positioning.startY);
-        const minHeight = 150 * positioning.ratio;
-        const maxHeight = maxWidthContainer / positioning.ratio;
-        let height = positioning.startHeight + diff;
+        const diff = Math.floor(event.clientY - positioning.startY)
+        const minHeight = 150 * positioning.ratio
+        const maxHeight = maxWidthContainer / positioning.ratio
+        let height = positioning.startHeight + diff
         if (height < minHeight) {
-          height = minHeight;
+          height = minHeight
         } else if (height > maxHeight) {
-          height = maxHeight;
+          height = maxHeight
         }
-        image.style.width = `inherit`;
-        image.style.height = `${height}px`;
-        positioning.currentHeight = height;
+        image.style.width = `inherit`
+        image.style.height = `${height}px`
+        positioning.currentHeight = height
       } else {
-        const diff = Math.floor(event.clientX - positioning.startX);
-        const minWidth = 150 * positioning.ratio;
-        const maxWidth = maxWidthContainer;
-        let width = positioning.startWidth + diff;
+        const diff = Math.floor(event.clientX - positioning.startX)
+        const minWidth = 150 * positioning.ratio
+        const maxWidth = maxWidthContainer
+        let width = positioning.startWidth + diff
         if (width < minWidth) {
-          width = minWidth;
+          width = minWidth
         } else if (width > maxWidth) {
-          width = maxWidth;
+          width = maxWidth
         }
-        image.style.width = `${width}px`;
-        image.style.height = `inherit`;
-        positioning.currentWidth = width;
+        image.style.width = `${width}px`
+        image.style.height = `inherit`
+        positioning.currentWidth = width
       }
     }
-  };
+  }
   const handlePointerUp = (_event: PointerEvent) => {
-    const image = imageRef.current;
-    const positioning = positioningRef.current;
+    const image = imageRef.current
+    const positioning = positioningRef.current
     if (image !== null && positioning.isResizing) {
-      const width = positioning.currentWidth;
-      const height = positioning.currentHeight;
-      positioning.startWidth = 0;
-      positioning.startHeight = 0;
-      positioning.ratio = 0;
-      positioning.startX = 0;
-      positioning.startY = 0;
-      positioning.currentWidth = 0;
-      positioning.currentHeight = 0;
-      positioning.isResizing = false;
-      onResizeEnd(width, height);
-      document.removeEventListener('pointermove', handlePointerMove);
-      document.removeEventListener('pointerup', handlePointerUp);
+      const width = positioning.currentWidth
+      const height = positioning.currentHeight
+      positioning.startWidth = 0
+      positioning.startHeight = 0
+      positioning.ratio = 0
+      positioning.startX = 0
+      positioning.startY = 0
+      positioning.currentWidth = 0
+      positioning.currentHeight = 0
+      positioning.isResizing = false
+      onResizeEnd(width, height)
+      document.removeEventListener('pointermove', handlePointerMove)
+      document.removeEventListener('pointerup', handlePointerUp)
     }
-  };
+  }
   return (
     <>
       {!showCaption && (
@@ -234,7 +234,7 @@ function ImageResizer({
           className="image-caption-button"
           ref={buttonRef}
           onClick={() => {
-            setShowCaption(!showCaption);
+            setShowCaption(!showCaption)
           }}>
           Add Caption
         </button>
@@ -242,29 +242,29 @@ function ImageResizer({
       <div
         className="image-resizer-ne"
         onPointerDown={(event) => {
-          handlePointerDown(event, 0);
+          handlePointerDown(event, 0)
         }}
       />
       <div
         className="image-resizer-se"
         onPointerDown={(event) => {
-          handlePointerDown(event, 1);
+          handlePointerDown(event, 1)
         }}
       />
       <div
         className="image-resizer-sw"
         onPointerDown={(event) => {
-          handlePointerDown(event, 2);
+          handlePointerDown(event, 2)
         }}
       />
       <div
         className="image-resizer-nw"
         onPointerDown={(event) => {
-          handlePointerDown(event, 3);
+          handlePointerDown(event, 3)
         }}
       />
     </>
-  );
+  )
 }
 
 function ImageComponent({
@@ -276,7 +276,7 @@ function ImageComponent({
   maxWidth,
   resizable,
   showCaption,
-  caption,
+  caption
 }: {
   altText: string,
   caption: LexicalEditor,
@@ -286,71 +286,71 @@ function ImageComponent({
   resizable: boolean,
   showCaption: boolean,
   src: string,
-  width: 'inherit' | number,
+  width: 'inherit' | number
 }): React.Node {
-  const ref = useRef(null);
+  const ref = useRef(null)
   const [isSelected, setSelected, clearSelection] =
-    useLexicalNodeSelection(nodeKey);
-  const [isResizing, setIsResizing] = useState<boolean>(false);
-  const {yjsDocMap} = useCollaborationContext();
-  const [editor] = useLexicalComposerContext();
-  const isCollab = yjsDocMap.get('main') !== undefined;
-  const [selection, setSelection] = useState(null);
+    useLexicalNodeSelection(nodeKey)
+  const [isResizing, setIsResizing] = useState<boolean>(false)
+  const { yjsDocMap } = useCollaborationContext()
+  const [editor] = useLexicalComposerContext()
+  const isCollab = yjsDocMap.get('main') !== undefined
+  const [selection, setSelection] = useState(null)
 
   const onDelete = useCallback(
     (payload) => {
       if (isSelected && $isNodeSelection($getSelection())) {
-        const event: KeyboardEvent = payload;
-        event.preventDefault();
+        const event: KeyboardEvent = payload
+        event.preventDefault()
         editor.update(() => {
-          const node = $getNodeByKey(nodeKey);
+          const node = $getNodeByKey(nodeKey)
           if ($isImageNode(node)) {
-            node.remove();
+            node.remove()
           }
-          setSelected(false);
-        });
+          setSelected(false)
+        })
       }
-      return false;
+      return false
     },
-    [editor, isSelected, nodeKey, setSelected],
-  );
+    [editor, isSelected, nodeKey, setSelected]
+  )
 
   useEffect(() => {
     return mergeRegister(
-      editor.registerUpdateListener(({editorState}) => {
-        setSelection(editorState.read(() => $getSelection()));
+      editor.registerUpdateListener(({ editorState }) => {
+        setSelection(editorState.read(() => $getSelection()))
       }),
       editor.registerCommand(
         CLICK_COMMAND,
         (payload) => {
-          const event: MouseEvent = payload;
+          const event: MouseEvent = payload
 
           if (isResizing) {
-            return true;
+            return true
           }
           if (event.target === ref.current) {
             if (!event.shiftKey) {
-              clearSelection();
+              clearSelection()
             }
-            setSelected(!isSelected);
-            return true;
+            setSelected(!isSelected)
+            return true
           }
 
-          return false;
+          return false
         },
-        COMMAND_PRIORITY_LOW,
+        COMMAND_PRIORITY_LOW
       ),
       editor.registerCommand(
         KEY_DELETE_COMMAND,
         onDelete,
-        COMMAND_PRIORITY_LOW,
+        COMMAND_PRIORITY_LOW
       ),
       editor.registerCommand(
         KEY_BACKSPACE_COMMAND,
         onDelete,
-        COMMAND_PRIORITY_LOW,
-      ),
-    );
+        COMMAND_PRIORITY_LOW
+      )
+    )
   }, [
     clearSelection,
     editor,
@@ -358,52 +358,52 @@ function ImageComponent({
     isSelected,
     nodeKey,
     onDelete,
-    setSelected,
-  ]);
+    setSelected
+  ])
 
   const setShowCaption = useCallback(() => {
     editor.update(() => {
-      const node = $getNodeByKey(nodeKey);
+      const node = $getNodeByKey(nodeKey)
       if ($isImageNode(node)) {
-        node.setShowCaption(true);
+        node.setShowCaption(true)
       }
-    });
-  }, [editor, nodeKey]);
+    })
+  }, [editor, nodeKey])
 
   const onResizeEnd = useCallback(
     (nextWidth, nextHeight) => {
-      const rootElement = editor.getRootElement();
+      const rootElement = editor.getRootElement()
       if (rootElement !== null) {
-        rootElement.style.setProperty('cursor', 'default');
+        rootElement.style.setProperty('cursor', 'default')
       }
 
       // Delay hiding the resize bars for click case
       setTimeout(() => {
-        setIsResizing(false);
-      }, 200);
+        setIsResizing(false)
+      }, 200)
 
       editor.update(() => {
-        const node = $getNodeByKey(nodeKey);
+        const node = $getNodeByKey(nodeKey)
         if ($isImageNode(node)) {
-          node.setWidthAndHeight(nextWidth, nextHeight);
+          node.setWidthAndHeight(nextWidth, nextHeight)
         }
-      });
+      })
     },
-    [editor, nodeKey],
-  );
+    [editor, nodeKey]
+  )
 
   const onResizeStart = useCallback(() => {
-    const rootElement = editor.getRootElement();
+    const rootElement = editor.getRootElement()
     if (rootElement !== null) {
-      rootElement.style.setProperty('cursor', 'nwse-resize', 'important');
+      rootElement.style.setProperty('cursor', 'nwse-resize', 'important')
     }
-    setIsResizing(true);
-  }, [editor]);
+    setIsResizing(true)
+  }, [editor])
 
-  const {historyState} = useSharedHistoryContext();
+  const { historyState } = useSharedHistoryContext()
   const {
-    settings: {showNestedEditorTreeView},
-  } = useSettings();
+    settings: { showNestedEditorTreeView }
+  } = useSettings()
 
   return (
     <Suspense fallback={null}>
@@ -466,20 +466,20 @@ function ImageComponent({
           )}
       </>
     </Suspense>
-  );
+  )
 }
 
 export class ImageNode extends DecoratorNode<React$Node> {
-  __src: string;
-  __altText: string;
-  __width: 'inherit' | number;
-  __height: 'inherit' | number;
-  __maxWidth: number;
-  __showCaption: boolean;
-  __caption: LexicalEditor;
+  __src: string
+  __altText: string
+  __width: 'inherit' | number
+  __height: 'inherit' | number
+  __maxWidth: number
+  __showCaption: boolean
+  __caption: LexicalEditor
 
   static getType(): string {
-    return 'image';
+    return 'image'
   }
 
   static clone(node: ImageNode): ImageNode {
@@ -491,8 +491,8 @@ export class ImageNode extends DecoratorNode<React$Node> {
       node.__height,
       node.__showCaption,
       node.__caption,
-      node.__key,
-    );
+      node.__key
+    )
   }
 
   constructor(
@@ -503,46 +503,46 @@ export class ImageNode extends DecoratorNode<React$Node> {
     height?: 'inherit' | number,
     showCaption?: boolean,
     caption?: LexicalEditor,
-    key?: NodeKey,
+    key?: NodeKey
   ) {
-    super(key);
-    this.__src = src;
-    this.__altText = altText;
-    this.__maxWidth = maxWidth;
-    this.__width = width || 'inherit';
-    this.__height = height || 'inherit';
-    this.__showCaption = showCaption || false;
-    this.__caption = caption || createEditor();
+    super(key)
+    this.__src = src
+    this.__altText = altText
+    this.__maxWidth = maxWidth
+    this.__width = width || 'inherit'
+    this.__height = height || 'inherit'
+    this.__showCaption = showCaption || false
+    this.__caption = caption || createEditor()
   }
 
   setWidthAndHeight(
     width: 'inherit' | number,
-    height: 'inherit' | number,
+    height: 'inherit' | number
   ): void {
-    const writable = this.getWritable();
-    writable.__width = width;
-    writable.__height = height;
+    const writable = this.getWritable()
+    writable.__width = width
+    writable.__height = height
   }
 
   setShowCaption(showCaption: boolean): void {
-    const writable = this.getWritable();
-    writable.__showCaption = showCaption;
+    const writable = this.getWritable()
+    writable.__showCaption = showCaption
   }
 
   // View
 
   createDOM<EditorContext>(config: EditorConfig<EditorContext>): HTMLElement {
-    const span = document.createElement('span');
-    const theme = config.theme;
-    const className = theme.image;
+    const span = document.createElement('span')
+    const theme = config.theme
+    const className = theme.image
     if (className !== undefined) {
-      span.className = className;
+      span.className = className
     }
-    return span;
+    return span
   }
 
   updateDOM(): false {
-    return false;
+    return false
   }
 
   decorate(): React$Node {
@@ -558,18 +558,18 @@ export class ImageNode extends DecoratorNode<React$Node> {
         caption={this.__caption}
         resizable={true}
       />
-    );
+    )
   }
 }
 
 export function $createImageNode(
   src: string,
   altText: string,
-  maxWidth: number,
+  maxWidth: number
 ): ImageNode {
-  return new ImageNode(src, altText, maxWidth);
+  return new ImageNode(src, altText, maxWidth)
 }
 
 export function $isImageNode(node: ?LexicalNode): boolean %checks {
-  return node instanceof ImageNode;
+  return node instanceof ImageNode
 }

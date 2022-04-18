@@ -14,32 +14,32 @@ import type {
   EditorConfig,
   LexicalEditor,
   LexicalNode,
-  NodeKey,
-} from 'lexical';
+  NodeKey
+} from 'lexical'
 
-import {addClassNamesToElement} from '@lexical/utils';
+import { addClassNamesToElement } from '@lexical/utils'
 import {
   $createParagraphNode,
   $isElementNode,
   $isLineBreakNode,
-  GridCellNode,
-} from 'lexical';
+  GridCellNode
+} from 'lexical'
 
 export const TableCellHeaderStates = {
   NO_STATUS: 0,
   ROW: 1,
   COLUMN: 2,
-  BOTH: 3,
-};
+  BOTH: 3
+}
 
-export type TableCellHeaderState = $Values<typeof TableCellHeaderStates>;
+export type TableCellHeaderState = $Values<typeof TableCellHeaderStates>
 
 export class TableCellNode extends GridCellNode {
-  __headerState: TableCellHeaderState;
-  __width: ?number;
+  __headerState: TableCellHeaderState
+  __width: ?number
 
   static getType(): 'tablecell' {
-    return 'tablecell';
+    return 'tablecell'
   }
 
   static clone(node: TableCellNode): TableCellNode {
@@ -47,175 +47,175 @@ export class TableCellNode extends GridCellNode {
       node.__headerState,
       node.__colSpan,
       node.__width,
-      node.__key,
-    );
+      node.__key
+    )
   }
 
   static importDOM(): DOMConversionMap | null {
     return {
       td: (node: Node) => ({
         conversion: convertTableCellNodeElement,
-        priority: 0,
+        priority: 0
       }),
       th: (node: Node) => ({
         conversion: convertTableCellNodeElement,
-        priority: 0,
-      }),
-    };
+        priority: 0
+      })
+    }
   }
 
   constructor(
     headerState?: TableCellHeaderState = TableCellHeaderStates.NO_STATUS,
     colSpan?: number = 1,
     width?: ?number,
-    key?: NodeKey,
+    key?: NodeKey
   ): void {
-    super(colSpan, key);
-    this.__headerState = headerState;
-    this.__width = width;
+    super(colSpan, key)
+    this.__headerState = headerState
+    this.__width = width
   }
 
   createDOM<EditorContext>(config: EditorConfig<EditorContext>): HTMLElement {
-    const element = document.createElement(this.getTag());
+    const element = document.createElement(this.getTag())
 
     if (this.__width) {
-      element.style.width = `${this.__width}px`;
+      element.style.width = `${this.__width}px`
     }
 
     addClassNamesToElement(
       element,
       config.theme.tableCell,
-      this.hasHeader() && config.theme.tableCellHeader,
-    );
+      this.hasHeader() && config.theme.tableCellHeader
+    )
 
-    return element;
+    return element
   }
 
   exportDOM(editor: LexicalEditor): DOMExportOutput {
-    const {element} = super.exportDOM(editor);
+    const { element } = super.exportDOM(editor)
 
     if (element) {
-      const maxWidth = 700;
-      const colCount = this.getParentOrThrow().getChildrenSize();
-      element.style.border = '1px solid black';
+      const maxWidth = 700
+      const colCount = this.getParentOrThrow().getChildrenSize()
+      element.style.border = '1px solid black'
       element.style.width = `${
         this.getWidth() || Math.max(90, maxWidth / colCount)
-      }px`;
+      }px`
 
-      element.style.verticalAlign = 'top';
-      element.style.textAlign = 'start';
+      element.style.verticalAlign = 'top'
+      element.style.textAlign = 'start'
 
       if (this.hasHeader()) {
-        element.style.backgroundColor = '#f2f3f5';
+        element.style.backgroundColor = '#f2f3f5'
       }
     }
 
     return {
-      element,
-    };
+      element
+    }
   }
 
   getTag(): string {
-    return this.hasHeader() ? 'th' : 'td';
+    return this.hasHeader() ? 'th' : 'td'
   }
 
   setHeaderStyles(headerState: TableCellHeaderState): TableCellHeaderState {
-    const self = this.getWritable();
-    self.__headerState = headerState;
-    return this.__headerState;
+    const self = this.getWritable()
+    self.__headerState = headerState
+    return this.__headerState
   }
 
   getHeaderStyles(): TableCellHeaderState {
-    return this.getLatest().__headerState;
+    return this.getLatest().__headerState
   }
 
   setWidth(width: number): ?number {
-    const self = this.getWritable();
-    self.__width = width;
-    return this.__width;
+    const self = this.getWritable()
+    self.__width = width
+    return this.__width
   }
 
   getWidth(): ?number {
-    return this.getLatest().__width;
+    return this.getLatest().__width
   }
 
   toggleHeaderStyle(headerStateToToggle: TableCellHeaderState): TableCellNode {
-    const self = this.getWritable();
+    const self = this.getWritable()
 
     if ((self.__headerState & headerStateToToggle) === headerStateToToggle) {
-      self.__headerState -= headerStateToToggle;
+      self.__headerState -= headerStateToToggle
     } else {
-      self.__headerState += headerStateToToggle;
+      self.__headerState += headerStateToToggle
     }
 
-    self.__headerState = self.__headerState;
+    self.__headerState = self.__headerState
 
-    return self;
+    return self
   }
 
   hasHeaderState(headerState: TableCellHeaderState): boolean {
-    return (this.getHeaderStyles() & headerState) === headerState;
+    return (this.getHeaderStyles() & headerState) === headerState
   }
 
   hasHeader(): boolean {
-    return this.getLatest().__headerState !== TableCellHeaderStates.NO_STATUS;
+    return this.getLatest().__headerState !== TableCellHeaderStates.NO_STATUS
   }
 
   updateDOM(prevNode: TableCellNode): boolean {
     return (
       prevNode.__headerState !== this.__headerState ||
       prevNode.__width !== this.__width
-    );
+    )
   }
 
   collapseAtStart(): true {
-    return true;
+    return true
   }
 
   canBeEmpty(): false {
-    return false;
+    return false
   }
 }
 
 export function convertTableCellNodeElement(
-  domNode: Node,
+  domNode: Node
 ): DOMConversionOutput {
-  const nodeName = domNode.nodeName.toLowerCase();
+  const nodeName = domNode.nodeName.toLowerCase()
 
   const tableCellNode = $createTableCellNode(
     nodeName === 'th'
       ? TableCellHeaderStates.ROW
-      : TableCellHeaderStates.NO_STATUS,
-  );
+      : TableCellHeaderStates.NO_STATUS
+  )
 
   return {
     node: tableCellNode,
     forChild: (lexicalNode, parentLexicalNode) => {
       if ($isTableCellNode(parentLexicalNode) && !$isElementNode(lexicalNode)) {
-        const paragraphNode = $createParagraphNode();
+        const paragraphNode = $createParagraphNode()
         if (
           $isLineBreakNode(lexicalNode) &&
           lexicalNode.getTextContent() === '\n'
         ) {
-          return null;
+          return null
         }
-        paragraphNode.append(lexicalNode);
-        return paragraphNode;
+        paragraphNode.append(lexicalNode)
+        return paragraphNode
       }
 
-      return lexicalNode;
-    },
-  };
+      return lexicalNode
+    }
+  }
 }
 
 export function $createTableCellNode(
   headerState: TableCellHeaderState,
   colSpan?: number = 1,
-  width?: ?number,
+  width?: ?number
 ): TableCellNode {
-  return new TableCellNode(headerState, colSpan, width);
+  return new TableCellNode(headerState, colSpan, width)
 }
 
 export function $isTableCellNode(node: ?LexicalNode): boolean %checks {
-  return node instanceof TableCellNode;
+  return node instanceof TableCellNode
 }

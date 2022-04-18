@@ -6,29 +6,27 @@
  *
  */
 
-import {$ReadOnly} from 'utility-types';
+import { $ReadOnly } from 'utility-types'
 export type Props = $ReadOnly<{
-  ariaActiveDescendantID?: string;
-  ariaAutoComplete?: string;
-  ariaControls?: string;
-  ariaDescribedBy?: string;
-  ariaExpanded?: boolean;
-  ariaLabel?: string;
-  ariaLabelledBy?: string;
-  ariaMultiline?: boolean;
-  ariaOwneeID?: string;
-  ariaRequired?: string;
-  autoCapitalize?: boolean;
-  autoComplete?: boolean;
-  autoCorrect?: boolean;
-  className?: string;
-  readOnly?: boolean;
-  role?: string;
-  style?: StyleSheetList;
-  spellCheck?: boolean;
-  tabIndex?: number;
-  testid?: string;
-}>;
-export default function LexicalContentEditable(
-  props: Props,
-): JSX.Element | null;
+  ariaActiveDescendantID?: string
+  ariaAutoComplete?: string
+  ariaControls?: string
+  ariaDescribedBy?: string
+  ariaExpanded?: boolean
+  ariaLabel?: string
+  ariaLabelledBy?: string
+  ariaMultiline?: boolean
+  ariaOwneeID?: string
+  ariaRequired?: string
+  autoCapitalize?: boolean
+  autoComplete?: boolean
+  autoCorrect?: boolean
+  className?: string
+  readOnly?: boolean
+  role?: string
+  style?: StyleSheetList
+  spellCheck?: boolean
+  tabIndex?: number
+  testid?: string
+}>
+export default function LexicalContentEditable(props: Props): JSX.Element | null

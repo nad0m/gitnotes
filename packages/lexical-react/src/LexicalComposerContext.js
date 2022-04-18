@@ -7,53 +7,53 @@
  * @flow strict
  */
 
-import type {EditorThemeClasses, LexicalEditor} from 'lexical';
+import type { EditorThemeClasses, LexicalEditor } from 'lexical'
 
-import {createContext as createReactContext, useContext} from 'react';
-import invariant from 'shared/invariant';
+import { createContext as createReactContext, useContext } from 'react'
+import invariant from 'shared/invariant'
 
 export type LexicalComposerContextType = {
-  getTheme: () => ?EditorThemeClasses,
-};
+  getTheme: () => ?EditorThemeClasses
+}
 
 export type LexicalComposerContextWithEditor = [
   LexicalEditor,
-  LexicalComposerContextType,
-];
+  LexicalComposerContextType
+]
 
 export const LexicalComposerContext: React$Context<?LexicalComposerContextWithEditor> =
-  createReactContext<?LexicalComposerContextWithEditor>(null);
+  createReactContext<?LexicalComposerContextWithEditor>(null)
 
 export function createLexicalComposerContext(
   parent: ?LexicalComposerContextWithEditor,
-  theme: ?EditorThemeClasses,
+  theme: ?EditorThemeClasses
 ): LexicalComposerContextType {
-  let parentContext = null;
+  let parentContext = null
   if (parent != null) {
-    parentContext = parent[1];
+    parentContext = parent[1]
   }
 
   function getTheme() {
     if (theme != null) {
-      return theme;
+      return theme
     }
 
-    return parentContext != null ? parentContext.getTheme() : null;
+    return parentContext != null ? parentContext.getTheme() : null
   }
 
   return {
-    getTheme,
-  };
+    getTheme
+  }
 }
 
 export function useLexicalComposerContext(): LexicalComposerContextWithEditor {
-  const composerContext = useContext(LexicalComposerContext);
+  const composerContext = useContext(LexicalComposerContext)
 
   if (composerContext == null) {
     invariant(
       false,
-      'LexicalComposerContext.useLexicalComposerContext: cannot find a LexicalComposerContext',
-    );
+      'LexicalComposerContext.useLexicalComposerContext: cannot find a LexicalComposerContext'
+    )
   }
-  return composerContext;
+  return composerContext
 }

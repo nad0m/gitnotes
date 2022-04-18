@@ -6,4 +6,4 @@
  *
  */
 
-export default function LexicalTablePlugin(): null;
+export default function LexicalTablePlugin(): null

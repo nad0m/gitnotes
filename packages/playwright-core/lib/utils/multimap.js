@@ -1,9 +1,9 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.MultiMap = void 0;
+})
+exports.MultiMap = void 0
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -22,57 +22,56 @@ exports.MultiMap = void 0;
  */
 class MultiMap {
   constructor() {
-    this._map = void 0;
-    this._map = new Map();
+    this._map = void 0
+    this._map = new Map()
   }
 
   set(key, value) {
-    let values = this._map.get(key);
+    let values = this._map.get(key)
 
     if (!values) {
-      values = [];
+      values = []
 
-      this._map.set(key, values);
+      this._map.set(key, values)
     }
 
-    values.push(value);
+    values.push(value)
   }
 
   get(key) {
-    return this._map.get(key) || [];
+    return this._map.get(key) || []
   }
 
   has(key) {
-    return this._map.has(key);
+    return this._map.has(key)
   }
 
   hasValue(key, value) {
-    const values = this._map.get(key);
+    const values = this._map.get(key)
 
-    if (!values) return false;
-    return values.includes(value);
+    if (!values) return false
+    return values.includes(value)
   }
 
   get size() {
-    return this._map.size;
+    return this._map.size
   }
 
   keys() {
-    return this._map.keys();
+    return this._map.keys()
   }
 
   values() {
-    const result = [];
+    const result = []
 
-    for (const key of this.keys()) result.push(...this.get(key));
+    for (const key of this.keys()) result.push(...this.get(key))
 
-    return result;
+    return result
   }
 
   clear() {
-    this._map.clear();
+    this._map.clear()
   }
-
 }
 
-exports.MultiMap = MultiMap;
+exports.MultiMap = MultiMap

@@ -4,22 +4,22 @@
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  */
-'use strict';
+'use strict'
 
-const fs = require('fs');
-const evalToString = require('./evalToString');
-const invertObject = require('./invertObject');
-const helperModuleImports = require('@babel/helper-module-imports');
+const fs = require('fs')
+const evalToString = require('./evalToString')
+const invertObject = require('./invertObject')
+const helperModuleImports = require('@babel/helper-module-imports')
 
 module.exports = function (babel) {
-  const t = babel.types;
+  const t = babel.types
 
   return {
     visitor: {
       CallExpression(path, file) {
-        const node = path.node;
-        const noMinify = file.opts.noMinify;
-        if (path.get('callee').isIdentifier({name: 'invariant'})) {
+        const node = path.node
+        const noMinify = file.opts.noMinify
+        if (path.get('callee').isIdentifier({ name: 'invariant' })) {
           // Turns this code:
           //
           // invariant(condition, 'A %s message that contains %s', adj, noun);
@@ -37,26 +37,28 @@ module.exports = function (babel) {
           // where ERR_CODE is an error code: a unique identifier (a number
           // string) that references a verbose error message. The mapping is
           // stored in `scripts/error-codes/codes.json`.
-          const condition = node.arguments[0];
-          const errorMsgLiteral = evalToString(node.arguments[1]);
-          const errorMsgExpressions = Array.from(node.arguments.slice(2));
+          const condition = node.arguments[0]
+          const errorMsgLiteral = evalToString(node.arguments[1])
+          const errorMsgExpressions = Array.from(node.arguments.slice(2))
           const errorMsgQuasis = errorMsgLiteral
             .split('%s')
-            .map((raw) => t.templateElement({cooked: String.raw({raw}), raw}));
+            .map((raw) =>
+              t.templateElement({ cooked: String.raw({ raw }), raw })
+            )
 
           // Outputs:
           //   `A ${adj} message that contains ${noun}`;
           const devMessage = t.templateLiteral(
             errorMsgQuasis,
-            errorMsgExpressions,
-          );
+            errorMsgExpressions
+          )
 
-          const parentStatementPath = path.parentPath;
+          const parentStatementPath = path.parentPath
           if (parentStatementPath.type !== 'ExpressionStatement') {
             throw path.buildCodeFrameError(
               'invariant() cannot be called from expression context. Move ' +
-                'the call to its own statement.',
-            );
+                'the call to its own statement.'
+            )
           }
 
           if (noMinify) {
@@ -71,21 +73,21 @@ module.exports = function (babel) {
                 t.unaryExpression('!', condition),
                 t.blockStatement([
                   t.throwStatement(
-                    t.callExpression(t.identifier('Error'), [devMessage]),
-                  ),
-                ]),
-              ),
-            );
-            return;
+                    t.callExpression(t.identifier('Error'), [devMessage])
+                  )
+                ])
+              )
+            )
+            return
           }
 
           // Avoid caching because we write it as we go.
           const existingErrorMap = JSON.parse(
-            fs.readFileSync(__dirname + '/codes.json', 'utf-8'),
-          );
-          const errorMap = invertObject(existingErrorMap);
+            fs.readFileSync(__dirname + '/codes.json', 'utf-8')
+          )
+          const errorMap = invertObject(existingErrorMap)
 
-          let prodErrorId = errorMap[errorMsgLiteral];
+          let prodErrorId = errorMap[errorMsgLiteral]
 
           if (prodErrorId === undefined) {
             // There is no error code for this message. Add an inline comment
@@ -102,31 +104,31 @@ module.exports = function (babel) {
                 t.unaryExpression('!', condition),
                 t.blockStatement([
                   t.throwStatement(
-                    t.callExpression(t.identifier('Error'), [devMessage]),
-                  ),
-                ]),
-              ),
-            );
+                    t.callExpression(t.identifier('Error'), [devMessage])
+                  )
+                ])
+              )
+            )
             parentStatementPath.addComment(
               'leading',
-              'FIXME (minify-errors-in-prod): Unminified error message in production build!',
-            );
-            return;
+              'FIXME (minify-errors-in-prod): Unminified error message in production build!'
+            )
+            return
           }
-          prodErrorId = parseInt(prodErrorId, 10);
+          prodErrorId = parseInt(prodErrorId, 10)
 
           // Import ReactErrorProd
           const formatProdErrorMessageIdentifier =
             helperModuleImports.addDefault(path, 'formatProdErrorMessage', {
-              nameHint: 'formatProdErrorMessage',
-            });
+              nameHint: 'formatProdErrorMessage'
+            })
 
           // Outputs:
           //   formatProdErrorMessage(ERR_CODE, adj, noun);
           const prodMessage = t.callExpression(
             formatProdErrorMessageIdentifier,
-            [t.numericLiteral(prodErrorId), ...errorMsgExpressions],
-          );
+            [t.numericLiteral(prodErrorId), ...errorMsgExpressions]
+          )
 
           // Outputs:
           // if (!condition) {
@@ -136,12 +138,12 @@ module.exports = function (babel) {
             t.ifStatement(
               t.unaryExpression('!', condition),
               t.blockStatement([
-                t.blockStatement([t.expressionStatement(prodMessage)]),
-              ]),
-            ),
-          );
+                t.blockStatement([t.expressionStatement(prodMessage)])
+              ])
+            )
+          )
         }
-      },
-    },
-  };
-};
+      }
+    }
+  }
+}

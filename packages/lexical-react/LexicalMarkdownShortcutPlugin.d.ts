@@ -6,4 +6,4 @@
  *
  */
 
-export default function LexicalMarkdownShortcutPlugin(): JSX.Element | null;
+export default function LexicalMarkdownShortcutPlugin(): JSX.Element | null

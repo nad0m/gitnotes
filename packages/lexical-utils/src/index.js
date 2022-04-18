@@ -7,15 +7,15 @@
  * @flow strict
  */
 
-import type {ElementNode, LexicalNode} from 'lexical';
+import type { ElementNode, LexicalNode } from 'lexical'
 
-import {$getRoot, $isElementNode} from 'lexical';
-import invariant from 'shared/invariant';
+import { $getRoot, $isElementNode } from 'lexical'
+import invariant from 'shared/invariant'
 
 export type DFSNode = $ReadOnly<{
   depth: number,
-  node: LexicalNode,
-}>;
+  node: LexicalNode
+}>
 
 export function addClassNamesToElement(
   element: HTMLElement,
@@ -23,9 +23,9 @@ export function addClassNamesToElement(
 ): void {
   classNames.forEach((className) => {
     if (className != null && typeof className === 'string') {
-      element.classList.add(...className.split(' '));
+      element.classList.add(...className.split(' '))
     }
-  });
+  })
 }
 
 export function removeClassNamesFromElement(
@@ -33,111 +33,111 @@ export function removeClassNamesFromElement(
   ...classNames: Array<string>
 ): void {
   classNames.forEach((className) => {
-    element.classList.remove(...className.split(' '));
-  });
+    element.classList.remove(...className.split(' '))
+  })
 }
 
 export function $dfs(
   startingNode?: LexicalNode,
-  endingNode?: LexicalNode,
+  endingNode?: LexicalNode
 ): Array<DFSNode> {
-  const nodes = [];
-  const start = (startingNode || $getRoot()).getLatest();
+  const nodes = []
+  const start = (startingNode || $getRoot()).getLatest()
   const end =
-    endingNode || ($isElementNode(start) ? start.getLastDescendant() : start);
-  let node = start;
-  let depth = $getDepth(node);
+    endingNode || ($isElementNode(start) ? start.getLastDescendant() : start)
+  let node = start
+  let depth = $getDepth(node)
   while (node !== null && !node.is(end)) {
-    nodes.push({depth, node});
+    nodes.push({ depth, node })
     if ($isElementNode(node) && node.getChildrenSize() > 0) {
-      node = node.getFirstChild();
-      depth++;
+      node = node.getFirstChild()
+      depth++
     } else {
       // Find immediate sibling or nearest parent sibling
-      let sibling = null;
+      let sibling = null
       while (sibling === null && node !== null) {
-        sibling = node.getNextSibling();
+        sibling = node.getNextSibling()
         if (sibling === null) {
-          node = node.getParent();
-          depth--;
+          node = node.getParent()
+          depth--
         } else {
-          node = sibling;
+          node = sibling
         }
       }
     }
   }
   if (node !== null && node.is(end)) {
-    nodes.push({depth, node});
+    nodes.push({ depth, node })
   }
-  return nodes;
+  return nodes
 }
 
 function $getDepth(node: LexicalNode): number {
-  let node_ = node;
-  let depth = 0;
+  let node_ = node
+  let depth = 0
   while ((node_ = node_.getParent()) !== null) {
-    depth++;
+    depth++
   }
-  return depth;
+  return depth
 }
 
 export function $getNearestNodeOfType<T: LexicalNode>(
   node: LexicalNode,
-  klass: Class<T>,
+  klass: Class<T>
 ): T | null {
-  let parent = node;
+  let parent = node
   while (parent != null) {
     if (parent instanceof klass) {
-      return parent;
+      return parent
     }
-    parent = parent.getParent();
+    parent = parent.getParent()
   }
-  return parent;
+  return parent
 }
 
 export function $getNearestBlockElementAncestorOrThrow(
-  startNode: LexicalNode,
+  startNode: LexicalNode
 ): ElementNode {
   const blockNode = $findMatchingParent(
     startNode,
-    (node) => $isElementNode(node) && !node.isInline(),
-  );
+    (node) => $isElementNode(node) && !node.isInline()
+  )
   if (!$isElementNode(blockNode)) {
     invariant(
       false,
       'Expected node %s to have closest block element node.',
-      startNode.__key,
-    );
+      startNode.__key
+    )
   }
-  return blockNode;
+  return blockNode
 }
 
-export type DOMNodeToLexicalConversion = (element: Node) => LexicalNode;
+export type DOMNodeToLexicalConversion = (element: Node) => LexicalNode
 export type DOMNodeToLexicalConversionMap = {
-  [string]: DOMNodeToLexicalConversion,
-};
+  [string]: DOMNodeToLexicalConversion
+}
 
 export function $findMatchingParent(
   startingNode: LexicalNode,
-  findFn: (LexicalNode) => boolean,
+  findFn: (LexicalNode) => boolean
 ): LexicalNode | null {
-  let curr = startingNode;
+  let curr = startingNode
 
   while (curr !== $getRoot() && curr != null) {
     if (findFn(curr)) {
-      return curr;
+      return curr
     }
 
-    curr = curr.getParent();
+    curr = curr.getParent()
   }
 
-  return null;
+  return null
 }
 
-type Func = () => void;
+type Func = () => void
 
 export function mergeRegister(...func: Array<Func>): () => void {
   return () => {
-    func.forEach((f) => f());
-  };
+    func.forEach((f) => f())
+  }
 }

@@ -7,43 +7,43 @@
  * @flow strict
  */
 
-import type {LexicalCommand} from 'lexical';
+import type { LexicalCommand } from 'lexical'
 
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import {
   $getSelection,
   $isRangeSelection,
   COMMAND_PRIORITY_EDITOR,
-  createCommand,
-} from 'lexical';
-import {useEffect} from 'react';
+  createCommand
+} from 'lexical'
+import { useEffect } from 'react'
 
-import {$createExcalidrawNode, ExcalidrawNode} from '../nodes/ExcalidrawNode';
+import { $createExcalidrawNode, ExcalidrawNode } from '../nodes/ExcalidrawNode'
 
-export const INSERT_EXCALIDRAW_COMMAND: LexicalCommand<void> = createCommand();
+export const INSERT_EXCALIDRAW_COMMAND: LexicalCommand<void> = createCommand()
 
 export default function ExcalidrawPlugin(): React$Node {
-  const [editor] = useLexicalComposerContext();
+  const [editor] = useLexicalComposerContext()
 
   useEffect(() => {
     if (!editor.hasNodes([ExcalidrawNode])) {
       throw new Error(
-        'ExcalidrawPlugin: ExcalidrawNode not registered on editor',
-      );
+        'ExcalidrawPlugin: ExcalidrawNode not registered on editor'
+      )
     }
 
     return editor.registerCommand(
       INSERT_EXCALIDRAW_COMMAND,
       () => {
-        const selection = $getSelection();
+        const selection = $getSelection()
         if ($isRangeSelection(selection)) {
-          const excalidrawNode = $createExcalidrawNode();
-          selection.insertNodes([excalidrawNode]);
+          const excalidrawNode = $createExcalidrawNode()
+          selection.insertNodes([excalidrawNode])
         }
-        return true;
+        return true
       },
-      COMMAND_PRIORITY_EDITOR,
-    );
-  }, [editor]);
-  return null;
+      COMMAND_PRIORITY_EDITOR
+    )
+  }, [editor])
+  return null
 }

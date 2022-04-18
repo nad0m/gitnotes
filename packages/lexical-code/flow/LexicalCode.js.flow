@@ -14,10 +14,10 @@ import type {
   ParagraphNode,
   RangeSelection,
   EditorThemeClasses,
-  LexicalEditor,
-} from 'lexical';
+  LexicalEditor
+} from 'lexical'
 
-import {ElementNode} from 'lexical';
+import { ElementNode } from 'lexical'
 
 declare export class CodeNode extends ElementNode {
   static getType(): string;
@@ -26,27 +26,27 @@ declare export class CodeNode extends ElementNode {
   createDOM<EditorContext>(config: EditorConfig<EditorContext>): HTMLElement;
   updateDOM(prevNode: CodeNode, dom: HTMLElement): boolean;
   insertNewAfter(
-    selection: RangeSelection,
+    selection: RangeSelection
   ): null | ParagraphNode | CodeHighlightNode;
   canInsertTab(): true;
   collapseAtStart(): true;
   setLanguage(language: string): void;
   getLanguage(): string | void;
 }
-declare export function $createCodeNode(): CodeNode;
+declare export function $createCodeNode(): CodeNode
 declare export function $isCodeNode(
-  node: ?LexicalNode,
-): boolean %checks(node instanceof CodeNode);
+  node: ?LexicalNode
+): boolean %checks(node instanceof CodeNode)
 
 declare export function getFirstCodeHighlightNodeOfLine(
-  anchor: LexicalNode,
-): ?CodeHighlightNode;
+  anchor: LexicalNode
+): ?CodeHighlightNode
 
 declare export function getLastCodeHighlightNodeOfLine(
-  anchor: LexicalNode,
-): ?CodeHighlightNode;
+  anchor: LexicalNode
+): ?CodeHighlightNode
 
-import {TextNode} from 'lexical';
+import { TextNode } from 'lexical'
 
 declare export class CodeHighlightNode extends TextNode {
   __highlightType: ?string;
@@ -58,22 +58,22 @@ declare export class CodeHighlightNode extends TextNode {
     // $FlowFixMe
     prevNode: CodeHighlightNode,
     dom: HTMLElement,
-    config: EditorConfig<EditorContext>,
+    config: EditorConfig<EditorContext>
   ): boolean;
   setFormat(format: number): this;
 }
 declare function getHighlightThemeClass(
   theme: EditorThemeClasses,
-  highlightType: ?string,
-): ?string;
+  highlightType: ?string
+): ?string
 declare export function $createCodeHighlightNode(
   text: string,
-  highlightType?: string,
-): CodeHighlightNode;
+  highlightType?: string
+): CodeHighlightNode
 declare export function $isCodeHighlightNode(
-  node: ?LexicalNode,
-): boolean %checks(node instanceof CodeHighlightNode);
+  node: ?LexicalNode
+): boolean %checks(node instanceof CodeHighlightNode)
 
 declare export function registerCodeHighlighting(
-  editor: LexicalEditor,
-): () => void;
+  editor: LexicalEditor
+): () => void

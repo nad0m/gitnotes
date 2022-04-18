@@ -13,38 +13,38 @@ import type {
   LexicalNode,
   NodeKey,
   RangeSelection,
-  LexicalCommand,
-} from 'lexical';
+  LexicalCommand
+} from 'lexical'
 
 export declare class LinkNode extends ElementNode {
-  __url: string;
-  static getType(): string;
-  static clone(node: LinkNode): LinkNode;
-  constructor(url: string, key?: NodeKey): void;
-  createDOM<EditorContext>(config: EditorConfig<EditorContext>): HTMLElement;
+  __url: string
+  static getType(): string
+  static clone(node: LinkNode): LinkNode
+  constructor(url: string, key?: NodeKey): void
+  createDOM<EditorContext>(config: EditorConfig<EditorContext>): HTMLElement
   updateDOM<EditorContext>(
     prevNode: LinkNode,
     dom: HTMLElement,
-    config: EditorConfig<EditorContext>,
-  ): boolean;
-  static importDOM(): DOMConversionMap | null;
-  getURL(): string;
-  setURL(url: string): void;
-  insertNewAfter(selection: RangeSelection): null | ElementNode;
-  canInsertTextBefore(): false;
-  canInsertTextAfter(): boolean;
-  canBeEmpty(): false;
-  isInline(): true;
+    config: EditorConfig<EditorContext>
+  ): boolean
+  static importDOM(): DOMConversionMap | null
+  getURL(): string
+  setURL(url: string): void
+  insertNewAfter(selection: RangeSelection): null | ElementNode
+  canInsertTextBefore(): false
+  canInsertTextAfter(): boolean
+  canBeEmpty(): false
+  isInline(): true
 }
-export function convertAnchorElement(domNode: Node): DOMConversionOutput;
-export function $createLinkNode(url: string): LinkNode;
-export function $isLinkNode(node: ?LexicalNode): boolean;
+export function convertAnchorElement(domNode: Node): DOMConversionOutput
+export function $createLinkNode(url: string): LinkNode
+export function $isLinkNode(node: ?LexicalNode): boolean
 export declare class AutoLinkNode extends LinkNode {
-  static getType(): string;
-  static clone(node: AutoLinkNode): AutoLinkNode;
-  insertNewAfter(selection: RangeSelection): null | ElementNode;
+  static getType(): string
+  static clone(node: AutoLinkNode): AutoLinkNode
+  insertNewAfter(selection: RangeSelection): null | ElementNode
 }
-export function $createAutoLinkNode(url: string): AutoLinkNode;
-export function $isAutoLinkNode(node: ?LexicalNode): boolean;
+export function $createAutoLinkNode(url: string): AutoLinkNode
+export function $isAutoLinkNode(node: ?LexicalNode): boolean
 
-export var TOGGLE_LINK_COMMAND: LexicalCommand<string | null>;
+export var TOGGLE_LINK_COMMAND: LexicalCommand<string | null>

@@ -1,3 +1,1 @@
-import App from './App'
-
-export const Playground = App
+export * from './App'

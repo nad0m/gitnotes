@@ -8,7 +8,7 @@
  */
 
 type Props = $ReadOnly<{
-  onClear?: () => void,
-}>;
+  onClear?: () => void
+}>
 
-declare export default function LexicalClearEditorPlugin(Props): React$Node;
+declare export default function LexicalClearEditorPlugin(Props): React$Node

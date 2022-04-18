@@ -7,7 +7,7 @@
  * @flow strict
  */
 
-import type {EditorThemeClasses, LexicalEditor, LexicalNode} from 'lexical';
+import type { EditorThemeClasses, LexicalEditor, LexicalNode } from 'lexical'
 
 type Props = {
   initialConfig: $ReadOnly<{
@@ -16,9 +16,9 @@ type Props = {
     namespace?: string,
     nodes?: $ReadOnlyArray<Class<LexicalNode>>,
     theme?: EditorThemeClasses,
-    onError: (error: Error, editor: LexicalEditor) => void,
+    onError: (error: Error, editor: LexicalEditor) => void
   }>,
-  children: React$Node,
-};
+  children: React$Node
+}
 
-declare export default function LexicalComposer(Props): React$MixedElement;
+declare export default function LexicalComposer(Props): React$MixedElement

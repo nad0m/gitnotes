@@ -7,43 +7,43 @@
  * @flow strict
  */
 
-import type {EditorConfig, LexicalEditor, LexicalNode, NodeKey} from 'lexical';
+import type { EditorConfig, LexicalEditor, LexicalNode, NodeKey } from 'lexical'
 
-import './StickyNode.css';
+import './StickyNode.css'
 
 import {
   CollaborationPlugin,
-  useCollaborationContext,
-} from '@lexical/react/LexicalCollaborationPlugin';
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {HistoryPlugin} from '@lexical/react/LexicalHistoryPlugin';
-import LexicalNestedComposer from '@lexical/react/LexicalNestedComposer';
-import PlainTextPlugin from '@lexical/react/LexicalPlainTextPlugin';
+  useCollaborationContext
+} from '@lexical/react/LexicalCollaborationPlugin'
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
+import LexicalNestedComposer from '@lexical/react/LexicalNestedComposer'
+import PlainTextPlugin from '@lexical/react/LexicalPlainTextPlugin'
 import {
   $getNodeByKey,
   $setSelection,
   createEditor,
-  DecoratorNode,
-} from 'lexical';
-import * as React from 'react';
-import {useCallback, useEffect, useRef} from 'react';
+  DecoratorNode
+} from 'lexical'
+import * as React from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 // $FlowFixMe
-import {createPortal} from 'react-dom';
-import useLayoutEffect from '../../shared/useLayoutEffect';
+import { createPortal } from 'react-dom'
+import useLayoutEffect from '../../shared/useLayoutEffect'
 
-import {createWebsocketProvider} from '../lib/collaboration';
-import {useSharedHistoryContext} from '../context/SharedHistoryContext';
-import StickyEditorTheme from '../themes/StickyEditorTheme';
-import ContentEditable from '../ui/ContentEditable';
-import Placeholder from '../ui/Placeholder';
+import { createWebsocketProvider } from '../lib/collaboration'
+import { useSharedHistoryContext } from '../context/SharedHistoryContext'
+import StickyEditorTheme from '../themes/StickyEditorTheme'
+import ContentEditable from '../ui/ContentEditable'
+import Placeholder from '../ui/Placeholder'
 
 function positionSticky(stickyElem: HTMLElement, positioning): void {
-  const style = stickyElem.style;
-  const rootElementRect = positioning.rootElementRect;
-  const rectLeft = rootElementRect !== null ? rootElementRect.left : 0;
-  const rectTop = rootElementRect !== null ? rootElementRect.top : 0;
-  style.top = rectTop + positioning.y + 'px';
-  style.left = rectLeft + positioning.x + 'px';
+  const style = stickyElem.style
+  const rootElementRect = positioning.rootElementRect
+  const rectLeft = rootElementRect !== null ? rootElementRect.left : 0
+  const rectTop = rootElementRect !== null ? rootElementRect.top : 0
+  style.top = rectTop + positioning.y + 'px'
+  style.left = rectLeft + positioning.x + 'px'
 }
 
 function StickyComponent({
@@ -51,155 +51,155 @@ function StickyComponent({
   y,
   nodeKey,
   color,
-  caption,
+  caption
 }: {
   caption: LexicalEditor,
   color: 'pink' | 'yellow',
   nodeKey: NodeKey,
   x: number,
-  y: number,
+  y: number
 }): React$Node {
-  const [editor] = useLexicalComposerContext();
-  const stickyContainerRef = useRef<null | HTMLElement>(null);
+  const [editor] = useLexicalComposerContext()
+  const stickyContainerRef = useRef<null | HTMLElement>(null)
   const positioningRef = useRef<{
     isDragging: boolean,
     offsetX: number,
     offsetY: number,
     rootElementRect: null | ClientRect,
     x: number,
-    y: number,
+    y: number
   }>({
     isDragging: false,
     offsetX: 0,
     offsetY: 0,
     rootElementRect: null,
     x: 0,
-    y: 0,
-  });
-  const {yjsDocMap} = useCollaborationContext();
-  const isCollab = yjsDocMap.get('main') !== undefined;
+    y: 0
+  })
+  const { yjsDocMap } = useCollaborationContext()
+  const isCollab = yjsDocMap.get('main') !== undefined
 
   useEffect(() => {
-    const position = positioningRef.current;
-    position.x = x;
-    position.y = y;
+    const position = positioningRef.current
+    position.x = x
+    position.y = y
 
-    const stickyContainer = stickyContainerRef.current;
+    const stickyContainer = stickyContainerRef.current
     if (stickyContainer !== null) {
-      positionSticky(stickyContainer, position);
+      positionSticky(stickyContainer, position)
     }
-  }, [x, y]);
+  }, [x, y])
 
   useLayoutEffect(() => {
-    const position = positioningRef.current;
+    const position = positioningRef.current
     const resizeObserver = new ResizeObserver((entries) => {
       for (let i = 0; i < entries.length; i++) {
-        const entry = entries[i];
-        const {target} = entry;
-        position.rootElementRect = target.getBoundingClientRect();
-        const stickyContainer = stickyContainerRef.current;
+        const entry = entries[i]
+        const { target } = entry
+        position.rootElementRect = target.getBoundingClientRect()
+        const stickyContainer = stickyContainerRef.current
         if (stickyContainer !== null) {
-          positionSticky(stickyContainer, position);
+          positionSticky(stickyContainer, position)
         }
       }
-    });
+    })
 
     const removeRootListener = editor.registerRootListener(
       (nextRootElem, prevRootElem) => {
         if (prevRootElem !== null) {
-          resizeObserver.unobserve(prevRootElem);
+          resizeObserver.unobserve(prevRootElem)
         }
         if (nextRootElem !== null) {
-          resizeObserver.observe(nextRootElem);
+          resizeObserver.observe(nextRootElem)
         }
-      },
-    );
+      }
+    )
 
     const handleWindowResize = () => {
-      const rootElement = editor.getRootElement();
-      const stickyContainer = stickyContainerRef.current;
+      const rootElement = editor.getRootElement()
+      const stickyContainer = stickyContainerRef.current
       if (rootElement !== null && stickyContainer !== null) {
-        position.rootElementRect = rootElement.getBoundingClientRect();
-        positionSticky(stickyContainer, position);
+        position.rootElementRect = rootElement.getBoundingClientRect()
+        positionSticky(stickyContainer, position)
       }
-    };
+    }
 
-    window.addEventListener('resize', handleWindowResize);
+    window.addEventListener('resize', handleWindowResize)
 
     return () => {
-      window.removeEventListener('resize', handleWindowResize);
-      removeRootListener();
-    };
-  }, [editor]);
+      window.removeEventListener('resize', handleWindowResize)
+      removeRootListener()
+    }
+  }, [editor])
 
   useEffect(() => {
-    const stickyContainer = stickyContainerRef.current;
+    const stickyContainer = stickyContainerRef.current
     if (stickyContainer !== null) {
       // Delay adding transition so we don't trigger the
       // transition on load of the sticky.
       setTimeout(() => {
         stickyContainer.style.setProperty(
           'transition',
-          'top 0.3s ease 0s, left 0.3s ease 0s',
-        );
-      }, 500);
+          'top 0.3s ease 0s, left 0.3s ease 0s'
+        )
+      }, 500)
     }
-  }, []);
+  }, [])
 
   const handlePointerMove = useCallback((event: PointerEvent) => {
-    const stickyContainer = stickyContainerRef.current;
-    const positioning = positioningRef.current;
-    const rootElementRect = positioning.rootElementRect;
+    const stickyContainer = stickyContainerRef.current
+    const positioning = positioningRef.current
+    const rootElementRect = positioning.rootElementRect
     if (
       stickyContainer !== null &&
       positioning.isDragging &&
       rootElementRect !== null
     ) {
-      positioning.x = event.pageX - positioning.offsetX - rootElementRect.left;
-      positioning.y = event.pageY - positioning.offsetY - rootElementRect.top;
-      positionSticky(stickyContainer, positioning);
+      positioning.x = event.pageX - positioning.offsetX - rootElementRect.left
+      positioning.y = event.pageY - positioning.offsetY - rootElementRect.top
+      positionSticky(stickyContainer, positioning)
     }
-  }, []);
+  }, [])
 
   const handlePointerUp = useCallback(
     (event: PointerEvent) => {
-      const stickyContainer = stickyContainerRef.current;
-      const positioning = positioningRef.current;
+      const stickyContainer = stickyContainerRef.current
+      const positioning = positioningRef.current
       if (stickyContainer !== null) {
-        positioning.isDragging = false;
-        stickyContainer.classList.remove('dragging');
+        positioning.isDragging = false
+        stickyContainer.classList.remove('dragging')
         editor.update(() => {
-          const node = $getNodeByKey(nodeKey);
+          const node = $getNodeByKey(nodeKey)
           if ($isStickyNode(node)) {
-            node.setPosition(positioning.x, positioning.y);
+            node.setPosition(positioning.x, positioning.y)
           }
-        });
+        })
       }
-      document.removeEventListener('pointermove', handlePointerMove);
-      document.removeEventListener('pointerup', handlePointerUp);
+      document.removeEventListener('pointermove', handlePointerMove)
+      document.removeEventListener('pointerup', handlePointerUp)
     },
-    [editor, handlePointerMove, nodeKey],
-  );
+    [editor, handlePointerMove, nodeKey]
+  )
 
   const handleDelete = useCallback(() => {
     editor.update(() => {
-      const node = $getNodeByKey(nodeKey);
+      const node = $getNodeByKey(nodeKey)
       if ($isStickyNode(node)) {
-        node.remove();
+        node.remove()
       }
-    });
-  }, [editor, nodeKey]);
+    })
+  }, [editor, nodeKey])
 
   const handleColorChange = useCallback(() => {
     editor.update(() => {
-      const node = $getNodeByKey(nodeKey);
+      const node = $getNodeByKey(nodeKey)
       if ($isStickyNode(node)) {
-        node.toggleColor();
+        node.toggleColor()
       }
-    });
-  }, [editor, nodeKey]);
+    })
+  }, [editor, nodeKey])
 
-  const {historyState} = useSharedHistoryContext();
+  const { historyState } = useSharedHistoryContext()
 
   return (
     <div
@@ -208,19 +208,19 @@ function StickyComponent({
       onPointerDown={(event) => {
         if (event.button === 2 || event.target !== stickyContainerRef.current) {
           // Right click or click on editor should not work
-          return;
+          return
         }
-        const stickContainer = stickyContainerRef.current;
-        const positioning = positioningRef.current;
+        const stickContainer = stickyContainerRef.current
+        const positioning = positioningRef.current
         if (stickContainer !== null) {
-          const {top, left} = stickContainer.getBoundingClientRect();
-          positioning.offsetX = event.clientX - left + 30;
-          positioning.offsetY = event.clientY - top + 20;
-          positioning.isDragging = true;
-          stickContainer.classList.add('dragging');
-          document.addEventListener('pointermove', handlePointerMove);
-          document.addEventListener('pointerup', handlePointerUp);
-          event.preventDefault();
+          const { top, left } = stickContainer.getBoundingClientRect()
+          positioning.offsetX = event.clientX - left + 30
+          positioning.offsetY = event.clientY - top + 20
+          positioning.isDragging = true
+          stickContainer.classList.add('dragging')
+          document.addEventListener('pointermove', handlePointerMove)
+          document.addEventListener('pointerup', handlePointerUp)
+          event.preventDefault()
         }
       }}>
       <button onClick={handleDelete} className="delete">
@@ -254,17 +254,17 @@ function StickyComponent({
         />
       </LexicalNestedComposer>
     </div>
-  );
+  )
 }
 
 export class StickyNode extends DecoratorNode<React$Node> {
-  __x: number;
-  __y: number;
-  __color: 'pink' | 'yellow';
-  __caption: LexicalEditor;
+  __x: number
+  __y: number
+  __color: 'pink' | 'yellow'
+  __caption: LexicalEditor
 
   static getType(): string {
-    return 'sticky';
+    return 'sticky'
   }
 
   static clone(node: StickyNode): StickyNode {
@@ -273,8 +273,8 @@ export class StickyNode extends DecoratorNode<React$Node> {
       node.__y,
       node.__color,
       node.__caption,
-      node.__key,
-    );
+      node.__key
+    )
   }
 
   constructor(
@@ -282,35 +282,35 @@ export class StickyNode extends DecoratorNode<React$Node> {
     y: number,
     color: 'pink' | 'yellow',
     caption?: LexicalEditor,
-    key?: NodeKey,
+    key?: NodeKey
   ) {
-    super(key);
-    this.__x = x;
-    this.__y = y;
-    this.__caption = caption || createEditor();
-    this.__color = color;
+    super(key)
+    this.__x = x
+    this.__y = y
+    this.__caption = caption || createEditor()
+    this.__color = color
   }
 
   createDOM<EditorContext>(config: EditorConfig<EditorContext>): HTMLElement {
-    const div = document.createElement('div');
-    div.style.display = 'contents';
-    return div;
+    const div = document.createElement('div')
+    div.style.display = 'contents'
+    return div
   }
 
   updateDOM(): false {
-    return false;
+    return false
   }
 
   setPosition(x: number, y: number): void {
-    const writable = this.getWritable();
-    writable.__x = x;
-    writable.__y = y;
-    $setSelection(null);
+    const writable = this.getWritable()
+    writable.__x = x
+    writable.__y = y
+    $setSelection(null)
   }
 
   toggleColor(): void {
-    const writable = this.getWritable();
-    writable.__color = writable.__color === 'pink' ? 'yellow' : 'pink';
+    const writable = this.getWritable()
+    writable.__color = writable.__color === 'pink' ? 'yellow' : 'pink'
   }
 
   decorate(editor: LexicalEditor): React$Node {
@@ -322,22 +322,22 @@ export class StickyNode extends DecoratorNode<React$Node> {
         nodeKey={this.getKey()}
         caption={this.__caption}
       />,
-      document.body,
-    );
+      document.body
+    )
   }
 
   isIsolated(): true {
-    return true;
+    return true
   }
 }
 
 export function $isStickyNode(node: ?LexicalNode): boolean %checks {
-  return node instanceof StickyNode;
+  return node instanceof StickyNode
 }
 
 export function $createStickyNode(
   xOffset: number,
-  yOffset: number,
+  yOffset: number
 ): StickyNode {
-  return new StickyNode(xOffset, yOffset, 'yellow');
+  return new StickyNode(xOffset, yOffset, 'yellow')
 }

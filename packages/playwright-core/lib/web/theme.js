@@ -1,9 +1,9 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.applyTheme = applyTheme;
+})
+exports.applyTheme = applyTheme
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -21,12 +21,21 @@ exports.applyTheme = applyTheme;
  * limitations under the License.
  */
 function applyTheme() {
-  if (document.playwrightThemeInitialized) return;
-  document.playwrightThemeInitialized = true;
-  document.defaultView.addEventListener('focus', event => {
-    if (event.target.document.nodeType === Node.DOCUMENT_NODE) document.body.classList.remove('inactive');
-  }, false);
-  document.defaultView.addEventListener('blur', event => {
-    document.body.classList.add('inactive');
-  }, false);
+  if (document.playwrightThemeInitialized) return
+  document.playwrightThemeInitialized = true
+  document.defaultView.addEventListener(
+    'focus',
+    (event) => {
+      if (event.target.document.nodeType === Node.DOCUMENT_NODE)
+        document.body.classList.remove('inactive')
+    },
+    false
+  )
+  document.defaultView.addEventListener(
+    'blur',
+    (event) => {
+      document.body.classList.add('inactive')
+    },
+    false
+  )
 }

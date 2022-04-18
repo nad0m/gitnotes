@@ -7,28 +7,28 @@
  * @flow strict
  */
 
-import type {LexicalNode} from 'lexical';
+import type { LexicalNode } from 'lexical'
 
-import {CodeHighlightNode, CodeNode} from '@lexical/code';
-import {HashtagNode} from '@lexical/hashtag';
-import {AutoLinkNode, LinkNode} from '@lexical/link';
-import {ListItemNode, ListNode} from '@lexical/list';
-import {OverflowNode} from '@lexical/overflow';
-import {HorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
-import {HeadingNode, QuoteNode} from '@lexical/rich-text';
-import {TableCellNode, TableNode, TableRowNode} from '@lexical/table';
+import { CodeHighlightNode, CodeNode } from '@lexical/code'
+import { HashtagNode } from '@lexical/hashtag'
+import { AutoLinkNode, LinkNode } from '@lexical/link'
+import { ListItemNode, ListNode } from '@lexical/list'
+import { OverflowNode } from '@lexical/overflow'
+import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
+import { HeadingNode, QuoteNode } from '@lexical/rich-text'
+import { TableCellNode, TableNode, TableRowNode } from '@lexical/table'
 
-import {EmojiNode} from './EmojiNode';
-import {EquationNode} from './EquationNode';
-import {ExcalidrawNode} from './ExcalidrawNode';
-import {ImageNode} from './ImageNode';
-import {KeywordNode} from './KeywordNode';
-import {MentionNode} from './MentionNode';
-import {PollNode} from './PollNode';
-import {StickyNode} from './StickyNode';
-import {TweetNode} from './TweetNode.jsx';
-import {TypeaheadNode} from './TypeaheadNode';
-import {YouTubeNode} from './YouTubeNode.jsx';
+import { EmojiNode } from './EmojiNode'
+import { EquationNode } from './EquationNode'
+import { ExcalidrawNode } from './ExcalidrawNode'
+import { ImageNode } from './ImageNode'
+import { KeywordNode } from './KeywordNode'
+import { MentionNode } from './MentionNode'
+import { PollNode } from './PollNode'
+import { StickyNode } from './StickyNode'
+import { TweetNode } from './TweetNode.jsx'
+import { TypeaheadNode } from './TypeaheadNode'
+import { YouTubeNode } from './YouTubeNode.jsx'
 
 const PlaygroundNodes: Array<Class<LexicalNode>> = [
   HeadingNode,
@@ -55,7 +55,7 @@ const PlaygroundNodes: Array<Class<LexicalNode>> = [
   KeywordNode,
   HorizontalRuleNode,
   TweetNode,
-  YouTubeNode,
-];
+  YouTubeNode
+]
 
-export default PlaygroundNodes;
+export default PlaygroundNodes

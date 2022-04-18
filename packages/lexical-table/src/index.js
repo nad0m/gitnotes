@@ -7,33 +7,33 @@
  * @flow strict
  */
 
-import type {LexicalCommand} from 'lexical';
+import type { LexicalCommand } from 'lexical'
 
-import {createCommand} from 'lexical';
+import { createCommand } from 'lexical'
 
 import {
   $createTableCellNode,
   $isTableCellNode,
   TableCellHeaderStates,
-  TableCellNode,
-} from './LexicalTableCellNode';
+  TableCellNode
+} from './LexicalTableCellNode'
 import {
   $createTableNode,
   $getElementGridForTableNode,
   $isTableNode,
-  TableNode,
-} from './LexicalTableNode';
+  TableNode
+} from './LexicalTableNode'
 import {
   $createTableRowNode,
   $isTableRowNode,
-  TableRowNode,
-} from './LexicalTableRowNode';
-import {TableSelection} from './LexicalTableSelection';
+  TableRowNode
+} from './LexicalTableRowNode'
+import { TableSelection } from './LexicalTableSelection'
 import {
   applyTableHandlers,
   getCellFromTarget,
-  getTableSelectionFromTableElement,
-} from './LexicalTableSelectionHelpers';
+  getTableSelectionFromTableElement
+} from './LexicalTableSelectionHelpers'
 import {
   $createTableNodeWithDimensions,
   $deleteTableColumn,
@@ -44,8 +44,8 @@ import {
   $getTableRowNodeFromTableCellNodeOrThrow,
   $insertTableColumn,
   $insertTableRow,
-  $removeTableRowAtIndex,
-} from './LexicalTableUtils';
+  $removeTableRowAtIndex
+} from './LexicalTableUtils'
 
 export {
   $createTableCellNode,
@@ -72,10 +72,10 @@ export {
   TableCellNode,
   TableNode,
   TableRowNode,
-  TableSelection,
-};
+  TableSelection
+}
 
 export const INSERT_TABLE_COMMAND: LexicalCommand<{
   columns: string,
-  rows: string,
-}> = createCommand();
+  rows: string
+}> = createCommand()

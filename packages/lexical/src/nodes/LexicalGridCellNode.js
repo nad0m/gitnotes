@@ -7,18 +7,18 @@
  * @flow strict
  */
 
-import type {LexicalNode, NodeKey} from 'lexical';
+import type { LexicalNode, NodeKey } from 'lexical'
 
-import {ElementNode} from './LexicalElementNode';
+import { ElementNode } from './LexicalElementNode'
 
 export class GridCellNode extends ElementNode {
-  __colSpan: number;
+  __colSpan: number
 
   constructor(colSpan: number, key?: NodeKey) {
-    super(key);
+    super(key)
   }
 }
 
 export function $isGridCellNode(node: ?LexicalNode): boolean %checks {
-  return node instanceof GridCellNode;
+  return node instanceof GridCellNode
 }

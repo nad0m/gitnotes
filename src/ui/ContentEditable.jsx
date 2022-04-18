@@ -7,17 +7,17 @@
  * @flow strict
  */
 
-import './ContentEditable.css';
+import './ContentEditable.css'
 
-import LexicalContentEditable from '@lexical/react/LexicalContentEditable';
-import * as React from 'react';
+import LexicalContentEditable from '@lexical/react/LexicalContentEditable'
+import * as React from 'react'
 
 export default function ContentEditable({
-  className,
+  className
 }: {
-  className?: string,
+  className?: string
 }): React$Node {
   return (
     <LexicalContentEditable className={className || 'ContentEditable__root'} />
-  );
+  )
 }

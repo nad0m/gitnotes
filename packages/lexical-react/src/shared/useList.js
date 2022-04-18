@@ -7,7 +7,7 @@
  * @flow strict
  */
 
-import type {LexicalEditor} from 'lexical';
+import type { LexicalEditor } from 'lexical'
 
 import {
   $handleListInsertParagraph,
@@ -17,16 +17,16 @@ import {
   insertList,
   outdentList,
   REMOVE_LIST_COMMAND,
-  removeList,
-} from '@lexical/list';
-import {mergeRegister} from '@lexical/utils';
+  removeList
+} from '@lexical/list'
+import { mergeRegister } from '@lexical/utils'
 import {
   COMMAND_PRIORITY_LOW,
   INDENT_CONTENT_COMMAND,
   INSERT_PARAGRAPH_COMMAND,
-  OUTDENT_CONTENT_COMMAND,
-} from 'lexical';
-import {useEffect} from 'react';
+  OUTDENT_CONTENT_COMMAND
+} from 'lexical'
+import { useEffect } from 'react'
 
 export default function useList(editor: LexicalEditor): void {
   useEffect(() => {
@@ -34,60 +34,60 @@ export default function useList(editor: LexicalEditor): void {
       editor.registerCommand(
         INDENT_CONTENT_COMMAND,
         () => {
-          const hasHandledIndention = indentList();
+          const hasHandledIndention = indentList()
           if (hasHandledIndention) {
-            return true;
+            return true
           }
-          return false;
+          return false
         },
-        COMMAND_PRIORITY_LOW,
+        COMMAND_PRIORITY_LOW
       ),
       editor.registerCommand(
         OUTDENT_CONTENT_COMMAND,
         () => {
-          const hasHandledIndention = outdentList();
+          const hasHandledIndention = outdentList()
           if (hasHandledIndention) {
-            return true;
+            return true
           }
-          return false;
+          return false
         },
-        COMMAND_PRIORITY_LOW,
+        COMMAND_PRIORITY_LOW
       ),
       editor.registerCommand(
         INSERT_ORDERED_LIST_COMMAND,
         () => {
-          insertList(editor, 'ol');
-          return true;
+          insertList(editor, 'ol')
+          return true
         },
-        COMMAND_PRIORITY_LOW,
+        COMMAND_PRIORITY_LOW
       ),
       editor.registerCommand(
         INSERT_UNORDERED_LIST_COMMAND,
         () => {
-          insertList(editor, 'ul');
-          return true;
+          insertList(editor, 'ul')
+          return true
         },
-        COMMAND_PRIORITY_LOW,
+        COMMAND_PRIORITY_LOW
       ),
       editor.registerCommand(
         REMOVE_LIST_COMMAND,
         () => {
-          removeList(editor);
-          return true;
+          removeList(editor)
+          return true
         },
-        COMMAND_PRIORITY_LOW,
+        COMMAND_PRIORITY_LOW
       ),
       editor.registerCommand(
         INSERT_PARAGRAPH_COMMAND,
         () => {
-          const hasHandledInsertParagraph = $handleListInsertParagraph();
+          const hasHandledInsertParagraph = $handleListInsertParagraph()
           if (hasHandledInsertParagraph) {
-            return true;
+            return true
           }
-          return false;
+          return false
         },
-        COMMAND_PRIORITY_LOW,
-      ),
-    );
-  }, [editor]);
+        COMMAND_PRIORITY_LOW
+      )
+    )
+  }, [editor])
 }

@@ -6,20 +6,20 @@
  *
  */
 
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import CommunityContributors from '@site/src/components/CommunityContributors';
-import CommunityHeader from '@site/src/components/CommunityHeader';
-import CommunityHowToContribute from '@site/src/components/CommunityHowToContribute';
-import CommunityLinks from '@site/src/components/CommunityLinks';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
+import CommunityContributors from '@site/src/components/CommunityContributors'
+import CommunityHeader from '@site/src/components/CommunityHeader'
+import CommunityHowToContribute from '@site/src/components/CommunityHowToContribute'
+import CommunityLinks from '@site/src/components/CommunityLinks'
 import App from '@site/src/packages/LexicalPlayground'
-import Layout from '@theme/Layout';
-import React from 'react';
+import Layout from '@theme/Layout'
+import React from 'react'
 
 export default function Community() {
-  const { siteConfig } = useDocusaurusContext();
+  const { siteConfig } = useDocusaurusContext()
   return (
     <Layout description={siteConfig.tagline}>
       <App />
     </Layout>
-  );
+  )
 }

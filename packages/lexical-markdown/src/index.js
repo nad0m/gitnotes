@@ -7,53 +7,53 @@
  * @flow strict
  */
 
-import type {AutoFormatTriggerState} from './utils';
-import type {DecoratorNode, LexicalEditor} from 'lexical';
+import type { AutoFormatTriggerState } from './utils'
+import type { DecoratorNode, LexicalEditor } from 'lexical'
 
 import {
   findScanningContext,
   getTriggerState,
-  updateAutoFormatting,
-} from './autoFormatUtils';
+  updateAutoFormatting
+} from './autoFormatUtils'
 import {
   convertMarkdownForElementNodes,
-  convertStringToLexical,
-} from './convertFromPlainTextUtils.js';
+  convertStringToLexical
+} from './convertFromPlainTextUtils.js'
 
 export function registerMarkdownShortcuts<T>(
   editor: LexicalEditor,
-  createHorizontalRuleNode: () => DecoratorNode<T>,
+  createHorizontalRuleNode: () => DecoratorNode<T>
 ): () => void {
   // The priorTriggerState is compared against the currentTriggerState to determine
   // if the user has performed some typing event that warrants an auto format.
   // For example, typing "#" and then " ", shoud trigger an format.
   // However, given "#A B", where the user delets "A" should not.
 
-  let priorTriggerState: null | AutoFormatTriggerState = null;
-  return editor.registerUpdateListener(({tags}) => {
+  let priorTriggerState: null | AutoFormatTriggerState = null
+  return editor.registerUpdateListener(({ tags }) => {
     // Examine historic so that we are not running autoformatting within markdown.
     if (tags.has('historic') === false) {
-      const currentTriggerState = getTriggerState(editor.getEditorState());
+      const currentTriggerState = getTriggerState(editor.getEditorState())
       const scanningContext =
         currentTriggerState == null
           ? null
-          : findScanningContext(editor, currentTriggerState, priorTriggerState);
+          : findScanningContext(editor, currentTriggerState, priorTriggerState)
       if (scanningContext != null) {
-        updateAutoFormatting(editor, scanningContext, createHorizontalRuleNode);
+        updateAutoFormatting(editor, scanningContext, createHorizontalRuleNode)
       }
-      priorTriggerState = currentTriggerState;
+      priorTriggerState = currentTriggerState
     } else {
-      priorTriggerState = null;
+      priorTriggerState = null
     }
-  });
+  })
 }
 
 export function $convertFromMarkdownString<T>(
   markdownString: string,
   editor: LexicalEditor,
-  createHorizontalRuleNode: null | (() => DecoratorNode<T>),
+  createHorizontalRuleNode: null | (() => DecoratorNode<T>)
 ): void {
   if (convertStringToLexical(markdownString, editor) != null) {
-    convertMarkdownForElementNodes(editor, createHorizontalRuleNode);
+    convertMarkdownForElementNodes(editor, createHorizontalRuleNode)
   }
 }

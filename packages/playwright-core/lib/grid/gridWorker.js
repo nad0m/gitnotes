@@ -1,18 +1,20 @@
-"use strict";
+'use strict'
 
-var _ws = _interopRequireDefault(require("ws"));
+var _ws = _interopRequireDefault(require('ws'))
 
-var _debug = _interopRequireDefault(require("debug"));
+var _debug = _interopRequireDefault(require('debug'))
 
-var _dispatcher = require("../dispatchers/dispatcher");
+var _dispatcher = require('../dispatchers/dispatcher')
 
-var _playwrightDispatcher = require("../dispatchers/playwrightDispatcher");
+var _playwrightDispatcher = require('../dispatchers/playwrightDispatcher')
 
-var _playwright = require("../server/playwright");
+var _playwright = require('../server/playwright')
 
-var _processLauncher = require("../utils/processLauncher");
+var _processLauncher = require('../utils/processLauncher')
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj }
+}
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -30,31 +32,38 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * limitations under the License.
  */
 function launchGridWorker(gridURL, agentId, workerId) {
-  const log = (0, _debug.default)(`[worker ${workerId}]`);
-  log('created');
-  const ws = new _ws.default(gridURL + `/registerWorker?agentId=${agentId}&workerId=${workerId}`);
-  const dispatcherConnection = new _dispatcher.DispatcherConnection();
+  const log = (0, _debug.default)(`[worker ${workerId}]`)
+  log('created')
+  const ws = new _ws.default(
+    gridURL + `/registerWorker?agentId=${agentId}&workerId=${workerId}`
+  )
+  const dispatcherConnection = new _dispatcher.DispatcherConnection()
 
-  dispatcherConnection.onmessage = message => ws.send(JSON.stringify(message));
+  dispatcherConnection.onmessage = (message) => ws.send(JSON.stringify(message))
 
   ws.once('open', () => {
-    new _dispatcher.Root(dispatcherConnection, async rootScope => {
-      const playwright = (0, _playwright.createPlaywright)('javascript');
-      const dispatcher = new _playwrightDispatcher.PlaywrightDispatcher(rootScope, playwright);
-      dispatcher.enableSocksProxy();
-      return dispatcher;
-    });
-  });
-  ws.on('message', message => dispatcherConnection.dispatch(JSON.parse(message.toString())));
+    new _dispatcher.Root(dispatcherConnection, async (rootScope) => {
+      const playwright = (0, _playwright.createPlaywright)('javascript')
+      const dispatcher = new _playwrightDispatcher.PlaywrightDispatcher(
+        rootScope,
+        playwright
+      )
+      dispatcher.enableSocksProxy()
+      return dispatcher
+    })
+  })
+  ws.on('message', (message) =>
+    dispatcherConnection.dispatch(JSON.parse(message.toString()))
+  )
   ws.on('close', async () => {
     // Drop any messages during shutdown on the floor.
-    dispatcherConnection.onmessage = () => {};
+    dispatcherConnection.onmessage = () => {}
 
-    setTimeout(() => process.exit(0), 30000); // Meanwhile, try to gracefully close all browsers.
+    setTimeout(() => process.exit(0), 30000) // Meanwhile, try to gracefully close all browsers.
 
-    await (0, _processLauncher.gracefullyCloseAll)();
-    process.exit(0);
-  });
+    await (0, _processLauncher.gracefullyCloseAll)()
+    process.exit(0)
+  })
 }
 
-launchGridWorker(process.argv[2], process.argv[3], process.argv[4]);
+launchGridWorker(process.argv[2], process.argv[3], process.argv[4])

@@ -21,10 +21,9 @@ function registerHistory(
 History package handles `UNDO_COMMAND`, `REDO_COMMAND` and `CLEAR_HISTORY_COMMAND` commands. It also triggers `CAN_UNDO_COMMAND` and `CAN_REDO_COMMAND` commands when history state is changed. These commands could be used to work with history state:
 
 ```jsx
-import {UNDO_COMMAND, REDO_COMMAND} from 'lexical';
-
-<Toolbar>
+import { UNDO_COMMAND, REDO_COMMAND } from 'lexical'
+;<Toolbar>
   <Button onClick={() => editor.dispatchCommand(UNDO_COMMAND)}>Undo</Button>
   <Button onClick={() => editor.dispatchCommand(REDO_COMMAND)}>Redo</Button>
-</Toolbar>;
+</Toolbar>
 ```

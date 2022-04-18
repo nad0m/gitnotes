@@ -14,19 +14,17 @@ export const routes: RouteType[] = [
     path: '/',
     component: <HomePage />,
     name: 'Home Screen',
-    protected: true,
+    protected: true
   },
   {
     path: 'login',
     component: <LoginPage />,
     name: 'Login Screen',
-    protected: false,
+    protected: false
   },
   {
     path: '*',
-    component: (
-      <Navigate to="/" />
-    ),
-    protected: true,
-  },
+    component: <Navigate to="/" />,
+    protected: true
+  }
 ]

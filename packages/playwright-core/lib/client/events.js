@@ -1,9 +1,9 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.Events = void 0;
+})
+exports.Events = void 0
 
 /**
  * Copyright 2019 Google Inc. All rights reserved.
@@ -85,5 +85,5 @@ const Events = {
     Close: 'close',
     Window: 'window'
   }
-};
-exports.Events = Events;
+}
+exports.Events = Events

@@ -7,10 +7,10 @@
  * @flow strict
  */
 
-import type {LexicalEditor} from 'lexical';
+import type { LexicalEditor } from 'lexical'
 
-import useList from './shared/useList';
+import useList from './shared/useList'
 
 export default function useLexicalList(editor: LexicalEditor): void {
-  useList(editor);
+  useList(editor)
 }

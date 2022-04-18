@@ -6,10 +6,10 @@
  *
  * @flow strict
  */
-import type {EditorState, LexicalEditor} from 'lexical';
-export type InitialEditorStateType = null | string | EditorState | (() => void);
+import type { EditorState, LexicalEditor } from 'lexical'
+export type InitialEditorStateType = null | string | EditorState | (() => void)
 
 declare function registerPlainText(
   editor: LexicalEditor,
-  initialEditorState?: InitialEditorStateType,
-): () => void;
+  initialEditorState?: InitialEditorStateType
+): () => void

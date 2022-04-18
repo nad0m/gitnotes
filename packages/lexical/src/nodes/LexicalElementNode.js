@@ -7,217 +7,217 @@
  * @flow strict
  */
 
-import type {NodeKey} from '../LexicalNode';
-import type {PointType, RangeSelection} from '../LexicalSelection';
+import type { NodeKey } from '../LexicalNode'
+import type { PointType, RangeSelection } from '../LexicalSelection'
 
-import invariant from 'shared/invariant';
+import invariant from 'shared/invariant'
 
-import {$isRootNode, $isTextNode, TextNode} from '../';
-import {ELEMENT_TYPE_TO_FORMAT} from '../LexicalConstants';
-import {LexicalNode} from '../LexicalNode';
+import { $isRootNode, $isTextNode, TextNode } from '../'
+import { ELEMENT_TYPE_TO_FORMAT } from '../LexicalConstants'
+import { LexicalNode } from '../LexicalNode'
 import {
   $getSelection,
   $isRangeSelection,
   internalMakeRangeSelection,
-  moveSelectionPointToSibling,
-} from '../LexicalSelection';
-import {errorOnReadOnly, getActiveEditor} from '../LexicalUpdates';
+  moveSelectionPointToSibling
+} from '../LexicalSelection'
+import { errorOnReadOnly, getActiveEditor } from '../LexicalUpdates'
 import {
   $getNodeByKey,
   internalMarkNodeAsDirty,
-  removeFromParent,
-} from '../LexicalUtils';
+  removeFromParent
+} from '../LexicalUtils'
 
-export type ElementFormatType = 'left' | 'center' | 'right' | 'justify';
+export type ElementFormatType = 'left' | 'center' | 'right' | 'justify'
 
 export class ElementNode extends LexicalNode {
-  __children: Array<NodeKey>;
-  __format: number;
-  __indent: number;
-  __dir: 'ltr' | 'rtl' | null;
+  __children: Array<NodeKey>
+  __format: number
+  __indent: number
+  __dir: 'ltr' | 'rtl' | null
 
   constructor(key?: NodeKey): void {
-    super(key);
-    this.__children = [];
-    this.__format = 0;
-    this.__indent = 0;
-    this.__dir = null;
+    super(key)
+    this.__children = []
+    this.__format = 0
+    this.__indent = 0
+    this.__dir = null
   }
 
   getFormat(): number {
-    const self = this.getLatest();
-    return self.__format;
+    const self = this.getLatest()
+    return self.__format
   }
   getIndent(): number {
-    const self = this.getLatest();
-    return self.__indent;
+    const self = this.getLatest()
+    return self.__indent
   }
   getChildren(): Array<LexicalNode> {
-    const self = this.getLatest();
-    const children = self.__children;
-    const childrenNodes = [];
+    const self = this.getLatest()
+    const children = self.__children
+    const childrenNodes = []
     for (let i = 0; i < children.length; i++) {
-      const childNode = $getNodeByKey<LexicalNode>(children[i]);
+      const childNode = $getNodeByKey<LexicalNode>(children[i])
       if (childNode !== null) {
-        childrenNodes.push(childNode);
+        childrenNodes.push(childNode)
       }
     }
-    return childrenNodes;
+    return childrenNodes
   }
   getChildrenKeys(): Array<NodeKey> {
-    return this.getLatest().__children;
+    return this.getLatest().__children
   }
   getChildrenSize(): number {
-    const self = this.getLatest();
-    return self.__children.length;
+    const self = this.getLatest()
+    return self.__children.length
   }
   isEmpty(): boolean {
-    return this.getChildrenSize() === 0;
+    return this.getChildrenSize() === 0
   }
   isDirty(): boolean {
-    const editor = getActiveEditor();
-    const dirtyElements = editor._dirtyElements;
-    return dirtyElements !== null && dirtyElements.has(this.__key);
+    const editor = getActiveEditor()
+    const dirtyElements = editor._dirtyElements
+    return dirtyElements !== null && dirtyElements.has(this.__key)
   }
   getAllTextNodes(includeInert?: boolean): Array<TextNode> {
-    const textNodes = [];
-    const self = this.getLatest();
-    const children = self.__children;
+    const textNodes = []
+    const self = this.getLatest()
+    const children = self.__children
     for (let i = 0; i < children.length; i++) {
-      const childNode = $getNodeByKey<LexicalNode>(children[i]);
+      const childNode = $getNodeByKey<LexicalNode>(children[i])
       if ($isTextNode(childNode) && (includeInert || !childNode.isInert())) {
-        textNodes.push(childNode);
+        textNodes.push(childNode)
       } else if ($isElementNode(childNode)) {
-        const subChildrenNodes = childNode.getAllTextNodes(includeInert);
-        textNodes.push(...subChildrenNodes);
+        const subChildrenNodes = childNode.getAllTextNodes(includeInert)
+        textNodes.push(...subChildrenNodes)
       }
     }
-    return textNodes;
+    return textNodes
   }
   getFirstDescendant(): null | LexicalNode {
-    let node = this.getFirstChild();
+    let node = this.getFirstChild()
     while (node !== null) {
       if ($isElementNode(node)) {
-        const child = node.getFirstChild();
+        const child = node.getFirstChild()
         if (child !== null) {
-          node = child;
-          continue;
+          node = child
+          continue
         }
       }
-      break;
+      break
     }
-    return node;
+    return node
   }
   getLastDescendant(): null | LexicalNode {
-    let node = this.getLastChild();
+    let node = this.getLastChild()
     while (node !== null) {
       if ($isElementNode(node)) {
-        const child = node.getLastChild();
+        const child = node.getLastChild()
         if (child !== null) {
-          node = child;
-          continue;
+          node = child
+          continue
         }
       }
-      break;
+      break
     }
-    return node;
+    return node
   }
   getDescendantByIndex(index: number): LexicalNode {
-    const children = this.getChildren();
-    const childrenLength = children.length;
+    const children = this.getChildren()
+    const childrenLength = children.length
     if (childrenLength === 0) {
-      return this;
+      return this
     }
     // For non-empty element nodes, we resolve its descendant
     // (either a leaf node or the bottom-most element)
     if (index >= childrenLength) {
-      const resolvedNode = children[childrenLength - 1];
+      const resolvedNode = children[childrenLength - 1]
       return (
         ($isElementNode(resolvedNode) && resolvedNode.getLastDescendant()) ||
         resolvedNode
-      );
+      )
     }
-    const resolvedNode = children[index];
+    const resolvedNode = children[index]
     return (
       ($isElementNode(resolvedNode) && resolvedNode.getFirstDescendant()) ||
       resolvedNode
-    );
+    )
   }
   getFirstChild<T: LexicalNode>(): null | T {
-    const self = this.getLatest();
-    const children = self.__children;
-    const childrenLength = children.length;
+    const self = this.getLatest()
+    const children = self.__children
+    const childrenLength = children.length
     if (childrenLength === 0) {
-      return null;
+      return null
     }
-    return $getNodeByKey<T>(children[0]);
+    return $getNodeByKey<T>(children[0])
   }
   getFirstChildOrThrow<T: LexicalNode>(): T {
-    const firstChild = this.getFirstChild<T>();
+    const firstChild = this.getFirstChild<T>()
     if (firstChild === null) {
-      invariant(false, 'Expected node %s to have a first child.', this.__key);
+      invariant(false, 'Expected node %s to have a first child.', this.__key)
     }
-    return firstChild;
+    return firstChild
   }
   getLastChild(): null | LexicalNode {
-    const self = this.getLatest();
-    const children = self.__children;
-    const childrenLength = children.length;
+    const self = this.getLatest()
+    const children = self.__children
+    const childrenLength = children.length
     if (childrenLength === 0) {
-      return null;
+      return null
     }
-    return $getNodeByKey<LexicalNode>(children[childrenLength - 1]);
+    return $getNodeByKey<LexicalNode>(children[childrenLength - 1])
   }
   getChildAtIndex(index: number): null | LexicalNode {
-    const self = this.getLatest();
-    const children = self.__children;
-    const key = children[index];
+    const self = this.getLatest()
+    const children = self.__children
+    const key = children[index]
     if (key === undefined) {
-      return null;
+      return null
     }
-    return $getNodeByKey(key);
+    return $getNodeByKey(key)
   }
   getTextContent(includeInert?: boolean, includeDirectionless?: false): string {
-    let textContent = '';
-    const children = this.getChildren();
-    const childrenLength = children.length;
+    let textContent = ''
+    const children = this.getChildren()
+    const childrenLength = children.length
     for (let i = 0; i < childrenLength; i++) {
-      const child = children[i];
-      textContent += child.getTextContent(includeInert, includeDirectionless);
+      const child = children[i]
+      textContent += child.getTextContent(includeInert, includeDirectionless)
       if (
         $isElementNode(child) &&
         i !== childrenLength - 1 &&
         !child.isInline()
       ) {
-        textContent += '\n\n';
+        textContent += '\n\n'
       }
     }
-    return textContent;
+    return textContent
   }
   getDirection(): 'ltr' | 'rtl' | null {
-    const self = this.getLatest();
-    return self.__dir;
+    const self = this.getLatest()
+    return self.__dir
   }
   hasFormat(type: ElementFormatType): boolean {
-    const formatFlag = ELEMENT_TYPE_TO_FORMAT[type];
-    return (this.getFormat() & formatFlag) !== 0;
+    const formatFlag = ELEMENT_TYPE_TO_FORMAT[type]
+    return (this.getFormat() & formatFlag) !== 0
   }
 
   // Mutators
 
   select(_anchorOffset?: number, _focusOffset?: number): RangeSelection {
-    errorOnReadOnly();
-    const selection = $getSelection();
-    let anchorOffset = _anchorOffset;
-    let focusOffset = _focusOffset;
-    const childrenCount = this.getChildrenSize();
+    errorOnReadOnly()
+    const selection = $getSelection()
+    let anchorOffset = _anchorOffset
+    let focusOffset = _focusOffset
+    const childrenCount = this.getChildrenSize()
     if (anchorOffset === undefined) {
-      anchorOffset = childrenCount;
+      anchorOffset = childrenCount
     }
     if (focusOffset === undefined) {
-      focusOffset = childrenCount;
+      focusOffset = childrenCount
     }
-    const key = this.__key;
+    const key = this.__key
     if (!$isRangeSelection(selection)) {
       return internalMakeRangeSelection(
         key,
@@ -225,115 +225,115 @@ export class ElementNode extends LexicalNode {
         key,
         focusOffset,
         'element',
-        'element',
-      );
+        'element'
+      )
     } else {
-      selection.anchor.set(key, anchorOffset, 'element');
-      selection.focus.set(key, focusOffset, 'element');
-      selection.dirty = true;
+      selection.anchor.set(key, anchorOffset, 'element')
+      selection.focus.set(key, focusOffset, 'element')
+      selection.dirty = true
     }
-    return selection;
+    return selection
   }
   selectStart(): RangeSelection {
-    const firstNode = this.getFirstDescendant();
+    const firstNode = this.getFirstDescendant()
     if ($isElementNode(firstNode) || $isTextNode(firstNode)) {
-      return firstNode.select(0, 0);
+      return firstNode.select(0, 0)
     }
     // Decorator or LineBreak
     if (firstNode !== null) {
-      return firstNode.selectPrevious();
+      return firstNode.selectPrevious()
     }
-    return this.select(0, 0);
+    return this.select(0, 0)
   }
   selectEnd(): RangeSelection {
-    const lastNode = this.getLastDescendant();
+    const lastNode = this.getLastDescendant()
     if ($isElementNode(lastNode) || $isTextNode(lastNode)) {
-      return lastNode.select();
+      return lastNode.select()
     }
     // Decorator or LineBreak
     if (lastNode !== null) {
-      return lastNode.selectNext();
+      return lastNode.selectNext()
     }
-    return this.select();
+    return this.select()
   }
   clear(): ElementNode {
-    errorOnReadOnly();
-    const writableSelf = this.getWritable();
-    const children = this.getChildren();
-    children.forEach((child) => child.remove());
-    return writableSelf;
+    errorOnReadOnly()
+    const writableSelf = this.getWritable()
+    const children = this.getChildren()
+    children.forEach((child) => child.remove())
+    return writableSelf
   }
   append(...nodesToAppend: LexicalNode[]): ElementNode {
-    errorOnReadOnly();
-    return this.splice(this.getChildrenSize(), 0, nodesToAppend);
+    errorOnReadOnly()
+    return this.splice(this.getChildrenSize(), 0, nodesToAppend)
   }
   setDirection(direction: 'ltr' | 'rtl' | null): this {
-    errorOnReadOnly();
-    const self = this.getWritable();
-    self.__dir = direction;
-    return self;
+    errorOnReadOnly()
+    const self = this.getWritable()
+    self.__dir = direction
+    return self
   }
   setFormat(type: ElementFormatType): this {
-    errorOnReadOnly();
-    const self = this.getWritable();
-    self.__format = ELEMENT_TYPE_TO_FORMAT[type];
-    return this;
+    errorOnReadOnly()
+    const self = this.getWritable()
+    self.__format = ELEMENT_TYPE_TO_FORMAT[type]
+    return this
   }
   setIndent(indentLevel: number): this {
-    errorOnReadOnly();
-    const self = this.getWritable();
-    self.__indent = indentLevel;
-    return this;
+    errorOnReadOnly()
+    const self = this.getWritable()
+    self.__indent = indentLevel
+    return this
   }
   splice(
     start: number,
     deleteCount: number,
-    nodesToInsert: Array<LexicalNode>,
+    nodesToInsert: Array<LexicalNode>
   ): ElementNode {
-    errorOnReadOnly();
-    const writableSelf = this.getWritable();
-    const writableSelfKey = writableSelf.__key;
-    const writableSelfChildren = writableSelf.__children;
-    const nodesToInsertLength = nodesToInsert.length;
-    const nodesToInsertKeys = [];
+    errorOnReadOnly()
+    const writableSelf = this.getWritable()
+    const writableSelfKey = writableSelf.__key
+    const writableSelfChildren = writableSelf.__children
+    const nodesToInsertLength = nodesToInsert.length
+    const nodesToInsertKeys = []
 
     // Remove nodes to insert from their previous parent
     for (let i = 0; i < nodesToInsertLength; i++) {
-      const nodeToInsert = nodesToInsert[i];
-      const writableNodeToInsert = nodeToInsert.getWritable();
+      const nodeToInsert = nodesToInsert[i]
+      const writableNodeToInsert = nodeToInsert.getWritable()
       if (nodeToInsert.__key === writableSelfKey) {
-        invariant(false, 'append: attemtping to append self');
+        invariant(false, 'append: attemtping to append self')
       }
-      removeFromParent(writableNodeToInsert);
+      removeFromParent(writableNodeToInsert)
       // Set child parent to self
-      writableNodeToInsert.__parent = writableSelfKey;
-      const newKey = writableNodeToInsert.__key;
-      nodesToInsertKeys.push(newKey);
+      writableNodeToInsert.__parent = writableSelfKey
+      const newKey = writableNodeToInsert.__key
+      nodesToInsertKeys.push(newKey)
     }
 
     // Mark range edges siblings as dirty
-    const nodeBeforeRange = this.getChildAtIndex(start - 1);
+    const nodeBeforeRange = this.getChildAtIndex(start - 1)
     if (nodeBeforeRange) {
-      internalMarkNodeAsDirty(nodeBeforeRange);
+      internalMarkNodeAsDirty(nodeBeforeRange)
     }
-    const nodeAfterRange = this.getChildAtIndex(start + deleteCount);
+    const nodeAfterRange = this.getChildAtIndex(start + deleteCount)
     if (nodeAfterRange) {
-      internalMarkNodeAsDirty(nodeAfterRange);
+      internalMarkNodeAsDirty(nodeAfterRange)
     }
 
     // Remove defined range of children
-    let nodesToRemoveKeys;
+    let nodesToRemoveKeys
 
     // Using faster push when only appending nodes
     if (start === writableSelfChildren.length) {
-      writableSelfChildren.push(...nodesToInsertKeys);
-      nodesToRemoveKeys = [];
+      writableSelfChildren.push(...nodesToInsertKeys)
+      nodesToRemoveKeys = []
     } else {
       nodesToRemoveKeys = writableSelfChildren.splice(
         start,
         deleteCount,
-        ...nodesToInsertKeys,
-      );
+        ...nodesToInsertKeys
+      )
     }
 
     // In case of deletion we need to adjust selection, unlink removed nodes
@@ -341,34 +341,34 @@ export class ElementNode extends LexicalNode {
     // for insertion-only cases
     if (nodesToRemoveKeys.length) {
       // Adjusting selection, in case node that was anchor/focus will be deleted
-      const selection = $getSelection();
+      const selection = $getSelection()
       if ($isRangeSelection(selection)) {
-        const nodesToRemoveKeySet = new Set(nodesToRemoveKeys);
-        const nodesToInsertKeySet = new Set(nodesToInsertKeys);
+        const nodesToRemoveKeySet = new Set(nodesToRemoveKeys)
+        const nodesToInsertKeySet = new Set(nodesToInsertKeys)
         const isPointRemoved = (point: PointType): boolean => {
-          let node = point.getNode();
+          let node = point.getNode()
           while (node) {
-            const nodeKey = node.__key;
+            const nodeKey = node.__key
             if (
               nodesToRemoveKeySet.has(nodeKey) &&
               !nodesToInsertKeySet.has(nodeKey)
             ) {
-              return true;
+              return true
             }
-            node = node.getParent();
+            node = node.getParent()
           }
-          return false;
-        };
+          return false
+        }
 
-        const {anchor, focus} = selection;
+        const { anchor, focus } = selection
         if (isPointRemoved(anchor)) {
           moveSelectionPointToSibling(
             anchor,
             anchor.getNode(),
             this,
             nodeBeforeRange,
-            nodeAfterRange,
-          );
+            nodeAfterRange
+          )
         }
         if (isPointRemoved(focus)) {
           moveSelectionPointToSibling(
@@ -376,17 +376,17 @@ export class ElementNode extends LexicalNode {
             focus.getNode(),
             this,
             nodeBeforeRange,
-            nodeAfterRange,
-          );
+            nodeAfterRange
+          )
         }
 
         // Unlink removed nodes from current parent
-        const nodesToRemoveKeysLength = nodesToRemoveKeys.length;
+        const nodesToRemoveKeysLength = nodesToRemoveKeys.length
         for (let i = 0; i < nodesToRemoveKeysLength; i++) {
-          const nodeToRemove = $getNodeByKey<LexicalNode>(nodesToRemoveKeys[i]);
+          const nodeToRemove = $getNodeByKey<LexicalNode>(nodesToRemoveKeys[i])
           if (nodeToRemove != null) {
-            const writableNodeToRemove = nodeToRemove.getWritable();
-            writableNodeToRemove.__parent = null;
+            const writableNodeToRemove = nodeToRemove.getWritable()
+            writableNodeToRemove.__parent = null
           }
         }
 
@@ -396,52 +396,52 @@ export class ElementNode extends LexicalNode {
           !this.canBeEmpty() &&
           !$isRootNode(this)
         ) {
-          this.remove();
+          this.remove()
         }
       }
     }
 
-    return writableSelf;
+    return writableSelf
   }
   // These are intended to be extends for specific element heuristics.
   insertNewAfter(selection: RangeSelection): null | LexicalNode {
-    return null;
+    return null
   }
   canInsertTab(): boolean {
-    return false;
+    return false
   }
   collapseAtStart(selection: RangeSelection): boolean {
-    return false;
+    return false
   }
   excludeFromCopy(): boolean {
-    return false;
+    return false
   }
   canExtractContents(): boolean {
-    return true;
+    return true
   }
   canReplaceWith(replacement: LexicalNode): boolean {
-    return true;
+    return true
   }
   canInsertAfter(node: LexicalNode): boolean {
-    return true;
+    return true
   }
   canBeEmpty(): boolean {
-    return true;
+    return true
   }
   canInsertTextBefore(): boolean {
-    return true;
+    return true
   }
   canInsertTextAfter(): boolean {
-    return true;
+    return true
   }
   isInline(): boolean {
-    return false;
+    return false
   }
   canMergeWith(node: ElementNode): boolean {
-    return false;
+    return false
   }
 }
 
 export function $isElementNode(node: ?LexicalNode): boolean %checks {
-  return node instanceof ElementNode;
+  return node instanceof ElementNode
 }

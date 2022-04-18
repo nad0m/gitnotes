@@ -7,45 +7,45 @@
  * @flow strict
  */
 
-import type {LexicalCommand} from 'lexical';
+import type { LexicalCommand } from 'lexical'
 
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import {
   $getSelection,
   $isRangeSelection,
   $isRootNode,
   COMMAND_PRIORITY_EDITOR,
-  createCommand,
-} from 'lexical';
-import {useEffect} from 'react';
+  createCommand
+} from 'lexical'
+import { useEffect } from 'react'
 
-import {$createPollNode, PollNode} from '../nodes/PollNode';
+import { $createPollNode, PollNode } from '../nodes/PollNode'
 
-export const INSERT_POLL_COMMAND: LexicalCommand<string> = createCommand();
+export const INSERT_POLL_COMMAND: LexicalCommand<string> = createCommand()
 
 export default function PollPlugin(): React$Node {
-  const [editor] = useLexicalComposerContext();
+  const [editor] = useLexicalComposerContext()
   useEffect(() => {
     if (!editor.hasNodes([PollNode])) {
-      throw new Error('PollPlugin: PollNode not registered on editor');
+      throw new Error('PollPlugin: PollNode not registered on editor')
     }
 
     return editor.registerCommand(
       INSERT_POLL_COMMAND,
       (payload) => {
-        const selection = $getSelection();
+        const selection = $getSelection()
         if ($isRangeSelection(selection)) {
-          const question: string = payload;
-          const pollNode = $createPollNode(question);
+          const question: string = payload
+          const pollNode = $createPollNode(question)
           if ($isRootNode(selection.anchor.getNode())) {
-            selection.insertParagraph();
+            selection.insertParagraph()
           }
-          selection.insertNodes([pollNode]);
+          selection.insertNodes([pollNode])
         }
-        return true;
+        return true
       },
-      COMMAND_PRIORITY_EDITOR,
-    );
-  }, [editor]);
-  return null;
+      COMMAND_PRIORITY_EDITOR
+    )
+  }, [editor])
+  return null
 }

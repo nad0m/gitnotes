@@ -6,10 +6,10 @@
  *
  */
 
-import type {LexicalEditor, EditorThemeClasses} from 'lexical';
+import type { LexicalEditor, EditorThemeClasses } from 'lexical'
 
 export default function LexicalNestedComposer(arg0: {
-  initialEditor: LexicalEditor;
-  initialTheme?: EditorThemeClasses;
-  children: JSX.Element | JSX.Element[] | null;
-}): JSX.Element | null;
+  initialEditor: LexicalEditor
+  initialTheme?: EditorThemeClasses
+  children: JSX.Element | JSX.Element[] | null
+}): JSX.Element | null

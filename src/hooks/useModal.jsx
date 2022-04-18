@@ -7,42 +7,42 @@
  * @flow strict
  */
 
-import {useCallback, useMemo, useState} from 'react';
-import * as React from 'react';
+import { useCallback, useMemo, useState } from 'react'
+import * as React from 'react'
 
-import Modal from '../ui/Modal';
+import Modal from '../ui/Modal'
 
 export default function useModal(): [
   React$Node,
-  (string, (() => void) => React$Node) => void,
+  (string, (() => void) => React$Node) => void
 ] {
   const [modalContent, setModalContent] = useState<null | {
     content: React$Node,
-    title: string,
-  }>(null);
+    title: string
+  }>(null)
 
   const onClose = useCallback(() => {
-    setModalContent(null);
-  }, []);
+    setModalContent(null)
+  }, [])
 
   const modal = useMemo(() => {
     if (modalContent === null) {
-      return null;
+      return null
     }
-    const {title, content} = modalContent;
+    const { title, content } = modalContent
     return (
       <Modal onClose={onClose} title={title}>
         {content}
       </Modal>
-    );
-  }, [modalContent, onClose]);
+    )
+  }, [modalContent, onClose])
 
   const showModal = useCallback(
     (title, getContent: (() => void) => React$Node) => {
-      setModalContent({content: getContent(onClose), title});
+      setModalContent({ content: getContent(onClose), title })
     },
-    [onClose],
-  );
+    [onClose]
+  )
 
-  return [modal, showModal];
+  return [modal, showModal]
 }

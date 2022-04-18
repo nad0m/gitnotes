@@ -9,9 +9,9 @@
  * @flow strict
  */
 
-'use strict';
+'use strict'
 
-const LEXICAL_PKG = 'lexical';
+const LEXICAL_PKG = 'lexical'
 const DEFAULT_PKGS = [
   'lexical-react',
   'lexical-yjs',
@@ -31,10 +31,10 @@ const DEFAULT_PKGS = [
   'lexical-overflow',
   'lexical-link',
   'lexical-text',
-  'lexical-markdown',
-];
+  'lexical-markdown'
+]
 
 module.exports = {
   DEFAULT_PKGS,
-  LEXICAL_PKG,
-};
+  LEXICAL_PKG
+}

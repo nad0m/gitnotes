@@ -1,9 +1,9 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.Accessibility = void 0;
+})
+exports.Accessibility = void 0
 
 /**
  * Copyright 2017 Google Inc. All rights reserved.
@@ -22,32 +22,47 @@ exports.Accessibility = void 0;
  * limitations under the License.
  */
 function axNodeFromProtocol(axNode) {
-  const result = { ...axNode,
-    value: axNode.valueNumber !== undefined ? axNode.valueNumber : axNode.valueString,
-    checked: axNode.checked === 'checked' ? true : axNode.checked === 'unchecked' ? false : axNode.checked,
-    pressed: axNode.pressed === 'pressed' ? true : axNode.pressed === 'released' ? false : axNode.pressed,
-    children: axNode.children ? axNode.children.map(axNodeFromProtocol) : undefined
-  };
-  delete result.valueNumber;
-  delete result.valueString;
-  return result;
+  const result = {
+    ...axNode,
+    value:
+      axNode.valueNumber !== undefined
+        ? axNode.valueNumber
+        : axNode.valueString,
+    checked:
+      axNode.checked === 'checked'
+        ? true
+        : axNode.checked === 'unchecked'
+        ? false
+        : axNode.checked,
+    pressed:
+      axNode.pressed === 'pressed'
+        ? true
+        : axNode.pressed === 'released'
+        ? false
+        : axNode.pressed,
+    children: axNode.children
+      ? axNode.children.map(axNodeFromProtocol)
+      : undefined
+  }
+  delete result.valueNumber
+  delete result.valueString
+  return result
 }
 
 class Accessibility {
   constructor(channel) {
-    this._channel = void 0;
-    this._channel = channel;
+    this._channel = void 0
+    this._channel = channel
   }
 
   async snapshot(options = {}) {
-    const root = options.root ? options.root._elementChannel : undefined;
+    const root = options.root ? options.root._elementChannel : undefined
     const result = await this._channel.accessibilitySnapshot({
       interestingOnly: options.interestingOnly,
       root
-    });
-    return result.rootAXNode ? axNodeFromProtocol(result.rootAXNode) : null;
+    })
+    return result.rootAXNode ? axNodeFromProtocol(result.rootAXNode) : null
   }
-
 }
 
-exports.Accessibility = Accessibility;
+exports.Accessibility = Accessibility

@@ -15,10 +15,10 @@ import type {
   RangeSelection,
   LexicalEditor,
   TextFormatType,
-  LexicalCommand,
-} from 'lexical';
+  LexicalCommand
+} from 'lexical'
 
-import {ElementNode} from 'lexical';
+import { ElementNode } from 'lexical'
 
 /**
  * LexicalTableCellNode
@@ -28,10 +28,10 @@ export const TableCellHeaderStates = {
   NO_STATUS: 0,
   ROW: 1,
   COLUMN: 2,
-  BOTH: 3,
-};
+  BOTH: 3
+}
 
-export type TableCellHeaderState = $Values<typeof TableCellHeaderStates>;
+export type TableCellHeaderState = $Values<typeof TableCellHeaderStates>
 
 declare export class TableCellNode extends ElementNode {
   static getType(): string;
@@ -40,13 +40,13 @@ declare export class TableCellNode extends ElementNode {
     headerState?: TableCellHeaderState,
     colSpan?: number,
     width?: ?number,
-    key?: NodeKey,
+    key?: NodeKey
   ): void;
   __headerState: TableCellHeaderState;
   createDOM<EditorContext>(config: EditorConfig<EditorContext>): HTMLElement;
   updateDOM(prevNode: TableCellNode, dom: HTMLElement): boolean;
   insertNewAfter(
-    selection: RangeSelection,
+    selection: RangeSelection
   ): null | ParagraphNode | TableCellNode;
   canInsertTab(): true;
   collapseAtStart(): true;
@@ -64,11 +64,11 @@ declare export class TableCellNode extends ElementNode {
 declare export function $createTableCellNode(
   headerState: TableCellHeaderState,
   colSpan?: number,
-  width?: ?number,
-): TableCellNode;
+  width?: ?number
+): TableCellNode
 declare export function $isTableCellNode(
-  node: ?LexicalNode,
-): boolean %checks(node instanceof TableCellNode);
+  node: ?LexicalNode
+): boolean %checks(node instanceof TableCellNode)
 
 /**
  * LexicalTableNode
@@ -85,8 +85,8 @@ declare export class TableNode extends ElementNode {
   collapseAtStart(): true;
   getCordsFromCellNode(
     tableCellNode: TableCellNode,
-    grid: Grid,
-  ): {x: number, y: number};
+    grid: Grid
+  ): { x: number, y: number };
   getCellFromCords(x: number, y: number, grid: Grid): ?Cell;
   getCellFromCordsOrThrow(x: number, y: number, grid: Grid): Cell;
   getCellNodeFromCords(x: number, y: number, grid: Grid): ?TableCellNode;
@@ -95,10 +95,10 @@ declare export class TableNode extends ElementNode {
   getGrid(): ?Grid;
   canSelectBefore(): true;
 }
-declare export function $createTableNode(): TableNode;
+declare export function $createTableNode(): TableNode
 declare export function $isTableNode(
-  node: ?LexicalNode,
-): boolean %checks(node instanceof TableNode);
+  node: ?LexicalNode
+): boolean %checks(node instanceof TableNode)
 
 /**
  * LexicalTableRowNode
@@ -113,15 +113,15 @@ declare export class TableRowNode extends ElementNode {
   setHeight(height: number): ?number;
   getHeight(): ?number;
   insertNewAfter(
-    selection: RangeSelection,
+    selection: RangeSelection
   ): null | ParagraphNode | TableRowNode;
   canInsertTab(): true;
   collapseAtStart(): true;
 }
-declare export function $createTableRowNode(): TableRowNode;
+declare export function $createTableRowNode(): TableRowNode
 declare export function $isTableRowNode(
-  node: ?LexicalNode,
-): boolean %checks(node instanceof TableRowNode);
+  node: ?LexicalNode
+): boolean %checks(node instanceof TableRowNode)
 
 /**
  * LexicalTableSelectionHelpers
@@ -131,33 +131,33 @@ export type Cell = {
   elem: HTMLElement,
   highlighted: boolean,
   x: number,
-  y: number,
-};
+  y: number
+}
 
-export type Cells = Array<Array<Cell>>;
+export type Cells = Array<Array<Cell>>
 
 export type Grid = {
   cells: Cells,
   columns: number,
-  rows: number,
-};
+  rows: number
+}
 
 declare export function applyTableHandlers(
   tableNode: TableNode,
   tableElement: HTMLElement,
-  editor: LexicalEditor,
-): TableSelection;
+  editor: LexicalEditor
+): TableSelection
 
 declare export function $getElementGridForTableNode(
   editor: LexicalEditor,
-  tableNode: TableNode,
-): Grid;
+  tableNode: TableNode
+): Grid
 
 declare export function getTableSelectionFromTableElement(
-  tableElement: HTMLElement,
-): TableSelection;
+  tableElement: HTMLElement
+): TableSelection
 
-declare export function getCellFromTarget(node: Node): Cell | null;
+declare export function getCellFromTarget(node: Node): Cell | null
 
 /**
  * LexicalTableUtils
@@ -166,53 +166,53 @@ declare export function getCellFromTarget(node: Node): Cell | null;
 declare export function $createTableNodeWithDimensions(
   rowCount: number,
   columnCount: number,
-  includeHeaders?: boolean,
-): TableNode;
+  includeHeaders?: boolean
+): TableNode
 
 declare export function $getTableCellNodeFromLexicalNode(
-  startingNode: LexicalNode,
-): TableCellNode | null;
+  startingNode: LexicalNode
+): TableCellNode | null
 
 declare export function $getTableRowNodeFromTableCellNodeOrThrow(
-  startingNode: LexicalNode,
-): TableRowNode;
+  startingNode: LexicalNode
+): TableRowNode
 
 declare export function $getTableNodeFromLexicalNodeOrThrow(
-  startingNode: LexicalNode,
-): TableNode;
+  startingNode: LexicalNode
+): TableNode
 
 declare export function $getTableRowIndexFromTableCellNode(
-  tableCellNode: TableCellNode,
-): number;
+  tableCellNode: TableCellNode
+): number
 
 declare export function $getTableColumnIndexFromTableCellNode(
-  tableCellNode: TableCellNode,
-): number;
+  tableCellNode: TableCellNode
+): number
 
 declare export function $removeTableRowAtIndex(
   tableNode: TableNode,
-  indexToDelete: number,
-): TableNode;
+  indexToDelete: number
+): TableNode
 
 declare export function $insertTableRow(
   tableNode: TableNode,
   targetIndex: number,
   shouldInsertAfter?: boolean,
   rowCount: number,
-  grid: Grid,
-): TableNode;
+  grid: Grid
+): TableNode
 
 declare export function $insertTableColumn(
   tableNode: TableNode,
   targetIndex: number,
   shouldInsertAfter?: boolean,
-  columnCount: number,
-): TableNode;
+  columnCount: number
+): TableNode
 
 declare export function $deleteTableColumn(
   tableNode: TableNode,
-  targetIndex: number,
-): TableNode;
+  targetIndex: number
+): TableNode
 
 /**
  * LexicalTableSelection.js
@@ -242,5 +242,5 @@ declare export class TableSelection {
 
 declare export var INSERT_TABLE_COMMAND: LexicalCommand<{
   rows: string,
-  columns: string,
-}>;
+  columns: string
+}>

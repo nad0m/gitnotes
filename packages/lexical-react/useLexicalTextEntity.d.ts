@@ -6,14 +6,14 @@
  *
  */
 
-import {Class} from 'utility-types';
-import type {TextNode} from 'lexical';
+import { Class } from 'utility-types'
+import type { TextNode } from 'lexical'
 export type EntityMatch = {
-  end: number;
-  start: number;
-};
+  end: number
+  start: number
+}
 export default function useLexicalTextEntity<N extends TextNode>(
   getMatch: (text: string) => null | EntityMatch,
   targetNode: Class<N>,
-  createNode: (textNode: TextNode) => N,
-): void;
+  createNode: (textNode: TextNode) => N
+): void

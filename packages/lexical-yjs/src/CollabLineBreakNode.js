@@ -7,64 +7,64 @@
  * @flow strict
  */
 
-import type {Binding} from '.';
-import type {CollabElementNode} from './CollabElementNode';
-import type {LineBreakNode, NodeKey} from 'lexical';
-import type {Map as YMap} from 'yjs';
+import type { Binding } from '.'
+import type { CollabElementNode } from './CollabElementNode'
+import type { LineBreakNode, NodeKey } from 'lexical'
+import type { Map as YMap } from 'yjs'
 
-import {$getNodeByKey, $isLineBreakNode} from 'lexical';
+import { $getNodeByKey, $isLineBreakNode } from 'lexical'
 
 export class CollabLineBreakNode {
-  _map: YMap;
-  _key: NodeKey;
-  _parent: CollabElementNode;
-  _type: 'linebreak';
+  _map: YMap
+  _key: NodeKey
+  _parent: CollabElementNode
+  _type: 'linebreak'
 
   constructor(map: YMap, parent: CollabElementNode) {
-    this._key = '';
-    this._map = map;
-    this._parent = parent;
-    this._type = 'linebreak';
+    this._key = ''
+    this._map = map
+    this._parent = parent
+    this._type = 'linebreak'
   }
 
   getNode(): null | LineBreakNode {
-    const node = $getNodeByKey(this._key);
-    return $isLineBreakNode(node) ? node : null;
+    const node = $getNodeByKey(this._key)
+    return $isLineBreakNode(node) ? node : null
   }
 
   getKey(): NodeKey {
-    return this._key;
+    return this._key
   }
 
   getSharedType(): YMap {
-    return this._map;
+    return this._map
   }
 
   getType(): string {
-    return this._type;
+    return this._type
   }
 
   getSize(): number {
-    return 1;
+    return 1
   }
 
   getOffset(): number {
-    const collabElementNode = this._parent;
-    return collabElementNode.getChildOffset(this);
+    const collabElementNode = this._parent
+    return collabElementNode.getChildOffset(this)
   }
 
   destroy(binding: Binding): void {
-    const collabNodeMap = binding.collabNodeMap;
-    collabNodeMap.delete(this._key);
+    const collabNodeMap = binding.collabNodeMap
+    collabNodeMap.delete(this._key)
   }
 }
 
 export function $createCollabLineBreakNode(
   map: YMap,
-  parent: CollabElementNode,
+  parent: CollabElementNode
 ): CollabLineBreakNode {
-  const collabNode = new CollabLineBreakNode(map, parent);
+  const collabNode = new CollabLineBreakNode(map, parent)
   // $FlowFixMe: internal field
-  map._collabNode = collabNode;
-  return collabNode;
+  map._collabNode = collabNode
+  return collabNode
 }

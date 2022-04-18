@@ -7,29 +7,29 @@
  * @flow strict
  */
 
-import type {LexicalNode, NodeKey} from 'lexical';
+import type { LexicalNode, NodeKey } from 'lexical'
 
-import {DecoratorNode} from 'lexical';
-import * as React from 'react';
-import {useEffect, useRef} from 'react';
+import { DecoratorNode } from 'lexical'
+import * as React from 'react'
+import { useEffect, useRef } from 'react'
 
 type YouTubeComponentProps = $ReadOnly<{
   onLoad?: () => void,
-  videoID: string,
-}>;
+  videoID: string
+}>
 
-function YouTubeComponent({onLoad, videoID}: YouTubeComponentProps) {
-  const previousYouTubeIDRef = useRef(null);
+function YouTubeComponent({ onLoad, videoID }: YouTubeComponentProps) {
+  const previousYouTubeIDRef = useRef(null)
 
   useEffect(() => {
     if (videoID !== previousYouTubeIDRef.current) {
       if (onLoad) {
-        onLoad();
+        onLoad()
       }
 
-      previousYouTubeIDRef.current = videoID;
+      previousYouTubeIDRef.current = videoID
     }
-  }, [onLoad, videoID]);
+  }, [onLoad, videoID])
 
   return (
     <iframe
@@ -41,43 +41,43 @@ function YouTubeComponent({onLoad, videoID}: YouTubeComponentProps) {
       allowFullScreen={true}
       title="YouTube video"
     />
-  );
+  )
 }
 
 export class YouTubeNode extends DecoratorNode<React$Node> {
-  __id: string;
+  __id: string
 
   static getType(): string {
-    return 'youtube';
+    return 'youtube'
   }
 
   static clone(node: YouTubeNode): YouTubeNode {
-    return new YouTubeNode(node.__id, node.__key);
+    return new YouTubeNode(node.__id, node.__key)
   }
 
   constructor(id: string, key?: NodeKey) {
-    super(key);
+    super(key)
 
-    this.__id = id;
+    this.__id = id
   }
 
   createDOM(): HTMLElement {
-    return document.createElement('div');
+    return document.createElement('div')
   }
 
   updateDOM(): false {
-    return false;
+    return false
   }
 
   decorate(): React$Node {
-    return <YouTubeComponent videoID={this.__id} />;
+    return <YouTubeComponent videoID={this.__id} />
   }
 }
 
 export function $createYouTubeNode(videoID: string): YouTubeNode {
-  return new YouTubeNode(videoID);
+  return new YouTubeNode(videoID)
 }
 
 export function $isYouTubeNode(node: ?LexicalNode): boolean %checks {
-  return node instanceof YouTubeNode;
+  return node instanceof YouTubeNode
 }

@@ -6,6 +6,6 @@
  *
  */
 
-'use strict';
+'use strict'
 
-module.exports = require('./dist/LexicalClipboard.js');
+module.exports = require('./dist/LexicalClipboard.js')

@@ -7,17 +7,17 @@
  * @flow strict
  */
 
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {useEffect} from 'react';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { useEffect } from 'react'
 
-import {StickyNode} from '../nodes/StickyNode';
+import { StickyNode } from '../nodes/StickyNode'
 
 export default function StickyPlugin(): React$Node {
-  const [editor] = useLexicalComposerContext();
+  const [editor] = useLexicalComposerContext()
   useEffect(() => {
     if (!editor.hasNodes([StickyNode])) {
-      throw new Error('StickyPlugin: StickyNode not registered on editor');
+      throw new Error('StickyPlugin: StickyNode not registered on editor')
     }
-  }, [editor]);
-  return null;
+  }, [editor])
+  return null
 }

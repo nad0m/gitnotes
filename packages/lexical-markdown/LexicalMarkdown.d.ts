@@ -6,13 +6,13 @@
  *
  */
 
-import type {DecoratorNode, LexicalEditor} from 'lexical';
+import type { DecoratorNode, LexicalEditor } from 'lexical'
 
 export function registerMarkdownShortcuts<T>(
   editor: LexicalEditor,
-  createHorizontalRuleNode: () => DecoratorNode<T>,
-): () => void;
+  createHorizontalRuleNode: () => DecoratorNode<T>
+): () => void
 export function $convertFromMarkdownString(
   markdownString: string,
-  editor: LexicalEditor,
-): void;
+  editor: LexicalEditor
+): void

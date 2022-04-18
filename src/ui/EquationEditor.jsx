@@ -7,53 +7,53 @@
  * @flow strict
  */
 
-import './EquationEditor.css';
+import './EquationEditor.css'
 
-import React, {useCallback} from 'react';
+import React, { useCallback } from 'react'
 
 type BaseEquationEditorProps = {
   equation: string,
   inline: boolean,
-  inputRef: {current: null | HTMLElement},
-  setEquation: (string) => void,
-};
+  inputRef: { current: null | HTMLElement },
+  setEquation: (string) => void
+}
 
 export default function EquationEditor({
   equation,
   setEquation,
   inline,
-  inputRef,
+  inputRef
 }: BaseEquationEditorProps): React$Node {
   const onChange = useCallback(
     (event) => {
-      setEquation(event.target.value);
+      setEquation(event.target.value)
     },
-    [setEquation],
-  );
+    [setEquation]
+  )
 
   const props = {
     equation,
     inputRef,
-    onChange,
-  };
+    onChange
+  }
 
   return inline ? (
     <InlineEquationEditor {...props} />
   ) : (
     <BlockEquationEditor {...props} />
-  );
+  )
 }
 
 type EquationEditorImplProps = {
   equation: string,
-  inputRef: {current: null | HTMLElement},
-  onChange: (SyntheticInputEvent<HTMLInputElement>) => void,
-};
+  inputRef: { current: null | HTMLElement },
+  onChange: (SyntheticInputEvent<HTMLInputElement>) => void
+}
 
 function InlineEquationEditor({
   equation,
   onChange,
-  inputRef,
+  inputRef
 }: EquationEditorImplProps): React$Node {
   return (
     <span className="EquationEditor_inputBackground">
@@ -67,13 +67,13 @@ function InlineEquationEditor({
       />
       <span className="EquationEditor_dollarSign">$</span>
     </span>
-  );
+  )
 }
 
 function BlockEquationEditor({
   equation,
   onChange,
-  inputRef,
+  inputRef
 }: EquationEditorImplProps): React$Node {
   return (
     <div className="EquationEditor_inputBackground">
@@ -86,5 +86,5 @@ function BlockEquationEditor({
       />
       <span className="EquationEditor_dollarSign">{'\n$$'}</span>
     </div>
-  );
+  )
 }

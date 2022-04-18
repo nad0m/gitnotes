@@ -7,51 +7,56 @@
  * @flow strict
  */
 
-import type {EditorConfig, LexicalNode, NodeKey, RangeSelection} from 'lexical';
+import type {
+  EditorConfig,
+  LexicalNode,
+  NodeKey,
+  RangeSelection
+} from 'lexical'
 
-import {ElementNode} from 'lexical';
+import { ElementNode } from 'lexical'
 
 export class OverflowNode extends ElementNode {
   static getType(): string {
-    return 'overflow';
+    return 'overflow'
   }
 
   static clone(node: OverflowNode): OverflowNode {
-    return new OverflowNode(node.__key);
+    return new OverflowNode(node.__key)
   }
 
   constructor(key?: NodeKey): void {
-    super(key);
-    this.__type = 'overflow';
+    super(key)
+    this.__type = 'overflow'
   }
 
   createDOM<EditorContext>(config: EditorConfig<EditorContext>): HTMLElement {
-    const div = document.createElement('span');
-    const className = config.theme.characterLimit;
+    const div = document.createElement('span')
+    const className = config.theme.characterLimit
     if (typeof className === 'string') {
-      div.className = className;
+      div.className = className
     }
-    return div;
+    return div
   }
 
   updateDOM(prevNode: OverflowNode, dom: HTMLElement): boolean {
-    return false;
+    return false
   }
 
   insertNewAfter(selection: RangeSelection): null | LexicalNode {
-    const parent = this.getParentOrThrow();
-    return parent.insertNewAfter(selection);
+    const parent = this.getParentOrThrow()
+    return parent.insertNewAfter(selection)
   }
 
   excludeFromCopy(): boolean {
-    return true;
+    return true
   }
 }
 
 export function $createOverflowNode(): OverflowNode {
-  return new OverflowNode();
+  return new OverflowNode()
 }
 
 export function $isOverflowNode(node: ?LexicalNode): boolean %checks {
-  return node instanceof OverflowNode;
+  return node instanceof OverflowNode
 }

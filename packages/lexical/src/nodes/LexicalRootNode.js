@@ -7,41 +7,41 @@
  * @flow strict
  */
 
-import type {LexicalNode} from '../LexicalNode';
-import type {ParsedElementNode} from '../LexicalParsing';
+import type { LexicalNode } from '../LexicalNode'
+import type { ParsedElementNode } from '../LexicalParsing'
 
-import invariant from 'shared/invariant';
+import invariant from 'shared/invariant'
 
-import {NO_DIRTY_NODES} from '../LexicalConstants';
-import {getActiveEditor, isCurrentlyReadOnlyMode} from '../LexicalUpdates';
-import {$isDecoratorNode} from './LexicalDecoratorNode';
-import {$isElementNode, ElementNode} from './LexicalElementNode';
+import { NO_DIRTY_NODES } from '../LexicalConstants'
+import { getActiveEditor, isCurrentlyReadOnlyMode } from '../LexicalUpdates'
+import { $isDecoratorNode } from './LexicalDecoratorNode'
+import { $isElementNode, ElementNode } from './LexicalElementNode'
 
 export class RootNode extends ElementNode {
-  __cachedText: null | string;
+  __cachedText: null | string
 
   static getType(): string {
-    return 'root';
+    return 'root'
   }
 
   static clone(): RootNode {
-    return new RootNode();
+    return new RootNode()
   }
 
   constructor(): void {
-    super('root');
-    this.__cachedText = null;
+    super('root')
+    this.__cachedText = null
   }
 
   getTopLevelElementOrThrow(): RootNode {
     invariant(
       false,
-      'getTopLevelElementOrThrow: root nodes are not top level elements',
-    );
+      'getTopLevelElementOrThrow: root nodes are not top level elements'
+    )
   }
 
   getTextContent(includeInert?: boolean, includeDirectionless?: false): string {
-    const cachedText = this.__cachedText;
+    const cachedText = this.__cachedText
     if (
       isCurrentlyReadOnlyMode() ||
       getActiveEditor()._dirtyType === NO_DIRTY_NODES
@@ -50,47 +50,47 @@ export class RootNode extends ElementNode {
         cachedText !== null &&
         (!includeInert || includeDirectionless !== false)
       ) {
-        return cachedText;
+        return cachedText
       }
     }
-    return super.getTextContent(includeInert, includeDirectionless);
+    return super.getTextContent(includeInert, includeDirectionless)
   }
 
   remove(): void {
-    invariant(false, 'remove: cannot be called on root nodes');
+    invariant(false, 'remove: cannot be called on root nodes')
   }
 
   replace<N: LexicalNode>(node: N): N {
-    invariant(false, 'replace: cannot be called on root nodes');
+    invariant(false, 'replace: cannot be called on root nodes')
   }
 
   insertBefore(nodeToInsert: LexicalNode): LexicalNode {
-    invariant(false, 'insertBefore: cannot be called on root nodes');
+    invariant(false, 'insertBefore: cannot be called on root nodes')
   }
 
   insertAfter(node: LexicalNode): LexicalNode {
-    invariant(false, 'insertAfter: cannot be called on root nodes');
+    invariant(false, 'insertAfter: cannot be called on root nodes')
   }
 
   // View
 
   updateDOM(prevNode: RootNode, dom: HTMLElement): false {
-    return false;
+    return false
   }
 
   // Mutate
 
   append(...nodesToAppend: LexicalNode[]): ElementNode {
     for (let i = 0; i < nodesToAppend.length; i++) {
-      const node = nodesToAppend[i];
+      const node = nodesToAppend[i]
       if (!$isElementNode(node) && !$isDecoratorNode(node)) {
         invariant(
           false,
-          'rootNode.append: Only element or decorator nodes can be appended to the root node',
-        );
+          'rootNode.append: Only element or decorator nodes can be appended to the root node'
+        )
       }
     }
-    return super.append(...nodesToAppend);
+    return super.append(...nodesToAppend)
   }
 
   toJSON(): ParsedElementNode {
@@ -101,15 +101,15 @@ export class RootNode extends ElementNode {
       __indent: this.__indent,
       __key: 'root',
       __parent: null,
-      __type: 'root',
-    };
+      __type: 'root'
+    }
   }
 }
 
 export function $createRootNode(): RootNode {
-  return new RootNode();
+  return new RootNode()
 }
 
 export function $isRootNode(node: ?LexicalNode): boolean %checks {
-  return node instanceof RootNode;
+  return node instanceof RootNode
 }

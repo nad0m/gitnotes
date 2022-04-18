@@ -7,42 +7,42 @@
  * @flow strict
  */
 
-import './Modal.css';
+import './Modal.css'
 
-import * as React from 'react';
-import {useEffect, useRef} from 'react';
+import * as React from 'react'
+import { useEffect, useRef } from 'react'
 // $FlowFixMe
-import {createPortal} from 'react-dom';
+import { createPortal } from 'react-dom'
 
 function PortalImpl({
   onClose,
   children,
-  title,
+  title
 }: {
   children: React$Node,
   onClose: () => void,
-  title: string,
+  title: string
 }) {
-  const modalRef = useRef(null);
+  const modalRef = useRef(null)
 
   useEffect(() => {
     if (modalRef.current !== null) {
-      modalRef.current.focus();
+      modalRef.current.focus()
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
     const handler = (event) => {
       if (event.keyCode === 27) {
-        onClose();
+        onClose()
       }
-    };
-    window.addEventListener('keydown', handler);
+    }
+    window.addEventListener('keydown', handler)
 
     return () => {
-      window.removeEventListener('keydown', handler);
-    };
-  }, [onClose]);
+      window.removeEventListener('keydown', handler)
+    }
+  }, [onClose])
 
   return (
     <div className="Modal__overlay" role="dialog">
@@ -51,29 +51,28 @@ function PortalImpl({
         <button
           className="Modal__closeButton"
           aria-label="Close modal"
-          onClick={onClose}
-        >
+          onClick={onClose}>
           X
         </button>
         <div className="Modal__content">{children}</div>
       </div>
     </div>
-  );
+  )
 }
 
 export default function Modal({
   onClose,
   children,
-  title,
+  title
 }: {
   children: React$Node,
   onClose: () => void,
-  title: string,
+  title: string
 }): React$Node {
   return createPortal(
     <PortalImpl onClose={onClose} title={title}>
       {children}
     </PortalImpl>,
-    document.body,
-  );
+    document.body
+  )
 }

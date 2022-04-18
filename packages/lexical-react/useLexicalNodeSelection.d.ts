@@ -6,7 +6,7 @@
  *
  */
 
-import type {NodeKey} from 'lexical';
+import type { NodeKey } from 'lexical'
 export default function useLexicalNodeSelection(
-  key: NodeKey,
-): [boolean, (arg0: boolean) => void, () => void];
+  key: NodeKey
+): [boolean, (arg0: boolean) => void, () => void]

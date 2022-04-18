@@ -1,22 +1,28 @@
 // https://docs.oracle.com/javase/specs/jls/se15/html/jls-3.html#jls-3.10
-var decimalDigits = '[0-9](_*[0-9])*';
-var frac = `\\.(${decimalDigits})`;
-var hexDigits = '[0-9a-fA-F](_*[0-9a-fA-F])*';
+var decimalDigits = '[0-9](_*[0-9])*'
+var frac = `\\.(${decimalDigits})`
+var hexDigits = '[0-9a-fA-F](_*[0-9a-fA-F])*'
 var NUMERIC = {
   className: 'number',
   variants: [
     // DecimalFloatingPointLiteral
     // including ExponentPart
-    { begin: `(\\b(${decimalDigits})((${frac})|\\.)?|(${frac}))` +
-      `[eE][+-]?(${decimalDigits})[fFdD]?\\b` },
+    {
+      begin:
+        `(\\b(${decimalDigits})((${frac})|\\.)?|(${frac}))` +
+        `[eE][+-]?(${decimalDigits})[fFdD]?\\b`
+    },
     // excluding ExponentPart
     { begin: `\\b(${decimalDigits})((${frac})[fFdD]?\\b|\\.([fFdD]\\b)?)` },
     { begin: `(${frac})[fFdD]?\\b` },
     { begin: `\\b(${decimalDigits})[fFdD]\\b` },
 
     // HexadecimalFloatingPointLiteral
-    { begin: `\\b0[xX]((${hexDigits})\\.?|(${hexDigits})?\\.(${hexDigits}))` +
-      `[pP][+-]?(${decimalDigits})[fFdD]?\\b` },
+    {
+      begin:
+        `\\b0[xX]((${hexDigits})\\.?|(${hexDigits})?\\.(${hexDigits}))` +
+        `[pP][+-]?(${decimalDigits})[fFdD]?\\b`
+    },
 
     // DecimalIntegerLiteral
     { begin: '\\b(0|[1-9](_*[0-9])*)[lL]?\\b' },
@@ -28,10 +34,10 @@ var NUMERIC = {
     { begin: '\\b0(_*[0-7])*[lL]?\\b' },
 
     // BinaryIntegerLiteral
-    { begin: '\\b0[bB][01](_*[01])*[lL]?\\b' },
+    { begin: '\\b0[bB][01](_*[01])*[lL]?\\b' }
   ],
   relevance: 0
-};
+}
 
 /*
 Language: Java
@@ -41,13 +47,20 @@ Website: https://www.java.com/
 */
 
 function java(hljs) {
-  var JAVA_IDENT_RE = '[\u00C0-\u02B8a-zA-Z_$][\u00C0-\u02B8a-zA-Z_$0-9]*';
-  var GENERIC_IDENT_RE = JAVA_IDENT_RE + '(<' + JAVA_IDENT_RE + '(\\s*,\\s*' + JAVA_IDENT_RE + ')*>)?';
-  var KEYWORDS = 'false synchronized int abstract float private char boolean var static null if const ' +
+  var JAVA_IDENT_RE = '[\u00C0-\u02B8a-zA-Z_$][\u00C0-\u02B8a-zA-Z_$0-9]*'
+  var GENERIC_IDENT_RE =
+    JAVA_IDENT_RE +
+    '(<' +
+    JAVA_IDENT_RE +
+    '(\\s*,\\s*' +
+    JAVA_IDENT_RE +
+    ')*>)?'
+  var KEYWORDS =
+    'false synchronized int abstract float private char boolean var static null if const ' +
     'for true while long strictfp finally protected import native final void ' +
     'enum else break transient catch instanceof byte super volatile case assert short ' +
     'package default double public try this switch continue throws protected public private ' +
-    'module requires exports do';
+    'module requires exports do'
 
   var ANNOTATION = {
     className: 'meta',
@@ -56,11 +69,11 @@ function java(hljs) {
       {
         begin: /\(/,
         end: /\)/,
-        contains: ["self"] // allow nested () inside our annotation
-      },
+        contains: ['self'] // allow nested () inside our annotation
+      }
     ]
-  };
-  const NUMBER = NUMERIC;
+  }
+  const NUMBER = NUMERIC
 
   return {
     name: 'Java',
@@ -68,27 +81,24 @@ function java(hljs) {
     keywords: KEYWORDS,
     illegal: /<\/|#/,
     contains: [
-      hljs.COMMENT(
-        '/\\*\\*',
-        '\\*/',
-        {
-          relevance: 0,
-          contains: [
-            {
-              // eat up @'s in emails to prevent them to be recognized as doctags
-              begin: /\w+@/, relevance: 0
-            },
-            {
-              className: 'doctag',
-              begin: '@[A-Za-z]+'
-            }
-          ]
-        }
-      ),
+      hljs.COMMENT('/\\*\\*', '\\*/', {
+        relevance: 0,
+        contains: [
+          {
+            // eat up @'s in emails to prevent them to be recognized as doctags
+            begin: /\w+@/,
+            relevance: 0
+          },
+          {
+            className: 'doctag',
+            begin: '@[A-Za-z]+'
+          }
+        ]
+      }),
       // relevance boost
       {
         begin: /import java\.[a-z]+\./,
-        keywords: "import",
+        keywords: 'import',
         relevance: 2
       },
       hljs.C_LINE_COMMENT_MODE,
@@ -97,7 +107,9 @@ function java(hljs) {
       hljs.QUOTE_STRING_MODE,
       {
         className: 'class',
-        beginKeywords: 'class interface enum', end: /[{;=]/, excludeEnd: true,
+        beginKeywords: 'class interface enum',
+        end: /[{;=]/,
+        excludeEnd: true,
         keywords: 'class interface enum',
         illegal: /[:"\[\]]/,
         contains: [
@@ -119,7 +131,7 @@ function java(hljs) {
         end: /[{;=]/,
         keywords: KEYWORDS,
         contains: [
-          { beginKeywords: "record" },
+          { beginKeywords: 'record' },
           {
             begin: hljs.UNDERSCORE_IDENT_RE + '\\s*\\(',
             returnBegin: true,
@@ -128,12 +140,11 @@ function java(hljs) {
           },
           {
             className: 'params',
-            begin: /\(/, end: /\)/,
+            begin: /\(/,
+            end: /\)/,
             keywords: KEYWORDS,
             relevance: 0,
-            contains: [
-              hljs.C_BLOCK_COMMENT_MODE
-            ]
+            contains: [hljs.C_BLOCK_COMMENT_MODE]
           },
           hljs.C_LINE_COMMENT_MODE,
           hljs.C_BLOCK_COMMENT_MODE
@@ -141,18 +152,27 @@ function java(hljs) {
       },
       {
         className: 'function',
-        begin: '(' + GENERIC_IDENT_RE + '\\s+)+' + hljs.UNDERSCORE_IDENT_RE + '\\s*\\(', returnBegin: true, end: /[{;=]/,
+        begin:
+          '(' +
+          GENERIC_IDENT_RE +
+          '\\s+)+' +
+          hljs.UNDERSCORE_IDENT_RE +
+          '\\s*\\(',
+        returnBegin: true,
+        end: /[{;=]/,
         excludeEnd: true,
         keywords: KEYWORDS,
         contains: [
           {
-            begin: hljs.UNDERSCORE_IDENT_RE + '\\s*\\(', returnBegin: true,
+            begin: hljs.UNDERSCORE_IDENT_RE + '\\s*\\(',
+            returnBegin: true,
             relevance: 0,
             contains: [hljs.UNDERSCORE_TITLE_MODE]
           },
           {
             className: 'params',
-            begin: /\(/, end: /\)/,
+            begin: /\(/,
+            end: /\)/,
             keywords: KEYWORDS,
             relevance: 0,
             contains: [
@@ -170,7 +190,7 @@ function java(hljs) {
       NUMBER,
       ANNOTATION
     ]
-  };
+  }
 }
 
-module.exports = java;
+module.exports = java

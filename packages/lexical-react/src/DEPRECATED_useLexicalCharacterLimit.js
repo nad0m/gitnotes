@@ -7,4 +7,4 @@
  * @flow strict
  */
 
-export {mergePrevious, useCharacterLimit} from './shared/useCharacterLimit';
+export { mergePrevious, useCharacterLimit } from './shared/useCharacterLimit'

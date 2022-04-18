@@ -7,64 +7,70 @@
  * @flow strict
  */
 
-import type {SettingName} from '../lib/appSettings';
+import type { SettingName } from '../lib/appSettings'
 
-import * as React from 'react';
-import {createContext, useCallback, useContext, useMemo, useState} from 'react';
+import * as React from 'react'
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState
+} from 'react'
 
-import {DEFAULT_SETTINGS} from '../lib/appSettings';
+import { DEFAULT_SETTINGS } from '../lib/appSettings'
 
 type SettingsContextShape = {
   setOption: (name: SettingName, value: boolean) => void,
-  settings: {[SettingName]: boolean},
-};
+  settings: { [SettingName]: boolean }
+}
 
 const Context: React$Context<SettingsContextShape> = createContext({
   setOption: (_, __) => {},
-  settings: {},
-});
+  settings: {}
+})
 
 export const SettingsContext = ({
-  children,
+  children
 }: {
-  children: React$Node,
+  children: React$Node
 }): React$Node => {
-  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
+  const [settings, setSettings] = useState(DEFAULT_SETTINGS)
   const setOption = useCallback((setting: SettingName, value: boolean) => {
     setSettings((options) => ({
       ...options,
-      [(setting: string)]: value,
-    }));
+      [(setting: string)]: value
+    }))
     if (DEFAULT_SETTINGS[setting] === value) {
-      setURLParam(setting, null);
+      setURLParam(setting, null)
     } else {
-      setURLParam(setting, value);
+      setURLParam(setting, value)
     }
-  }, []);
+  }, [])
   const contextValue = useMemo(() => {
-    return {setOption, settings};
-  }, [setOption, settings]);
-  return <Context.Provider value={contextValue}>{children}</Context.Provider>;
-};
+    return { setOption, settings }
+  }, [setOption, settings])
+  return <Context.Provider value={contextValue}>{children}</Context.Provider>
+}
 
 export const useSettings = (): SettingsContextShape => {
-  return useContext(Context);
-};
+  return useContext(Context)
+}
 
 function setURLParam(param: SettingName, value: null | boolean) {
-  const url = new URL(window.location.href);
-  const params = new URLSearchParams(url.search);
+  const url = new URL(window.location.href)
+  const params = new URLSearchParams(url.search)
   if (value !== null) {
     if (params.has(param)) {
-      params.set(param, String(value));
+      params.set(param, String(value))
     } else {
-      params.append(param, String(value));
+      params.append(param, String(value))
     }
   } else {
     if (params.has(param)) {
-      params.delete(param);
+      params.delete(param)
     }
   }
-  url.search = params.toString();
-  window.history.pushState(null, '', url.toString());
+  url.search = params.toString()
+  window.history.pushState(null, '', url.toString())
 }

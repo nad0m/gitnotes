@@ -6,12 +6,12 @@
  *
  */
 
-import Link from '@docusaurus/Link';
-import * as Tabs from '@radix-ui/react-tabs';
-import clsx from 'clsx';
-import React, {useState} from 'react';
+import Link from '@docusaurus/Link'
+import * as Tabs from '@radix-ui/react-tabs'
+import clsx from 'clsx'
+import React, { useState } from 'react'
 
-import styles from './styles.module.css';
+import styles from './styles.module.css'
 
 const EXAMPLES = [
   {
@@ -26,7 +26,7 @@ const EXAMPLES = [
     ),
     id: 'example-feature-1',
     label: 'Simple Setup',
-    src: 'https://codesandbox.io/embed/lexical-plain-text-example-g932e?fontsize=12&hidenavigation=1&module=%2Fsrc%2FEditor.js&theme=dark',
+    src: 'https://codesandbox.io/embed/lexical-plain-text-example-g932e?fontsize=12&hidenavigation=1&module=%2Fsrc%2FEditor.js&theme=dark'
   },
   {
     content: (
@@ -41,7 +41,7 @@ const EXAMPLES = [
     ),
     id: 'example-feature-2',
     label: 'Powerful Features',
-    src: 'https://codesandbox.io/embed/lexical-rich-text-example-5tncvy?fontsize=12&hidenavigation=1&module=%2Fsrc%2FEditor.js&theme=dark',
+    src: 'https://codesandbox.io/embed/lexical-rich-text-example-5tncvy?fontsize=12&hidenavigation=1&module=%2Fsrc%2FEditor.js&theme=dark'
   },
   {
     content: (
@@ -53,39 +53,37 @@ const EXAMPLES = [
     ),
     id: 'example-feature-3',
     label: 'Built to Extend',
-    src: 'https://codesandbox.io/embed/lexical-plain-text-example-forked-qdxhy?fontsize=12&hidenavigation=1&module=%2Fsrc%2FEmoticonPlugin.js&theme=dark&view=editor',
-  },
-];
+    src: 'https://codesandbox.io/embed/lexical-plain-text-example-forked-qdxhy?fontsize=12&hidenavigation=1&module=%2Fsrc%2FEmoticonPlugin.js&theme=dark&view=editor'
+  }
+]
 
 export default function HomepageExamples() {
-  const [activeItemID, setActiveItemID] = useState(EXAMPLES[0].id);
+  const [activeItemID, setActiveItemID] = useState(EXAMPLES[0].id)
 
   return (
     <Tabs.Root
       value={activeItemID}
       orientation="horizontal"
-      onValueChange={setActiveItemID}
-    >
+      onValueChange={setActiveItemID}>
       <div className="container">
         <Tabs.List asChild={true} className="pills" loop={true}>
           <ul>
-            {EXAMPLES.map(({id, label}) => (
+            {EXAMPLES.map(({ id, label }) => (
               <Tabs.Trigger asChild={true} value={id} key={id}>
                 <li
                   className={clsx(
                     'pills__item',
-                    activeItemID === id && 'pills__item--active',
+                    activeItemID === id && 'pills__item--active'
                   )}
                   tabIndex={0}
-                  role="tab"
-                >
+                  role="tab">
                   {label}
                 </li>
               </Tabs.Trigger>
             ))}
           </ul>
         </Tabs.List>
-        {EXAMPLES.map(({id, content, src}) => (
+        {EXAMPLES.map(({ id, content, src }) => (
           <Tabs.Content asChild={true} value={id} key={id}>
             <div className="row">
               <div className="col col--4">
@@ -93,8 +91,7 @@ export default function HomepageExamples() {
                 <div>
                   <Link
                     className="button button--primary margin-top--md"
-                    to="/docs/intro"
-                  >
+                    to="/docs/intro">
                     Get Started
                   </Link>
                 </div>
@@ -112,5 +109,5 @@ export default function HomepageExamples() {
         ))}
       </div>
     </Tabs.Root>
-  );
+  )
 }

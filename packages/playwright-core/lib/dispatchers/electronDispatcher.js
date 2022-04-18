@@ -1,19 +1,19 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.ElectronApplicationDispatcher = exports.ElectronDispatcher = void 0;
+})
+exports.ElectronApplicationDispatcher = exports.ElectronDispatcher = void 0
 
-var _dispatcher = require("./dispatcher");
+var _dispatcher = require('./dispatcher')
 
-var _electron = require("../server/electron/electron");
+var _electron = require('../server/electron/electron')
 
-var _browserContextDispatcher = require("./browserContextDispatcher");
+var _browserContextDispatcher = require('./browserContextDispatcher')
 
-var _jsHandleDispatcher = require("./jsHandleDispatcher");
+var _jsHandleDispatcher = require('./jsHandleDispatcher')
 
-var _elementHandlerDispatcher = require("./elementHandlerDispatcher");
+var _elementHandlerDispatcher = require('./elementHandlerDispatcher')
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -32,62 +32,88 @@ var _elementHandlerDispatcher = require("./elementHandlerDispatcher");
  */
 class ElectronDispatcher extends _dispatcher.Dispatcher {
   constructor(scope, electron) {
-    super(scope, electron, 'Electron', {}, true);
+    super(scope, electron, 'Electron', {}, true)
   }
 
   async launch(params) {
-    const electronApplication = await this._object.launch(params);
+    const electronApplication = await this._object.launch(params)
     return {
-      electronApplication: new ElectronApplicationDispatcher(this._scope, electronApplication)
-    };
+      electronApplication: new ElectronApplicationDispatcher(
+        this._scope,
+        electronApplication
+      )
+    }
   }
-
 }
 
-exports.ElectronDispatcher = ElectronDispatcher;
+exports.ElectronDispatcher = ElectronDispatcher
 
 class ElectronApplicationDispatcher extends _dispatcher.Dispatcher {
   constructor(scope, electronApplication) {
-    super(scope, electronApplication, 'ElectronApplication', {
-      context: new _browserContextDispatcher.BrowserContextDispatcher(scope, electronApplication.context())
-    }, true);
+    super(
+      scope,
+      electronApplication,
+      'ElectronApplication',
+      {
+        context: new _browserContextDispatcher.BrowserContextDispatcher(
+          scope,
+          electronApplication.context()
+        )
+      },
+      true
+    )
     electronApplication.on(_electron.ElectronApplication.Events.Close, () => {
-      this._dispatchEvent('close');
+      this._dispatchEvent('close')
 
-      this._dispose();
-    });
+      this._dispose()
+    })
   }
 
   async browserWindow(params) {
-    const handle = await this._object.browserWindow(params.page.page());
+    const handle = await this._object.browserWindow(params.page.page())
     return {
-      handle: _elementHandlerDispatcher.ElementHandleDispatcher.fromJSHandle(this._scope, handle)
-    };
+      handle: _elementHandlerDispatcher.ElementHandleDispatcher.fromJSHandle(
+        this._scope,
+        handle
+      )
+    }
   }
 
   async evaluateExpression(params) {
-    const handle = await this._object._nodeElectronHandlePromise;
+    const handle = await this._object._nodeElectronHandlePromise
     return {
-      value: (0, _jsHandleDispatcher.serializeResult)(await handle.evaluateExpressionAndWaitForSignals(params.expression, params.isFunction, true
-      /* returnByValue */
-      , (0, _jsHandleDispatcher.parseArgument)(params.arg)))
-    };
+      value: (0, _jsHandleDispatcher.serializeResult)(
+        await handle.evaluateExpressionAndWaitForSignals(
+          params.expression,
+          params.isFunction,
+          true,
+          /* returnByValue */
+          (0, _jsHandleDispatcher.parseArgument)(params.arg)
+        )
+      )
+    }
   }
 
   async evaluateExpressionHandle(params) {
-    const handle = await this._object._nodeElectronHandlePromise;
-    const result = await handle.evaluateExpressionAndWaitForSignals(params.expression, params.isFunction, false
-    /* returnByValue */
-    , (0, _jsHandleDispatcher.parseArgument)(params.arg));
+    const handle = await this._object._nodeElectronHandlePromise
+    const result = await handle.evaluateExpressionAndWaitForSignals(
+      params.expression,
+      params.isFunction,
+      false,
+      /* returnByValue */
+      (0, _jsHandleDispatcher.parseArgument)(params.arg)
+    )
     return {
-      handle: _elementHandlerDispatcher.ElementHandleDispatcher.fromJSHandle(this._scope, result)
-    };
+      handle: _elementHandlerDispatcher.ElementHandleDispatcher.fromJSHandle(
+        this._scope,
+        result
+      )
+    }
   }
 
   async close() {
-    await this._object.close();
+    await this._object.close()
   }
-
 }
 
-exports.ElectronApplicationDispatcher = ElectronApplicationDispatcher;
+exports.ElectronApplicationDispatcher = ElectronApplicationDispatcher

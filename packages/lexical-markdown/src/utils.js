@@ -7,7 +7,7 @@
  * @flow strict
  */
 
-import type {TextNodeWithOffset} from '@lexical/text';
+import type { TextNodeWithOffset } from '@lexical/text'
 import type {
   DecoratorNode,
   ElementNode,
@@ -15,17 +15,21 @@ import type {
   LexicalNode,
   NodeKey,
   RangeSelection,
-  TextFormatType,
-} from 'lexical';
+  TextFormatType
+} from 'lexical'
 
-import {$createCodeNode} from '@lexical/code';
-import {TOGGLE_LINK_COMMAND} from '@lexical/link';
-import {$createListItemNode, $createListNode, $isListNode} from '@lexical/list';
-import {$createHeadingNode, $createQuoteNode} from '@lexical/rich-text';
+import { $createCodeNode } from '@lexical/code'
+import { TOGGLE_LINK_COMMAND } from '@lexical/link'
+import {
+  $createListItemNode,
+  $createListNode,
+  $isListNode
+} from '@lexical/list'
+import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text'
 import {
   $findNodeWithOffsetFromJoinedText,
-  $joinTextNodesInElementNode,
-} from '@lexical/text';
+  $joinTextNodesInElementNode
+} from '@lexical/text'
 import {
   $createLineBreakNode,
   $createParagraphNode,
@@ -33,9 +37,9 @@ import {
   $getSelection,
   $isElementNode,
   $isRangeSelection,
-  $setSelection,
-} from 'lexical';
-import invariant from 'shared/invariant';
+  $setSelection
+} from 'lexical'
+import invariant from 'shared/invariant'
 
 /*
    How to add a new syntax to capture and transform.
@@ -58,8 +62,8 @@ export type AutoFormatTriggerState = $ReadOnly<{
   isSelectionCollapsed: boolean,
   isSimpleText: boolean,
   nodeKey: NodeKey,
-  textContent: string,
-}>;
+  textContent: string
+}>
 
 // When auto formatting, this enum represents the conversion options.
 // There are two categories.
@@ -88,7 +92,7 @@ export type MarkdownFormatKind =
   | 'strikethrough_italic'
   | 'strikethrough_bold'
   | 'strikethrough_italic_bold'
-  | 'link';
+  | 'link'
 
 // The scanning context provides the overall data structure for
 // locating a auto formatting candidate and then transforming that candidate
@@ -105,8 +109,8 @@ export type ScanningContext = {
   markdownCriteria: MarkdownCriteria,
   patternMatchResults: PatternMatchResults,
   textNodeWithOffset: ?TextNodeWithOffset,
-  triggerState: ?AutoFormatTriggerState,
-};
+  triggerState: ?AutoFormatTriggerState
+}
 
 // The auto formatter runs these steps:
 // 1. Examine the current and prior editor states to see if a potential auto format is triggered.
@@ -124,44 +128,44 @@ export type MarkdownCriteria = $ReadOnly<{
   markdownFormatKind: ?MarkdownFormatKind,
   regEx: RegExp,
   regExForAutoFormatting: RegExp,
-  requiresParagraphStart: ?boolean,
-}>;
+  requiresParagraphStart: ?boolean
+}>
 
 // RegEx returns the discovered pattern matches in an array of capture groups.
 // Each CaptureGroupDetail contains the relevant regEx information.
 type CaptureGroupDetail = {
   offsetInParent: number,
-  text: string,
-};
+  text: string
+}
 
 // This type stores the result details when a particular
 // match is found.
 export type PatternMatchResults = {
-  regExCaptureGroups: Array<CaptureGroupDetail>,
-};
+  regExCaptureGroups: Array<CaptureGroupDetail>
+}
 
 export type MarkdownCriteriaWithPatternMatchResults = {
   markdownCriteria: null | MarkdownCriteria,
-  patternMatchResults: null | PatternMatchResults,
-};
+  patternMatchResults: null | PatternMatchResults
+}
 
-export type MarkdownCriteriaArray = Array<MarkdownCriteria>;
+export type MarkdownCriteriaArray = Array<MarkdownCriteria>
 
 // Eventually we need to support multiple trigger string's including newlines.
-const SEPARATOR_BETWEEN_TEXT_AND_NON_TEXT_NODES = '\u0004'; // Select an unused unicode character to separate text and non-text nodes.
-const SEPARATOR_LENGTH = SEPARATOR_BETWEEN_TEXT_AND_NON_TEXT_NODES.length;
+const SEPARATOR_BETWEEN_TEXT_AND_NON_TEXT_NODES = '\u0004' // Select an unused unicode character to separate text and non-text nodes.
+const SEPARATOR_LENGTH = SEPARATOR_BETWEEN_TEXT_AND_NON_TEXT_NODES.length
 
-export type AutoFormatTriggerKind = 'space_trigger' | 'codeBlock_trigger';
+export type AutoFormatTriggerKind = 'space_trigger' | 'codeBlock_trigger'
 
 export type AutoFormatTrigger = {
   triggerKind: AutoFormatTriggerKind,
-  triggerString: string,
-};
+  triggerString: string
+}
 
 const spaceTrigger: AutoFormatTrigger = {
   triggerKind: 'space_trigger',
-  triggerString: '\u0020',
-};
+  triggerString: '\u0020'
+}
 
 // Future todo: add support for ``` + carriage return either inside or not inside code block. Should toggle between.
 // const codeBlockTrigger : AutoFormatTrigger = {
@@ -170,137 +174,137 @@ const spaceTrigger: AutoFormatTrigger = {
 // };
 
 export const triggers: Array<AutoFormatTrigger> = [
-  spaceTrigger /*, codeBlockTrigger*/,
-];
+  spaceTrigger /*, codeBlockTrigger*/
+]
 
 // Future Todo: speed up performance by having non-capture group variations of the regex.
 const autoFormatBase: MarkdownCriteria = {
   markdownFormatKind: null,
   regEx: /(?:)/,
   regExForAutoFormatting: /(?:)/,
-  requiresParagraphStart: false,
-};
+  requiresParagraphStart: false
+}
 
 const paragraphStartBase: MarkdownCriteria = {
   ...autoFormatBase,
-  requiresParagraphStart: true,
-};
+  requiresParagraphStart: true
+}
 const markdownHeader1: MarkdownCriteria = {
   ...paragraphStartBase,
   markdownFormatKind: 'paragraphH1',
   regEx: /^(?:# )/,
-  regExForAutoFormatting: /^(?:# )/,
-};
+  regExForAutoFormatting: /^(?:# )/
+}
 
 const markdownHeader2: MarkdownCriteria = {
   ...paragraphStartBase,
   markdownFormatKind: 'paragraphH2',
   regEx: /^(?:## )/,
-  regExForAutoFormatting: /^(?:## )/,
-};
+  regExForAutoFormatting: /^(?:## )/
+}
 
 const markdownHeader3: MarkdownCriteria = {
   ...paragraphStartBase,
   markdownFormatKind: 'paragraphH3',
   regEx: /^(?:### )/,
-  regExForAutoFormatting: /^(?:### )/,
-};
+  regExForAutoFormatting: /^(?:### )/
+}
 
 const markdownHeader4: MarkdownCriteria = {
   ...paragraphStartBase,
   markdownFormatKind: 'paragraphH4',
   regEx: /^(?:#### )/,
-  regExForAutoFormatting: /^(?:#### )/,
-};
+  regExForAutoFormatting: /^(?:#### )/
+}
 
 const markdownHeader5: MarkdownCriteria = {
   ...paragraphStartBase,
   markdownFormatKind: 'paragraphH5',
   regEx: /^(?:##### )/,
-  regExForAutoFormatting: /^(?:##### )/,
-};
+  regExForAutoFormatting: /^(?:##### )/
+}
 const markdownBlockQuote: MarkdownCriteria = {
   ...paragraphStartBase,
   markdownFormatKind: 'paragraphBlockQuote',
   regEx: /^(?:> )/,
-  regExForAutoFormatting: /^(?:> )/,
-};
+  regExForAutoFormatting: /^(?:> )/
+}
 
 const markdownUnorderedListDash: MarkdownCriteria = {
   ...paragraphStartBase,
   markdownFormatKind: 'paragraphUnorderedList',
   regEx: /^(\s{0,10})(?:- )/,
-  regExForAutoFormatting: /^(\s{0,10})(?:- )/,
-};
+  regExForAutoFormatting: /^(\s{0,10})(?:- )/
+}
 
 const markdownUnorderedListAsterisk: MarkdownCriteria = {
   ...paragraphStartBase,
   markdownFormatKind: 'paragraphUnorderedList',
   regEx: /^(\s{0,10})(?:\* )/,
-  regExForAutoFormatting: /^(\s{0,10})(?:\* )/,
-};
+  regExForAutoFormatting: /^(\s{0,10})(?:\* )/
+}
 
 const markdownCodeBlock: MarkdownCriteria = {
   ...paragraphStartBase,
   markdownFormatKind: 'paragraphCodeBlock',
   regEx: /^(```)$/,
-  regExForAutoFormatting: /^(```)([a-z]*)( )/,
-};
+  regExForAutoFormatting: /^(```)([a-z]*)( )/
+}
 
 const markdownOrderedList: MarkdownCriteria = {
   ...paragraphStartBase,
   markdownFormatKind: 'paragraphOrderedList',
   regEx: /^(\s{0,10})(\d+)\.\s/,
-  regExForAutoFormatting: /^(\s{0,10})(\d+)\.\s/,
-};
+  regExForAutoFormatting: /^(\s{0,10})(\d+)\.\s/
+}
 
 const markdownHorizontalRule: MarkdownCriteria = {
   ...paragraphStartBase,
   markdownFormatKind: 'horizontalRule',
   regEx: /^(?:\*\*\*)$/,
-  regExForAutoFormatting: /^(?:\*\*\* )/,
-};
+  regExForAutoFormatting: /^(?:\*\*\* )/
+}
 
 const markdownHorizontalRuleUsingDashes: MarkdownCriteria = {
   ...paragraphStartBase,
   markdownFormatKind: 'horizontalRule',
   regEx: /^(?:---)$/,
-  regExForAutoFormatting: /^(?:--- )/,
-};
+  regExForAutoFormatting: /^(?:--- )/
+}
 
 const markdownInlineCode: MarkdownCriteria = {
   ...autoFormatBase,
   markdownFormatKind: 'code',
   regEx: /(`)([^`]*)(`)/,
-  regExForAutoFormatting: /(`)(\s*\b)([^`]*)(\b\s*)(`)(\s)$/,
-};
+  regExForAutoFormatting: /(`)(\s*\b)([^`]*)(\b\s*)(`)(\s)$/
+}
 
 const markdownBold: MarkdownCriteria = {
   ...autoFormatBase,
   markdownFormatKind: 'bold',
   regEx: /(\*\*)(\s*)([^\*\*]*)(\s*)(\*\*)()/,
-  regExForAutoFormatting: /(\*\*)(\s*\b)([^\*\*]*)(\b\s*)(\*\*)(\s)$/,
-};
+  regExForAutoFormatting: /(\*\*)(\s*\b)([^\*\*]*)(\b\s*)(\*\*)(\s)$/
+}
 
 const markdownItalic: MarkdownCriteria = {
   ...autoFormatBase,
   markdownFormatKind: 'italic',
   regEx: /(\*)(\s*)([^\*]*)(\s*)(\*)()/,
-  regExForAutoFormatting: /(\*)(\s*\b)([^\*]*)(\b\s*)(\*)(\s)$/,
-};
+  regExForAutoFormatting: /(\*)(\s*\b)([^\*]*)(\b\s*)(\*)(\s)$/
+}
 const markdownBold2: MarkdownCriteria = {
   ...autoFormatBase,
   markdownFormatKind: 'bold',
   regEx: /(__)(\s*)([^__]*)(\s*)(__)()/,
-  regExForAutoFormatting: /(__)(\s*)([^__]*)(\s*)(__)(\s)$/,
-};
+  regExForAutoFormatting: /(__)(\s*)([^__]*)(\s*)(__)(\s)$/
+}
 
 const markdownItalic2: MarkdownCriteria = {
   ...autoFormatBase,
   markdownFormatKind: 'italic',
   regEx: /(_)()([^_]*)()(_)()/,
-  regExForAutoFormatting: /(_)()([^_]*)()(_)(\s)$/, // Maintain 7 groups.
-};
+  regExForAutoFormatting: /(_)()([^_]*)()(_)(\s)$/ // Maintain 7 groups.
+}
 
 // Markdown does not support underline, but we can allow folks to use
 // the HTML tags for underline.
@@ -308,53 +312,52 @@ const fakeMarkdownUnderline: MarkdownCriteria = {
   ...autoFormatBase,
   markdownFormatKind: 'underline',
   regEx: /(\<u\>)(\s*)([^\<]*)(\s*)(\<\/u\>)()/,
-  regExForAutoFormatting: /(\<u\>)(\s*\b)([^\<]*)(\b\s*)(\<\/u\>)(\s)$/,
-};
+  regExForAutoFormatting: /(\<u\>)(\s*\b)([^\<]*)(\b\s*)(\<\/u\>)(\s)$/
+}
 
 const markdownStrikethrough: MarkdownCriteria = {
   ...autoFormatBase,
   markdownFormatKind: 'strikethrough',
   regEx: /(~~)(\s*)([^~~]*)(\s*)(~~)()/,
-  regExForAutoFormatting: /(~~)(\s*\b)([^~~]*)(\b\s*)(~~)(\s)$/,
-};
+  regExForAutoFormatting: /(~~)(\s*\b)([^~~]*)(\b\s*)(~~)(\s)$/
+}
 
 const markdownStrikethroughItalicBold: MarkdownCriteria = {
   ...autoFormatBase,
   markdownFormatKind: 'strikethrough_italic_bold',
   regEx: /(~~_\*\*)(\s*\b)([^~~_\*\*][^\*\*_~~]*)(\b\s*)(\*\*_~~)()/,
   regExForAutoFormatting:
-    /(~~_\*\*)(\s*\b)([^~~_\*\*][^\*\*_~~]*)(\b\s*)(\*\*_~~)(\s)$/,
-};
+    /(~~_\*\*)(\s*\b)([^~~_\*\*][^\*\*_~~]*)(\b\s*)(\*\*_~~)(\s)$/
+}
 
 const markdownItalicbold: MarkdownCriteria = {
   ...autoFormatBase,
   markdownFormatKind: 'italic_bold',
   regEx: /(_\*\*)(\s*\b)([^_\*\*][^\*\*_]*)(\b\s*)(\*\*_)/,
-  regExForAutoFormatting:
-    /(_\*\*)(\s*\b)([^_\*\*][^\*\*_]*)(\b\s*)(\*\*_)(\s)$/,
-};
+  regExForAutoFormatting: /(_\*\*)(\s*\b)([^_\*\*][^\*\*_]*)(\b\s*)(\*\*_)(\s)$/
+}
 
 const markdownStrikethroughItalic: MarkdownCriteria = {
   ...autoFormatBase,
   markdownFormatKind: 'strikethrough_italic',
   regEx: /(~~_)(\s*)([^~~_][^_~~]*)(\s*)(_~~)/,
-  regExForAutoFormatting: /(~~_)(\s*)([^~~_][^_~~]*)(\s*)(_~~)(\s)$/,
-};
+  regExForAutoFormatting: /(~~_)(\s*)([^~~_][^_~~]*)(\s*)(_~~)(\s)$/
+}
 
 const markdownStrikethroughBold: MarkdownCriteria = {
   ...autoFormatBase,
   markdownFormatKind: 'strikethrough_bold',
   regEx: /(~~\*\*)(\s*\b)([^~~\*\*][^\*\*~~]*)(\b\s*)(\*\*~~)/,
   regExForAutoFormatting:
-    /(~~\*\*)(\s*\b)([^~~\*\*][^\*\*~~]*)(\b\s*)(\*\*~~)(\s)$/,
-};
+    /(~~\*\*)(\s*\b)([^~~\*\*][^\*\*~~]*)(\b\s*)(\*\*~~)(\s)$/
+}
 
 const markdownLink: MarkdownCriteria = {
   ...autoFormatBase,
   markdownFormatKind: 'link',
   regEx: /(\[)([^\]]*)(\]\()([^)]*)(\)*)()/,
-  regExForAutoFormatting: /(\[)([^\]]*)(\]\()([^)]*)(\)*)(\s)$/,
-};
+  regExForAutoFormatting: /(\[)([^\]]*)(\]\()([^)]*)(\)*)(\s)$/
+}
 
 const allMarkdownCriteriaForTextNodes: MarkdownCriteriaArray = [
   // Place the combination formats ahead of the individual formats.
@@ -373,8 +376,8 @@ const allMarkdownCriteriaForTextNodes: MarkdownCriteriaArray = [
   markdownItalic2, // Must appear after markdownBold2.
   fakeMarkdownUnderline,
   markdownStrikethrough,
-  markdownLink,
-];
+  markdownLink
+]
 
 const allMarkdownCriteriaForParagraphs: MarkdownCriteriaArray = [
   markdownHeader1,
@@ -388,35 +391,35 @@ const allMarkdownCriteriaForParagraphs: MarkdownCriteriaArray = [
   markdownOrderedList,
   markdownCodeBlock,
   markdownHorizontalRule,
-  markdownHorizontalRuleUsingDashes,
-];
+  markdownHorizontalRuleUsingDashes
+]
 
 export const allMarkdownCriteria: MarkdownCriteriaArray = [
   ...allMarkdownCriteriaForParagraphs,
-  ...allMarkdownCriteriaForTextNodes,
-];
+  ...allMarkdownCriteriaForTextNodes
+]
 
 export function getAllTriggers(): Array<AutoFormatTrigger> {
-  return triggers;
+  return triggers
 }
 
 export function getAllMarkdownCriteriaForParagraphs(): MarkdownCriteriaArray {
-  return allMarkdownCriteriaForParagraphs;
+  return allMarkdownCriteriaForParagraphs
 }
 
 export function getAllMarkdownCriteriaForTextNodes(): MarkdownCriteriaArray {
-  return allMarkdownCriteriaForTextNodes;
+  return allMarkdownCriteriaForTextNodes
 }
 
 export function getAllMarkdownCriteria(): MarkdownCriteriaArray {
-  return allMarkdownCriteria;
+  return allMarkdownCriteria
 }
 
 export function getInitialScanningContext(
   editor: LexicalEditor,
   isAutoFormatting: boolean,
   textNodeWithOffset: null | TextNodeWithOffset,
-  triggerState: null | AutoFormatTriggerState,
+  triggerState: null | AutoFormatTriggerState
 ): ScanningContext {
   return {
     currentElementNode: null,
@@ -428,86 +431,86 @@ export function getInitialScanningContext(
       markdownFormatKind: 'noTransformation',
       regEx: /(?:)/, // Empty reg ex.
       regExForAutoFormatting: /(?:)/, // Empty reg ex.
-      requiresParagraphStart: null,
+      requiresParagraphStart: null
     },
     patternMatchResults: {
-      regExCaptureGroups: [],
+      regExCaptureGroups: []
     },
     textNodeWithOffset,
-    triggerState,
-  };
+    triggerState
+  }
 }
 
 export function resetScanningContext(
-  scanningContext: ScanningContext,
+  scanningContext: ScanningContext
 ): ScanningContext {
-  scanningContext.joinedText = null;
+  scanningContext.joinedText = null
 
   scanningContext.markdownCriteria = {
     markdownFormatKind: 'noTransformation',
     regEx: /(?:)/, // Empty reg ex.
     regExForAutoFormatting: /(?:)/, // Empty reg ex.
-    requiresParagraphStart: null,
-  };
+    requiresParagraphStart: null
+  }
 
   scanningContext.patternMatchResults = {
-    regExCaptureGroups: [],
-  };
+    regExCaptureGroups: []
+  }
 
-  scanningContext.triggerState = null;
-  scanningContext.textNodeWithOffset = null;
+  scanningContext.triggerState = null
+  scanningContext.textNodeWithOffset = null
 
-  return scanningContext;
+  return scanningContext
 }
 
 export function getCodeBlockCriteria(): MarkdownCriteria {
-  return markdownCodeBlock;
+  return markdownCodeBlock
 }
 
 export function getPatternMatchResultsForCriteria(
   markdownCriteria: MarkdownCriteria,
   scanningContext: ScanningContext,
-  parentElementNode: ElementNode,
+  parentElementNode: ElementNode
 ): null | PatternMatchResults {
   if (markdownCriteria.requiresParagraphStart === true) {
     return getPatternMatchResultsForParagraphs(
       markdownCriteria,
-      scanningContext,
-    );
+      scanningContext
+    )
   }
   return getPatternMatchResultsForText(
     markdownCriteria,
     scanningContext,
-    parentElementNode,
-  );
+    parentElementNode
+  )
 }
 
 export function getPatternMatchResultsForCodeBlock(
   scanningContext: ScanningContext,
-  text: string,
+  text: string
 ): null | PatternMatchResults {
-  const markdownCriteria = getCodeBlockCriteria();
+  const markdownCriteria = getCodeBlockCriteria()
   return getPatternMatchResultsWithRegEx(
     text,
     true,
     false,
     scanningContext.isAutoFormatting
       ? markdownCriteria.regExForAutoFormatting
-      : markdownCriteria.regEx,
-  );
+      : markdownCriteria.regEx
+  )
 }
 
 function getPatternMatchResultsWithRegEx(
   textToSearch: string,
   matchMustAppearAtStartOfString: boolean,
   matchMustAppearAtEndOfString: boolean,
-  regEx: RegExp,
+  regEx: RegExp
 ): null | PatternMatchResults {
   const patternMatchResults: PatternMatchResults = {
-    regExCaptureGroups: [],
-  };
+    regExCaptureGroups: []
+  }
 
-  const regExMatches = textToSearch.match(regEx);
+  const regExMatches = textToSearch.match(regEx)
   if (
     regExMatches !== null &&
     regExMatches.length > 0 &&
@@ -515,57 +518,57 @@ function getPatternMatchResultsWithRegEx(
     (matchMustAppearAtEndOfString === false ||
       regExMatches.index + regExMatches[0].length === textToSearch.length)
   ) {
-    const captureGroupsCount = regExMatches.length;
-    let runningLength = regExMatches.index;
+    const captureGroupsCount = regExMatches.length
+    let runningLength = regExMatches.index
     for (
       let captureGroupIndex = 0;
       captureGroupIndex < captureGroupsCount;
       captureGroupIndex++
     ) {
-      const textContent = regExMatches[captureGroupIndex];
+      const textContent = regExMatches[captureGroupIndex]
       patternMatchResults.regExCaptureGroups.push({
         offsetInParent: runningLength,
-        text: textContent,
-      });
+        text: textContent
+      })
 
       // The 0th capture group is special in that it's text contents is
       // a join of all subsequent capture groups. So, skip this group
       // when calculating the runningLength.
       if (captureGroupIndex > 0) {
-        runningLength += textContent.length;
+        runningLength += textContent.length
       }
     }
-    return patternMatchResults;
+    return patternMatchResults
   }
 
-  return null;
+  return null
 }
 
 export function hasPatternMatchResults(
-  scanningContext: ScanningContext,
+  scanningContext: ScanningContext
 ): boolean {
-  return scanningContext.patternMatchResults.regExCaptureGroups.length > 0;
+  return scanningContext.patternMatchResults.regExCaptureGroups.length > 0
 }
 
 export function getTextNodeWithOffsetOrThrow(
-  scanningContext: ScanningContext,
+  scanningContext: ScanningContext
 ): TextNodeWithOffset {
-  const textNodeWithOffset = scanningContext.textNodeWithOffset;
+  const textNodeWithOffset = scanningContext.textNodeWithOffset
   if (textNodeWithOffset == null) {
-    invariant(false, 'Expect to have a text node with offset.');
+    invariant(false, 'Expect to have a text node with offset.')
   }
-  return textNodeWithOffset;
+  return textNodeWithOffset
 }
 
 function getPatternMatchResultsForParagraphs(
   markdownCriteria: MarkdownCriteria,
-  scanningContext: ScanningContext,
+  scanningContext: ScanningContext
 ): null | PatternMatchResults {
-  const textNodeWithOffset = getTextNodeWithOffsetOrThrow(scanningContext);
+  const textNodeWithOffset = getTextNodeWithOffsetOrThrow(scanningContext)
 
   // At start of paragraph.
   if (textNodeWithOffset.node.getPreviousSibling() === null) {
-    const textToSearch = textNodeWithOffset.node.getTextContent();
+    const textToSearch = textNodeWithOffset.node.getTextContent()
 
     return getPatternMatchResultsWithRegEx(
       textToSearch,
@@ -573,17 +576,17 @@ function getPatternMatchResultsForParagraphs(
       false,
       scanningContext.isAutoFormatting
         ? markdownCriteria.regExForAutoFormatting
-        : markdownCriteria.regEx,
-    );
+        : markdownCriteria.regEx
+    )
   }
 
-  return null;
+  return null
 }
 
 function getPatternMatchResultsForText(
   markdownCriteria: MarkdownCriteria,
   scanningContext: ScanningContext,
-  parentElementNode: ElementNode,
+  parentElementNode: ElementNode
 ): null | PatternMatchResults {
   if (scanningContext.joinedText == null) {
     if ($isElementNode(parentElementNode)) {
@@ -592,20 +595,20 @@ function getPatternMatchResultsForText(
         scanningContext.joinedText = $joinTextNodesInElementNode(
           parentElementNode,
           SEPARATOR_BETWEEN_TEXT_AND_NON_TEXT_NODES,
-          getTextNodeWithOffsetOrThrow(scanningContext),
-        );
+          getTextNodeWithOffsetOrThrow(scanningContext)
+        )
       }
     } else {
       invariant(
         false,
         'Expected node %s to to be a ElementNode.',
-        parentElementNode.__key,
-      );
+        parentElementNode.__key
+      )
     }
   }
 
   const matchMustAppearAtEndOfString =
-    markdownCriteria.regExForAutoFormatting === true;
+    markdownCriteria.regExForAutoFormatting === true
 
   return getPatternMatchResultsWithRegEx(
     scanningContext.joinedText,
@@ -613,60 +616,60 @@ function getPatternMatchResultsForText(
     matchMustAppearAtEndOfString,
     scanningContext.isAutoFormatting
       ? markdownCriteria.regExForAutoFormatting
-      : markdownCriteria.regEx,
-  );
+      : markdownCriteria.regEx
+  )
 }
 
 function getNewNodeForCriteria<T>(
   scanningContext: ScanningContext,
   element: ElementNode,
-  createHorizontalRuleNode: null | (() => DecoratorNode<T>),
-): {newNode: null | ElementNode, shouldDelete: boolean} {
-  let newNode = null;
-  const shouldDelete = false;
-  const children = element.getChildren();
-  const markdownCriteria = scanningContext.markdownCriteria;
-  const patternMatchResults = scanningContext.patternMatchResults;
+  createHorizontalRuleNode: null | (() => DecoratorNode<T>)
+): { newNode: null | ElementNode, shouldDelete: boolean } {
+  let newNode = null
+  const shouldDelete = false
+  const children = element.getChildren()
+  const markdownCriteria = scanningContext.markdownCriteria
+  const patternMatchResults = scanningContext.patternMatchResults
   if (markdownCriteria.markdownFormatKind != null) {
     switch (markdownCriteria.markdownFormatKind) {
       case 'paragraphH1': {
-        newNode = $createHeadingNode('h1');
-        newNode.append(...children);
-        return {newNode, shouldDelete};
+        newNode = $createHeadingNode('h1')
+        newNode.append(...children)
+        return { newNode, shouldDelete }
       }
       case 'paragraphH2': {
-        newNode = $createHeadingNode('h2');
-        newNode.append(...children);
-        return {newNode, shouldDelete};
+        newNode = $createHeadingNode('h2')
+        newNode.append(...children)
+        return { newNode, shouldDelete }
       }
       case 'paragraphH3': {
-        newNode = $createHeadingNode('h3');
-        newNode.append(...children);
-        return {newNode, shouldDelete};
+        newNode = $createHeadingNode('h3')
+        newNode.append(...children)
+        return { newNode, shouldDelete }
       }
       case 'paragraphH4': {
-        newNode = $createHeadingNode('h4');
-        newNode.append(...children);
-        return {newNode, shouldDelete};
+        newNode = $createHeadingNode('h4')
+        newNode.append(...children)
+        return { newNode, shouldDelete }
       }
       case 'paragraphH5': {
-        newNode = $createHeadingNode('h5');
-        newNode.append(...children);
-        return {newNode, shouldDelete};
+        newNode = $createHeadingNode('h5')
+        newNode.append(...children)
+        return { newNode, shouldDelete }
       }
       case 'paragraphBlockQuote': {
-        newNode = $createQuoteNode();
-        newNode.append(...children);
-        return {newNode, shouldDelete};
+        newNode = $createQuoteNode()
+        newNode.append(...children)
+        return { newNode, shouldDelete }
       }
       case 'paragraphUnorderedList': {
         createListOrMergeWithPrevious(
           element,
           children,
           patternMatchResults,
-          'ul',
-        );
-        return {newNode: null, shouldDelete: false};
+          'ul'
+        )
+        return { newNode: null, shouldDelete: false }
       }
       case 'paragraphOrderedList': {
         const startAsString =
@@ -674,203 +677,202 @@ function getNewNodeForCriteria<T>(
             ? patternMatchResults.regExCaptureGroups[
                 patternMatchResults.regExCaptureGroups.length - 1
               ].text
-            : '1';
+            : '1'
 
         // For conversion, don't use start number.
         // For short-cuts aka autoFormatting, use start number.
         // Later, this should be surface dependent and externalized.
         const start = scanningContext.isAutoFormatting
           ? parseInt(startAsString, 10)
-          : undefined;
+          : undefined
         createListOrMergeWithPrevious(
           element,
           children,
           patternMatchResults,
           'ol',
-          start,
-        );
-        return {newNode: null, shouldDelete: false};
+          start
+        )
+        return { newNode: null, shouldDelete: false }
       }
       case 'paragraphCodeBlock': {
         // Toggle code and paragraph nodes.
         if (scanningContext.isAutoFormatting === false) {
-          const shouldToggle = hasPatternMatchResults(scanningContext);
+          const shouldToggle = hasPatternMatchResults(scanningContext)
 
           if (shouldToggle) {
             scanningContext.isWithinCodeBlock =
-              scanningContext.isWithinCodeBlock !== true;
+              scanningContext.isWithinCodeBlock !== true
 
             // When toggling, always clear the code block element node.
-            scanningContext.currentElementNode = null;
-            return {newNode: null, shouldDelete: true};
+            scanningContext.currentElementNode = null
+            return { newNode: null, shouldDelete: true }
           }
 
           if (scanningContext.isWithinCodeBlock) {
             // Create the code block and return it to the caller.
             if (scanningContext.currentElementNode == null) {
-              const newCodeBlockNode = $createCodeNode();
-              newCodeBlockNode.append(...children);
-              scanningContext.currentElementNode = newCodeBlockNode;
+              const newCodeBlockNode = $createCodeNode()
+              newCodeBlockNode.append(...children)
+              scanningContext.currentElementNode = newCodeBlockNode
 
               return {
                 newNode: newCodeBlockNode,
-                shouldDelete: false,
-              };
+                shouldDelete: false
+              }
             }
 
             // Build up the code block with a line break and the children.
             if (scanningContext.currentElementNode != null) {
-              const codeBlockNode = scanningContext.currentElementNode;
-              const lineBreakNode = $createLineBreakNode();
-              codeBlockNode.append(lineBreakNode);
+              const codeBlockNode = scanningContext.currentElementNode
+              const lineBreakNode = $createLineBreakNode()
+              codeBlockNode.append(lineBreakNode)
               if (children.length) {
-                codeBlockNode.append(lineBreakNode);
+                codeBlockNode.append(lineBreakNode)
               }
-              codeBlockNode.append(...children);
+              codeBlockNode.append(...children)
             }
           }
 
-          return {newNode: null, shouldDelete: true};
+          return { newNode: null, shouldDelete: true }
         }
 
         if (
           scanningContext.triggerState != null &&
           scanningContext.triggerState.isCodeBlock
         ) {
-          newNode = $createParagraphNode();
+          newNode = $createParagraphNode()
         } else {
-          newNode = $createCodeNode();
+          newNode = $createCodeNode()
           const codingLanguage =
             patternMatchResults.regExCaptureGroups.length >= 3
               ? patternMatchResults.regExCaptureGroups[2].text
-              : null;
+              : null
           if (codingLanguage != null && codingLanguage.length > 0) {
-            newNode.setLanguage(codingLanguage);
+            newNode.setLanguage(codingLanguage)
           }
         }
-        newNode.append(...children);
-        return {newNode, shouldDelete};
+        newNode.append(...children)
+        return { newNode, shouldDelete }
       }
       case 'horizontalRule': {
         if (createHorizontalRuleNode != null) {
           // return null for newNode. Insert the HR here.
-          const horizontalRuleNode = createHorizontalRuleNode();
-          element.insertBefore(horizontalRuleNode);
+          const horizontalRuleNode = createHorizontalRuleNode()
+          element.insertBefore(horizontalRuleNode)
         }
-        break;
+        break
       }
       default:
-        break;
+        break
     }
   }
 
-  return {newNode, shouldDelete};
+  return { newNode, shouldDelete }
 }
-
 
 function createListOrMergeWithPrevious(
   element: ElementNode,
   children: Array<LexicalNode>,
   patternMatchResults: PatternMatchResults,
   tag: 'ol' | 'ul',
-  start?: number,
+  start?: number
 ): void {
-  const listItem = $createListItemNode();
+  const listItem = $createListItemNode()
   const indentMatch =
-    patternMatchResults.regExCaptureGroups[0].text.match(/^\s*/);
-  const indent = indentMatch ? Math.floor(indentMatch[0].length / 4) : 0;
-  listItem.append(...children);
+    patternMatchResults.regExCaptureGroups[0].text.match(/^\s*/)
+  const indent = indentMatch ? Math.floor(indentMatch[0].length / 4) : 0
+  listItem.append(...children)
   // Checking if previous element is a list, and if so append
   // new list item inside instead of creating new list
-  const prevElement = element.getPreviousSibling();
+  const prevElement = element.getPreviousSibling()
   if ($isListNode(prevElement) && prevElement.getTag() === tag) {
-    prevElement.append(listItem);
-    element.remove();
+    prevElement.append(listItem)
+    element.remove()
   } else {
-    const list = $createListNode(tag, start);
-    list.append(listItem);
-    element.replace(list);
+    const list = $createListNode(tag, start)
+    list.append(listItem)
+    element.replace(list)
   }
   if (indent) {
-    listItem.setIndent(indent);
+    listItem.setIndent(indent)
   }
 }
 
 export function transformTextNodeForMarkdownCriteria<T>(
   scanningContext: ScanningContext,
   elementNode: ElementNode,
-  createHorizontalRuleNode: null | (() => DecoratorNode<T>),
+  createHorizontalRuleNode: null | (() => DecoratorNode<T>)
 ) {
   if (scanningContext.markdownCriteria.requiresParagraphStart === true) {
     transformTextNodeForElementNode(
       elementNode,
       scanningContext,
-      createHorizontalRuleNode,
-    );
+      createHorizontalRuleNode
+    )
   } else {
-    transformTextNodeForText(scanningContext, elementNode);
+    transformTextNodeForText(scanningContext, elementNode)
   }
 }
 
 function transformTextNodeForElementNode<T>(
   elementNode: ElementNode,
   scanningContext: ScanningContext,
-  createHorizontalRuleNode: null | (() => DecoratorNode<T>),
+  createHorizontalRuleNode: null | (() => DecoratorNode<T>)
 ): void {
   if (scanningContext.textNodeWithOffset != null) {
-    const textNodeWithOffset = getTextNodeWithOffsetOrThrow(scanningContext);
+    const textNodeWithOffset = getTextNodeWithOffsetOrThrow(scanningContext)
     if (hasPatternMatchResults(scanningContext)) {
       const text =
-        scanningContext.patternMatchResults.regExCaptureGroups[0].text;
+        scanningContext.patternMatchResults.regExCaptureGroups[0].text
 
       // Remove the text which we matched.
       const textNode = textNodeWithOffset.node.spliceText(
         0,
         text.length,
         '',
-        true,
-      );
+        true
+      )
       if (textNode.getTextContent() === '') {
-        textNode.selectPrevious();
-        textNode.remove();
+        textNode.selectPrevious()
+        textNode.remove()
       }
     }
   }
 
   // Transform the current element kind to the new element kind.
-  const {newNode, shouldDelete} = getNewNodeForCriteria(
+  const { newNode, shouldDelete } = getNewNodeForCriteria(
     scanningContext,
     elementNode,
-    createHorizontalRuleNode,
-  );
+    createHorizontalRuleNode
+  )
 
   if (shouldDelete) {
-    elementNode.remove();
+    elementNode.remove()
   } else if (newNode !== null) {
-    elementNode.replace(newNode);
+    elementNode.replace(newNode)
   }
 }
 
 function transformTextNodeForText(
   scanningContext: ScanningContext,
-  parentElementNode: ElementNode,
+  parentElementNode: ElementNode
 ) {
-  const markdownCriteria = scanningContext.markdownCriteria;
+  const markdownCriteria = scanningContext.markdownCriteria
 
   if (markdownCriteria.markdownFormatKind != null) {
-    const formatting = getTextFormatType(markdownCriteria.markdownFormatKind);
+    const formatting = getTextFormatType(markdownCriteria.markdownFormatKind)
 
     if (formatting != null) {
       transformTextNodeWithFormatting(
         formatting,
         scanningContext,
-        parentElementNode,
-      );
-      return;
+        parentElementNode
+      )
+      return
     }
 
     if (markdownCriteria.markdownFormatKind === 'link') {
-      transformTextNodeWithLink(scanningContext, parentElementNode);
+      transformTextNodeWithLink(scanningContext, parentElementNode)
     }
   }
 }
@@ -878,10 +880,10 @@ function transformTextNodeForText(
 function transformTextNodeWithFormatting(
   formatting: Array<TextFormatType>,
   scanningContext: ScanningContext,
-  parentElementNode: ElementNode,
+  parentElementNode: ElementNode
 ) {
-  const patternMatchResults = scanningContext.patternMatchResults;
-  const groupCount = patternMatchResults.regExCaptureGroups.length;
+  const patternMatchResults = scanningContext.patternMatchResults
+  const groupCount = patternMatchResults.regExCaptureGroups.length
   if (groupCount !== 7) {
     // For BIUS and similar formats which have a pattern + text + pattern:
     // given '*italic* ' below are the capture groups by index:
@@ -892,35 +894,35 @@ function transformTextNodeWithFormatting(
     // 4. whitespace  // typicallly this is "".
     // 5. '*'
     // 6. ' '
-    return;
+    return
   }
 
   // Remove unwanted text in reg ex pattern.
 
   // Remove group 5.
-  removeTextByCaptureGroups(5, 5, scanningContext, parentElementNode);
+  removeTextByCaptureGroups(5, 5, scanningContext, parentElementNode)
   // Remove group 1.
-  removeTextByCaptureGroups(1, 1, scanningContext, parentElementNode);
+  removeTextByCaptureGroups(1, 1, scanningContext, parentElementNode)
 
   // Apply the formatting.
   formatTextInCaptureGroupIndex(
     formatting,
     3,
     scanningContext,
-    parentElementNode,
-  );
+    parentElementNode
+  )
 
   // Place caret at end of final capture group.
-  selectAfterFinalCaptureGroup(scanningContext, parentElementNode);
+  selectAfterFinalCaptureGroup(scanningContext, parentElementNode)
 }
 
 function transformTextNodeWithLink(
   scanningContext: ScanningContext,
-  parentElementNode: ElementNode,
+  parentElementNode: ElementNode
 ) {
-  const patternMatchResults = scanningContext.patternMatchResults;
-  const regExCaptureGroups = patternMatchResults.regExCaptureGroups;
-  const groupCount = regExCaptureGroups.length;
+  const patternMatchResults = scanningContext.patternMatchResults
+  const regExCaptureGroups = patternMatchResults.regExCaptureGroups
+  const groupCount = regExCaptureGroups.length
   if (groupCount !== 7) {
     // For links and similar formats which have: pattern + text + pattern + pattern2 text2 + pattern2:
     // Given '[title](url) ', below are the capture groups by index:
@@ -932,23 +934,23 @@ function transformTextNodeWithLink(
     // 5. ')'
     // 6. ' '
 
-    return;
+    return
   }
 
-  const title = regExCaptureGroups[2].text;
-  const url = regExCaptureGroups[4].text;
+  const title = regExCaptureGroups[2].text
+  const url = regExCaptureGroups[4].text
   if (title.length === 0 || url.length === 0) {
-    return;
+    return
   }
 
   // Remove the initial pattern through to the final pattern.
-  removeTextByCaptureGroups(1, 5, scanningContext, parentElementNode);
+  removeTextByCaptureGroups(1, 5, scanningContext, parentElementNode)
   insertTextPriorToCaptureGroup(
     1, // Insert at the beginning of the meaningful capture groups, namely index 1. Index 0 refers to the whole matched string.
     title,
     scanningContext,
-    parentElementNode,
-  );
+    parentElementNode
+  )
 
   const newSelectionForLink = createSelectionWithCaptureGroups(
     1,
@@ -956,46 +958,46 @@ function transformTextNodeWithLink(
     false,
     true,
     scanningContext,
-    parentElementNode,
-  );
+    parentElementNode
+  )
 
   if (newSelectionForLink == null) {
-    return;
+    return
   }
 
-  $setSelection(newSelectionForLink);
+  $setSelection(newSelectionForLink)
 
-  scanningContext.editor.dispatchCommand(TOGGLE_LINK_COMMAND, url);
+  scanningContext.editor.dispatchCommand(TOGGLE_LINK_COMMAND, url)
 
   // Place caret at end of final capture group.
-  selectAfterFinalCaptureGroup(scanningContext, parentElementNode);
+  selectAfterFinalCaptureGroup(scanningContext, parentElementNode)
 }
 
 // Below are lower level helper functions.
 
 export function getParentElementNodeOrThrow(
-  scanningContext: ScanningContext,
+  scanningContext: ScanningContext
 ): ElementNode {
-  return getTextNodeWithOffsetOrThrow(scanningContext).node.getParentOrThrow();
+  return getTextNodeWithOffsetOrThrow(scanningContext).node.getParentOrThrow()
 }
 
 function getJoinedTextLength(patternMatchResults: PatternMatchResults): number {
-  const groupCount = patternMatchResults.regExCaptureGroups.length;
+  const groupCount = patternMatchResults.regExCaptureGroups.length
   if (groupCount < 2) {
     // Ignore capture group 0, as regEx defaults the 0th one to the entire matched string.
-    return 0;
+    return 0
   }
 
-  const lastGroupIndex = groupCount - 1;
+  const lastGroupIndex = groupCount - 1
 
   return (
     patternMatchResults.regExCaptureGroups[lastGroupIndex].offsetInParent +
     patternMatchResults.regExCaptureGroups[lastGroupIndex].text.length
-  );
+  )
 }
 
 function getTextFormatType(
-  markdownFormatKind: MarkdownFormatKind,
+  markdownFormatKind: MarkdownFormatKind
 ): null | Array<TextFormatType> {
   switch (markdownFormatKind) {
     case 'italic':
@@ -1003,22 +1005,22 @@ function getTextFormatType(
     case 'underline':
     case 'strikethrough':
     case 'code':
-      return [markdownFormatKind];
+      return [markdownFormatKind]
     case 'strikethrough_italic_bold': {
-      return ['strikethrough', 'italic', 'bold'];
+      return ['strikethrough', 'italic', 'bold']
     }
     case 'italic_bold': {
-      return ['italic', 'bold'];
+      return ['italic', 'bold']
     }
     case 'strikethrough_italic': {
-      return ['strikethrough', 'italic'];
+      return ['strikethrough', 'italic']
     }
     case 'strikethrough_bold': {
-      return ['strikethrough', 'bold'];
+      return ['strikethrough', 'bold']
     }
     default:
   }
-  return null;
+  return null
 }
 
 function createSelectionWithCaptureGroups(
@@ -1027,90 +1029,90 @@ function createSelectionWithCaptureGroups(
   startAtEndOfAnchor: boolean,
   finishAtEndOfFocus: boolean,
   scanningContext: ScanningContext,
-  parentElementNode: ElementNode,
+  parentElementNode: ElementNode
 ): null | RangeSelection {
-  const patternMatchResults = scanningContext.patternMatchResults;
-  const regExCaptureGroups = patternMatchResults.regExCaptureGroups;
-  const regExCaptureGroupsCount = regExCaptureGroups.length;
+  const patternMatchResults = scanningContext.patternMatchResults
+  const regExCaptureGroups = patternMatchResults.regExCaptureGroups
+  const regExCaptureGroupsCount = regExCaptureGroups.length
 
   if (
     anchorCaptureGroupIndex >= regExCaptureGroupsCount ||
     focusCaptureGroupIndex >= regExCaptureGroupsCount
   ) {
-    return null;
+    return null
   }
 
-  const joinedTextLength = getJoinedTextLength(patternMatchResults);
+  const joinedTextLength = getJoinedTextLength(patternMatchResults)
 
-  const anchorCaptureGroupDetail = regExCaptureGroups[anchorCaptureGroupIndex];
-  const focusCaptureGroupDetail = regExCaptureGroups[focusCaptureGroupIndex];
+  const anchorCaptureGroupDetail = regExCaptureGroups[anchorCaptureGroupIndex]
+  const focusCaptureGroupDetail = regExCaptureGroups[focusCaptureGroupIndex]
 
   const anchorLocation = startAtEndOfAnchor
     ? anchorCaptureGroupDetail.offsetInParent +
       anchorCaptureGroupDetail.text.length
-    : anchorCaptureGroupDetail.offsetInParent;
+    : anchorCaptureGroupDetail.offsetInParent
 
   const focusLocation = finishAtEndOfFocus
     ? focusCaptureGroupDetail.offsetInParent +
       focusCaptureGroupDetail.text.length
-    : focusCaptureGroupDetail.offsetInParent;
+    : focusCaptureGroupDetail.offsetInParent
 
   const anchorTextNodeWithOffset = $findNodeWithOffsetFromJoinedText(
     anchorLocation,
     joinedTextLength,
     SEPARATOR_LENGTH,
-    parentElementNode,
-  );
+    parentElementNode
+  )
 
   const focusTextNodeWithOffset = $findNodeWithOffsetFromJoinedText(
     focusLocation,
     joinedTextLength,
     SEPARATOR_LENGTH,
-    parentElementNode,
-  );
+    parentElementNode
+  )
 
   if (
     anchorTextNodeWithOffset == null &&
     focusTextNodeWithOffset == null &&
     parentElementNode.getChildren().length === 0
   ) {
-    const emptyElementSelection = $createRangeSelection();
+    const emptyElementSelection = $createRangeSelection()
 
-    emptyElementSelection.anchor.set(parentElementNode.getKey(), 0, 'element');
+    emptyElementSelection.anchor.set(parentElementNode.getKey(), 0, 'element')
 
-    emptyElementSelection.focus.set(parentElementNode.getKey(), 0, 'element');
-    return emptyElementSelection;
+    emptyElementSelection.focus.set(parentElementNode.getKey(), 0, 'element')
+    return emptyElementSelection
   }
 
   if (anchorTextNodeWithOffset == null || focusTextNodeWithOffset == null) {
-    return null;
+    return null
   }
 
-  const selection = $createRangeSelection();
+  const selection = $createRangeSelection()
 
   selection.anchor.set(
     anchorTextNodeWithOffset.node.getKey(),
     anchorTextNodeWithOffset.offset,
-    'text',
-  );
+    'text'
+  )
 
   selection.focus.set(
     focusTextNodeWithOffset.node.getKey(),
     focusTextNodeWithOffset.offset,
-    'text',
-  );
+    'text'
+  )
 
-  return selection;
+  return selection
 }
 
 function removeTextByCaptureGroups(
   anchorCaptureGroupIndex,
   focusCaptureGroupIndex,
   scanningContext: ScanningContext,
-  parentElementNode: ElementNode,
+  parentElementNode: ElementNode
 ) {
-  const patternMatchResults = scanningContext.patternMatchResults;
-  const regExCaptureGroups = patternMatchResults.regExCaptureGroups;
+  const patternMatchResults = scanningContext.patternMatchResults
+  const regExCaptureGroups = patternMatchResults.regExCaptureGroups
 
   const newSelection = createSelectionWithCaptureGroups(
     anchorCaptureGroupIndex,
@@ -1118,32 +1120,32 @@ function removeTextByCaptureGroups(
     false,
     true,
     scanningContext,
-    parentElementNode,
-  );
+    parentElementNode
+  )
 
   if (newSelection != null) {
-    $setSelection(newSelection);
-    const currentSelection = $getSelection();
+    $setSelection(newSelection)
+    const currentSelection = $getSelection()
     if (
       currentSelection != null &&
       $isRangeSelection(currentSelection) &&
       currentSelection.isCollapsed() === false
     ) {
-      currentSelection.removeText();
+      currentSelection.removeText()
 
       // Shift all group offsets and clear out group text.
-      let runningLength = 0;
-      const groupCount = regExCaptureGroups.length;
+      let runningLength = 0
+      const groupCount = regExCaptureGroups.length
       for (let i = anchorCaptureGroupIndex; i < groupCount; i++) {
-        const captureGroupDetail = regExCaptureGroups[i];
+        const captureGroupDetail = regExCaptureGroups[i]
 
         if (i > anchorCaptureGroupIndex) {
-          captureGroupDetail.offsetInParent -= runningLength;
+          captureGroupDetail.offsetInParent -= runningLength
         }
 
         if (i <= focusCaptureGroupIndex) {
-          runningLength += captureGroupDetail.text.length;
-          captureGroupDetail.text = '';
+          runningLength += captureGroupDetail.text.length
+          captureGroupDetail.text = ''
         }
       }
     }
@@ -1154,21 +1156,21 @@ function insertTextPriorToCaptureGroup(
   captureGroupIndex: number,
   text: string,
   scanningContext: ScanningContext,
-  parentElementNode: ElementNode,
+  parentElementNode: ElementNode
 ) {
-  const patternMatchResults = scanningContext.patternMatchResults;
-  const regExCaptureGroups = patternMatchResults.regExCaptureGroups;
-  const regExCaptureGroupsCount = regExCaptureGroups.length;
+  const patternMatchResults = scanningContext.patternMatchResults
+  const regExCaptureGroups = patternMatchResults.regExCaptureGroups
+  const regExCaptureGroupsCount = regExCaptureGroups.length
   if (captureGroupIndex >= regExCaptureGroupsCount) {
-    return;
+    return
   }
 
-  const captureGroupDetail = regExCaptureGroups[captureGroupIndex];
+  const captureGroupDetail = regExCaptureGroups[captureGroupIndex]
 
   const newCaptureGroupDetail = {
     offsetInParent: captureGroupDetail.offsetInParent,
-    text,
-  };
+    text
+  }
 
   const newSelection = createSelectionWithCaptureGroups(
     captureGroupIndex,
@@ -1176,26 +1178,26 @@ function insertTextPriorToCaptureGroup(
     false,
     false,
     scanningContext,
-    parentElementNode,
-  );
+    parentElementNode
+  )
 
   if (newSelection != null) {
-    $setSelection(newSelection);
-    const currentSelection = $getSelection();
+    $setSelection(newSelection)
+    const currentSelection = $getSelection()
     if (
       currentSelection != null &&
       $isRangeSelection(currentSelection) &&
       currentSelection.isCollapsed()
     ) {
-      currentSelection.insertText(newCaptureGroupDetail.text);
+      currentSelection.insertText(newCaptureGroupDetail.text)
 
       // Update the capture groups.
-      regExCaptureGroups.splice(captureGroupIndex, 0, newCaptureGroupDetail);
-      const textLength = newCaptureGroupDetail.text.length;
-      const newGroupCount = regExCaptureGroups.length;
+      regExCaptureGroups.splice(captureGroupIndex, 0, newCaptureGroupDetail)
+      const textLength = newCaptureGroupDetail.text.length
+      const newGroupCount = regExCaptureGroups.length
       for (let i = captureGroupIndex + 1; i < newGroupCount; i++) {
-        const currentCaptureGroupDetail = regExCaptureGroups[i];
-        currentCaptureGroupDetail.offsetInParent += textLength;
+        const currentCaptureGroupDetail = regExCaptureGroups[i]
+        currentCaptureGroupDetail.offsetInParent += textLength
       }
     }
   }
@@ -1205,20 +1207,20 @@ function formatTextInCaptureGroupIndex(
   formatTypes: Array<TextFormatType>,
   captureGroupIndex: number,
   scanningContext: ScanningContext,
-  parentElementNode: ElementNode,
+  parentElementNode: ElementNode
 ) {
-  const patternMatchResults = scanningContext.patternMatchResults;
-  const regExCaptureGroups = patternMatchResults.regExCaptureGroups;
-  const regExCaptureGroupsCount = regExCaptureGroups.length;
+  const patternMatchResults = scanningContext.patternMatchResults
+  const regExCaptureGroups = patternMatchResults.regExCaptureGroups
+  const regExCaptureGroupsCount = regExCaptureGroups.length
 
   invariant(
     captureGroupIndex < regExCaptureGroupsCount,
-    'The capture group count in the RegEx does match the actual capture group count.',
-  );
+    'The capture group count in the RegEx does match the actual capture group count.'
+  )
 
-  const captureGroupDetail = regExCaptureGroups[captureGroupIndex];
+  const captureGroupDetail = regExCaptureGroups[captureGroupIndex]
   if (captureGroupDetail.text.length === 0) {
-    return;
+    return
   }
 
   const newSelection = createSelectionWithCaptureGroups(
@@ -1227,15 +1229,15 @@ function formatTextInCaptureGroupIndex(
     false,
     true,
     scanningContext,
-    parentElementNode,
-  );
+    parentElementNode
+  )
 
   if (newSelection != null) {
-    $setSelection(newSelection);
-    const currentSelection = $getSelection();
+    $setSelection(newSelection)
+    const currentSelection = $getSelection()
     if ($isRangeSelection(currentSelection)) {
       for (let i = 0; i < formatTypes.length; i++) {
-        currentSelection.formatText(formatTypes[i]);
+        currentSelection.formatText(formatTypes[i])
       }
     }
   }
@@ -1244,15 +1246,15 @@ function formatTextInCaptureGroupIndex(
 // Place caret at end of final capture group.
 function selectAfterFinalCaptureGroup(
   scanningContext: ScanningContext,
-  parentElementNode: ElementNode,
+  parentElementNode: ElementNode
 ) {
-  const patternMatchResults = scanningContext.patternMatchResults;
-  const groupCount = patternMatchResults.regExCaptureGroups.length;
+  const patternMatchResults = scanningContext.patternMatchResults
+  const groupCount = patternMatchResults.regExCaptureGroups.length
   if (groupCount < 2) {
     // Ignore capture group 0, as regEx defaults the 0th one to the entire matched string.
-    return;
+    return
   }
-  const lastGroupIndex = groupCount - 1;
+  const lastGroupIndex = groupCount - 1
 
   const newSelection = createSelectionWithCaptureGroups(
     lastGroupIndex,
@@ -1260,10 +1262,10 @@ function selectAfterFinalCaptureGroup(
     true,
     true,
     scanningContext,
-    parentElementNode,
-  );
+    parentElementNode
+  )
 
   if (newSelection != null) {
-    $setSelection(newSelection);
+    $setSelection(newSelection)
   }
 }

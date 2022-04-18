@@ -7,24 +7,24 @@
  * @flow strict
  */
 
-import type {EntityMatch} from '@lexical/text';
-import type {TextNode} from 'lexical';
+import type { EntityMatch } from '@lexical/text'
+import type { TextNode } from 'lexical'
 
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {registerLexicalTextEntity} from '@lexical/text';
-import {mergeRegister} from '@lexical/utils';
-import {useEffect} from 'react';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { registerLexicalTextEntity } from '@lexical/text'
+import { mergeRegister } from '@lexical/utils'
+import { useEffect } from 'react'
 
 export default function useLexicalTextEntity<N: TextNode>(
   getMatch: (text: string) => null | EntityMatch,
   targetNode: Class<N>,
-  createNode: (textNode: TextNode) => N,
+  createNode: (textNode: TextNode) => N
 ): void {
-  const [editor] = useLexicalComposerContext();
+  const [editor] = useLexicalComposerContext()
 
   useEffect(() => {
     return mergeRegister(
-      ...registerLexicalTextEntity(editor, getMatch, targetNode, createNode),
-    );
-  }, [createNode, editor, getMatch, targetNode]);
+      ...registerLexicalTextEntity(editor, getMatch, targetNode, createNode)
+    )
+  }, [createNode, editor, getMatch, targetNode])
 }

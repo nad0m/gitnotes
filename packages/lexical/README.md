@@ -48,9 +48,9 @@ const editor = createEditor(config);
 Once you have an editor instance, when ready, you can associate the editor instance with a content editable `<div>` element in your document:
 
 ```js
-const contentEditableElement = document.getElementById('editor');
+const contentEditableElement = document.getElementById('editor')
 
-editor.setRootElement(contentEditableElement);
+editor.setRootElement(contentEditableElement)
 ```
 
 If you want to clear the editor instance from the element, you can pass `null`. Alternatively, you can switch to another element if need be,
@@ -78,9 +78,9 @@ Editor states are serializable to JSON, and the editor instance provides a usefu
 to deserialize stringified editor states.
 
 ```js
-const stringifiedEditorState = JSON.stringify(editor.getEditorState().toJSON());
+const stringifiedEditorState = JSON.stringify(editor.getEditorState().toJSON())
 
-const newEditorState = editor.parseEditorState(stringifiedEditorState);
+const newEditorState = editor.parseEditorState(stringifiedEditorState)
 ```
 
 ### Updating an editor
@@ -108,8 +108,8 @@ based on the changes from the update.
 Here's an example of how you can update an editor instance:
 
 ```js
-import {$getRoot, $getSelection} from 'lexical';
-import {$createParagraphNode} from 'lexical/PargraphNode';
+import { $getRoot, $getSelection } from 'lexical'
+import { $createParagraphNode } from 'lexical/PargraphNode'
 
 // Inside the `editor.update` you can use special $ prefixed helper functions.
 // These functions cannot be used outside the closure, and will error if you try.
@@ -117,36 +117,36 @@ import {$createParagraphNode} from 'lexical/PargraphNode';
 // outside of a React function component).
 editor.update(() => {
   // Get the RootNode from the EditorState
-  const root = $getRoot();
+  const root = $getRoot()
 
   // Get the selection from the EditorState
-  const selection = $getSelection();
+  const selection = $getSelection()
 
   // Create a new ParagraphNode
-  const paragraphNode = $createParagraphNode();
+  const paragraphNode = $createParagraphNode()
 
   // Create a new TextNode
-  const textNode = $createTextNode('Hello world');
+  const textNode = $createTextNode('Hello world')
 
   // Append the text node to the paragraph
-  paragraphNode.append(textNode);
+  paragraphNode.append(textNode)
 
   // Finally, append the paragraph to the root
-  root.append(paragraphNode);
-});
+  root.append(paragraphNode)
+})
 ```
 
 If you want to know when the editor updates so you can react to the changes, you can add an update
 listener to the editor, as shown below:
 
 ```js
-editor.registerUpdateListener(({editorState}) => {
+editor.registerUpdateListener(({ editorState }) => {
   // The latest EditorState can be found as `editorState`.
   // To read the contents of the EditorState, use the following API:
 
   editorState.read(() => {
     // Just like editor.update(), .read() expects a closure where you can use
     // the $ prefixed helper functions.
-  });
-});
+  })
+})
 ```

@@ -7,24 +7,24 @@
  * @flow strict
  */
 
-import type {LexicalCommand} from 'lexical';
+import type { LexicalCommand } from 'lexical'
 
-import {createCommand} from 'lexical';
+import { createCommand } from 'lexical'
 
 import {
   $handleListInsertParagraph,
   indentList,
   insertList,
   outdentList,
-  removeList,
-} from './formatList';
+  removeList
+} from './formatList'
 import {
   $createListItemNode,
   $isListItemNode,
-  ListItemNode,
-} from './LexicalListItemNode';
-import {$createListNode, $isListNode, ListNode} from './LexicalListNode';
-import {$getListDepth} from './utils';
+  ListItemNode
+} from './LexicalListItemNode'
+import { $createListNode, $isListNode, ListNode } from './LexicalListNode'
+import { $getListDepth } from './utils'
 
 export {
   $createListItemNode,
@@ -38,11 +38,10 @@ export {
   ListItemNode,
   ListNode,
   outdentList,
-  removeList,
-};
+  removeList
+}
 
 export const INSERT_UNORDERED_LIST_COMMAND: LexicalCommand<void> =
-  createCommand();
-export const INSERT_ORDERED_LIST_COMMAND: LexicalCommand<void> =
-  createCommand();
-export const REMOVE_LIST_COMMAND: LexicalCommand<void> = createCommand();
+  createCommand()
+export const INSERT_ORDERED_LIST_COMMAND: LexicalCommand<void> = createCommand()
+export const REMOVE_LIST_COMMAND: LexicalCommand<void> = createCommand()

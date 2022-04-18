@@ -7,15 +7,15 @@
  * @flow strict
  */
 
-import * as React from 'react';
-import {useMemo, useState} from 'react';
+import * as React from 'react'
+import { useMemo, useState } from 'react'
 
-import {isDevPlayground} from './appSettings';
-import {useSettings} from '../context/SettingsContext';
-import Switch from '../ui/Switch';
+import { isDevPlayground } from './appSettings'
+import { useSettings } from '../context/SettingsContext'
+import Switch from '../ui/Switch'
 
 export default function Settings(): React$Node {
-  const windowLocation = window.location;
+  const windowLocation = window.location
   const {
     setOption,
     settings: {
@@ -26,17 +26,17 @@ export default function Settings(): React$Node {
       isCharLimitUtf8,
       isAutocomplete,
       showTreeView,
-      showNestedEditorTreeView,
-    },
-  } = useSettings();
-  const [showSettings, setShowSettings] = useState(false);
+      showNestedEditorTreeView
+    }
+  } = useSettings()
+  const [showSettings, setShowSettings] = useState(false)
   const [isSplitScreen, search] = useMemo(() => {
-    const parentWindow = window.parent;
-    const _search = windowLocation.search;
+    const parentWindow = window.parent
+    const _search = windowLocation.search
     const _isSplitScreen =
-      parentWindow && parentWindow.location.pathname === '/split/';
-    return [_isSplitScreen, _search];
-  }, [windowLocation]);
+      parentWindow && parentWindow.location.pathname === '/split/'
+    return [_isSplitScreen, _search]
+  }, [windowLocation])
 
   return (
     <>
@@ -50,8 +50,8 @@ export default function Settings(): React$Node {
           {isRichText && isDevPlayground && (
             <Switch
               onClick={() => {
-                setOption('isCollab', !isCollab);
-                window.location.reload();
+                setOption('isCollab', !isCollab)
+                window.location.reload()
               }}
               checked={isCollab}
               text="Collaboration"
@@ -61,9 +61,9 @@ export default function Settings(): React$Node {
             <Switch
               onClick={() => {
                 if (isSplitScreen) {
-                  window.parent.location.href = `/${search}`;
+                  window.parent.location.href = `/${search}`
                 } else {
-                  window.location.href = `/split/${search}`;
+                  window.location.href = `/split/${search}`
                 }
               }}
               checked={isSplitScreen}
@@ -89,8 +89,8 @@ export default function Settings(): React$Node {
           />
           <Switch
             onClick={() => {
-              setOption('isRichText', !isRichText);
-              setOption('isCollab', false);
+              setOption('isRichText', !isRichText)
+              setOption('isCollab', false)
             }}
             checked={isRichText}
             text="Rich Text"
@@ -113,5 +113,5 @@ export default function Settings(): React$Node {
         </div>
       ) : null}
     </>
-  );
+  )
 }

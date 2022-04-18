@@ -1,19 +1,57 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.ConsoleMessage = void 0;
+})
+exports.ConsoleMessage = void 0
 
-var util = _interopRequireWildcard(require("util"));
+var util = _interopRequireWildcard(require('util'))
 
-var _jsHandle = require("./jsHandle");
+var _jsHandle = require('./jsHandle')
 
-var _channelOwner = require("./channelOwner");
+var _channelOwner = require('./channelOwner')
 
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+function _getRequireWildcardCache(nodeInterop) {
+  if (typeof WeakMap !== 'function') return null
+  var cacheBabelInterop = new WeakMap()
+  var cacheNodeInterop = new WeakMap()
+  return (_getRequireWildcardCache = function (nodeInterop) {
+    return nodeInterop ? cacheNodeInterop : cacheBabelInterop
+  })(nodeInterop)
+}
 
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+function _interopRequireWildcard(obj, nodeInterop) {
+  if (!nodeInterop && obj && obj.__esModule) {
+    return obj
+  }
+  if (obj === null || (typeof obj !== 'object' && typeof obj !== 'function')) {
+    return { default: obj }
+  }
+  var cache = _getRequireWildcardCache(nodeInterop)
+  if (cache && cache.has(obj)) {
+    return cache.get(obj)
+  }
+  var newObj = {}
+  var hasPropertyDescriptor =
+    Object.defineProperty && Object.getOwnPropertyDescriptor
+  for (var key in obj) {
+    if (key !== 'default' && Object.prototype.hasOwnProperty.call(obj, key)) {
+      var desc = hasPropertyDescriptor
+        ? Object.getOwnPropertyDescriptor(obj, key)
+        : null
+      if (desc && (desc.get || desc.set)) {
+        Object.defineProperty(newObj, key, desc)
+      } else {
+        newObj[key] = obj[key]
+      }
+    }
+  }
+  newObj.default = obj
+  if (cache) {
+    cache.set(obj, newObj)
+  }
+  return newObj
+}
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -32,33 +70,32 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
  */
 class ConsoleMessage extends _channelOwner.ChannelOwner {
   static from(message) {
-    return message._object;
+    return message._object
   }
 
   constructor(parent, type, guid, initializer) {
-    super(parent, type, guid, initializer);
+    super(parent, type, guid, initializer)
   }
 
   type() {
-    return this._initializer.type;
+    return this._initializer.type
   }
 
   text() {
-    return this._initializer.text;
+    return this._initializer.text
   }
 
   args() {
-    return this._initializer.args.map(_jsHandle.JSHandle.from);
+    return this._initializer.args.map(_jsHandle.JSHandle.from)
   }
 
   location() {
-    return this._initializer.location;
+    return this._initializer.location
   }
 
   [util.inspect.custom]() {
-    return this.text();
+    return this.text()
   }
-
 }
 
-exports.ConsoleMessage = ConsoleMessage;
+exports.ConsoleMessage = ConsoleMessage

@@ -7,10 +7,10 @@
  * @flow strict
  */
 
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import * as React from 'react';
-import {useCallback, useState} from 'react';
-import useLayoutEffect from 'shared/useLayoutEffect';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import * as React from 'react'
+import { useCallback, useState } from 'react'
+import useLayoutEffect from 'shared/useLayoutEffect'
 
 export type Props = $ReadOnly<{
   ariaActiveDescendantID?: string,
@@ -33,8 +33,8 @@ export type Props = $ReadOnly<{
   spellCheck?: boolean,
   style?: StyleSheetList,
   tabIndex?: number,
-  testid?: string,
-}>;
+  testid?: string
+}>
 
 export default function LexicalContentEditable({
   ariaActiveDescendantID,
@@ -56,22 +56,22 @@ export default function LexicalContentEditable({
   spellCheck = true,
   style,
   tabIndex,
-  testid,
+  testid
 }: Props): React.MixedElement {
-  const [editor] = useLexicalComposerContext();
-  const [isReadOnly, setReadOnly] = useState(true);
+  const [editor] = useLexicalComposerContext()
+  const [isReadOnly, setReadOnly] = useState(true)
   const ref = useCallback(
     (rootElement: null | HTMLElement) => {
-      editor.setRootElement(rootElement);
+      editor.setRootElement(rootElement)
     },
-    [editor],
-  );
+    [editor]
+  )
   useLayoutEffect(() => {
-    setReadOnly(editor.isReadOnly());
+    setReadOnly(editor.isReadOnly())
     return editor.registerReadOnlyListener((currentIsReadOnly) => {
-      setReadOnly(currentIsReadOnly);
-    });
-  }, [editor]);
+      setReadOnly(currentIsReadOnly)
+    })
+  }, [editor])
 
   return (
     <div
@@ -100,5 +100,5 @@ export default function LexicalContentEditable({
       style={style}
       tabIndex={tabIndex}
     />
-  );
+  )
 }

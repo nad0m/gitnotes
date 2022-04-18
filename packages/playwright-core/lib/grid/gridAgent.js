@@ -1,19 +1,21 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.launchGridAgent = launchGridAgent;
+})
+exports.launchGridAgent = launchGridAgent
 
-var _debug = _interopRequireDefault(require("debug"));
+var _debug = _interopRequireDefault(require('debug'))
 
-var _ws = _interopRequireDefault(require("ws"));
+var _ws = _interopRequireDefault(require('ws'))
 
-var _child_process = require("child_process");
+var _child_process = require('child_process')
 
-var _utils = require("../utils/utils");
+var _utils = require('../utils/utils')
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj }
+}
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -31,19 +33,27 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * limitations under the License.
  */
 function launchGridAgent(agentId, gridURL) {
-  const log = (0, _debug.default)(`[agent ${agentId}]`);
-  log('created');
-  const params = new URLSearchParams();
-  params.set('pwVersion', (0, _utils.getPlaywrightVersion)(true
-  /* majorMinorOnly */
-  ));
-  params.set('agentId', agentId);
-  const ws = new _ws.default(gridURL + `/registerAgent?` + params.toString());
-  ws.on('message', workerId => {
-    log('Worker requested ' + workerId);
-    (0, _child_process.fork)(require.resolve('./gridWorker.js'), [gridURL, agentId, workerId], {
-      detached: true
-    });
-  });
-  ws.on('close', () => process.exit(0));
+  const log = (0, _debug.default)(`[agent ${agentId}]`)
+  log('created')
+  const params = new URLSearchParams()
+  params.set(
+    'pwVersion',
+    (0, _utils.getPlaywrightVersion)(
+      true
+      /* majorMinorOnly */
+    )
+  )
+  params.set('agentId', agentId)
+  const ws = new _ws.default(gridURL + `/registerAgent?` + params.toString())
+  ws.on('message', (workerId) => {
+    log('Worker requested ' + workerId)
+    ;(0, _child_process.fork)(
+      require.resolve('./gridWorker.js'),
+      [gridURL, agentId, workerId],
+      {
+        detached: true
+      }
+    )
+  })
+  ws.on('close', () => process.exit(0))
 }

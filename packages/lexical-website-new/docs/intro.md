@@ -9,7 +9,7 @@ sidebar_position: 1
 Lexical is an extensible JavaScript web text-editor framework with an emphasis on reliability, accessibility and performance. Lexical aims to provide a best-in-class developer experience, so you can easily prototype and build features with confidence. Combined with a highly extensible architecture, Lexical allows developers to create unique text editing experiences that scale in size and functionality.
 
 Lexical works by attaching itself to a `contentEditable` element and from there you can work with Lexical's declarative APIs to make
-things happen without needing to worry about specific edge-cases around the DOM. In fact, you rarely need to interact with the DOM at all in 
+things happen without needing to worry about specific edge-cases around the DOM. In fact, you rarely need to interact with the DOM at all in
 most cases (unless you build your own custom nodes).
 
 The core package of Lexical is only 22kb in file size (min+gzip) and you only ever pay the cost for what you need. So Lexical can grow with
@@ -74,13 +74,13 @@ Outside of invoking updates, the bulk of work done with Lexical is via listeners
 the editor and are prefixed with `register`. Another important feature is that all the register methods return a function to easily unsubscribe them. For example here is how you listen to an update to a Lexical editor:
 
 ```js
-const unregisterListener = editor.registerUpdateListener(({editorState}) => {
+const unregisterListener = editor.registerUpdateListener(({ editorState }) => {
   // An update has occurred!
-  console.log(editorState);
-});
+  console.log(editorState)
+})
 
 // Ensure we remove the listener later!
-unregisterListener();
+unregisterListener()
 ```
 
 Commands are the communication system used to wire everything together in Lexical. Custom commands can be created using `createCommand()` and

@@ -1,9 +1,9 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.Video = void 0;
+})
+exports.Video = void 0
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -22,37 +22,42 @@ exports.Video = void 0;
  */
 class Video {
   constructor(page, connection) {
-    this._artifact = null;
+    this._artifact = null
 
-    this._artifactCallback = artifact => {};
+    this._artifactCallback = (artifact) => {}
 
-    this._isRemote = false;
-    this._isRemote = connection.isRemote();
-    this._artifact = Promise.race([new Promise(f => this._artifactCallback = f), page._closedOrCrashedPromise.then(() => null)]);
+    this._isRemote = false
+    this._isRemote = connection.isRemote()
+    this._artifact = Promise.race([
+      new Promise((f) => (this._artifactCallback = f)),
+      page._closedOrCrashedPromise.then(() => null)
+    ])
   }
 
   _artifactReady(artifact) {
-    this._artifactCallback(artifact);
+    this._artifactCallback(artifact)
   }
 
   async path() {
-    if (this._isRemote) throw new Error(`Path is not available when connecting remotely. Use saveAs() to save a local copy.`);
-    const artifact = await this._artifact;
-    if (!artifact) throw new Error('Page did not produce any video frames');
-    return artifact._initializer.absolutePath;
+    if (this._isRemote)
+      throw new Error(
+        `Path is not available when connecting remotely. Use saveAs() to save a local copy.`
+      )
+    const artifact = await this._artifact
+    if (!artifact) throw new Error('Page did not produce any video frames')
+    return artifact._initializer.absolutePath
   }
 
   async saveAs(path) {
-    const artifact = await this._artifact;
-    if (!artifact) throw new Error('Page did not produce any video frames');
-    return artifact.saveAs(path);
+    const artifact = await this._artifact
+    if (!artifact) throw new Error('Page did not produce any video frames')
+    return artifact.saveAs(path)
   }
 
   async delete() {
-    const artifact = await this._artifact;
-    if (artifact) await artifact.delete();
+    const artifact = await this._artifact
+    if (artifact) await artifact.delete()
   }
-
 }
 
-exports.Video = Video;
+exports.Video = Video

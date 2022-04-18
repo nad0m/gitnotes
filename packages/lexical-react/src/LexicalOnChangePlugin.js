@@ -7,42 +7,42 @@
  * @flow strict
  */
 
-import type {EditorState, LexicalEditor} from 'lexical';
+import type { EditorState, LexicalEditor } from 'lexical'
 
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import useLayoutEffect from 'shared/useLayoutEffect';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import useLayoutEffect from 'shared/useLayoutEffect'
 
 export default function OnChangePlugin({
   ignoreInitialChange = true,
   ignoreSelectionChange = false,
-  onChange,
+  onChange
 }: {
   ignoreInitialChange?: boolean,
   ignoreSelectionChange?: boolean,
-  onChange: (editorState: EditorState, editor: LexicalEditor) => void,
+  onChange: (editorState: EditorState, editor: LexicalEditor) => void
 }): null {
-  const [editor] = useLexicalComposerContext();
+  const [editor] = useLexicalComposerContext()
   useLayoutEffect(() => {
     if (onChange) {
       return editor.registerUpdateListener(
-        ({editorState, dirtyElements, dirtyLeaves, prevEditorState}) => {
+        ({ editorState, dirtyElements, dirtyLeaves, prevEditorState }) => {
           if (
             ignoreSelectionChange &&
             dirtyElements.size === 0 &&
             dirtyLeaves.size === 0
           ) {
-            return;
+            return
           }
 
           if (ignoreInitialChange && prevEditorState.isEmpty()) {
-            return;
+            return
           }
 
-          onChange(editorState, editor);
-        },
-      );
+          onChange(editorState, editor)
+        }
+      )
     }
-  }, [editor, ignoreInitialChange, ignoreSelectionChange, onChange]);
+  }, [editor, ignoreInitialChange, ignoreSelectionChange, onChange])
 
-  return null;
+  return null
 }

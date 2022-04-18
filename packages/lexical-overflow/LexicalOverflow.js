@@ -7,6 +7,6 @@
  *
  */
 
-'use strict';
+'use strict'
 
-module.exports = require('./dist/LexicalOverflow.js');
+module.exports = require('./dist/LexicalOverflow.js')

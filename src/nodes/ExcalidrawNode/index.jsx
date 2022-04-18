@@ -7,11 +7,11 @@
  * @flow strict
  */
 
-import type {EditorConfig, LexicalEditor, LexicalNode, NodeKey} from 'lexical';
+import type { EditorConfig, LexicalEditor, LexicalNode, NodeKey } from 'lexical'
 
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import useLexicalNodeSelection from '@lexical/react/useLexicalNodeSelection';
-import {mergeRegister} from '@lexical/utils';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import useLexicalNodeSelection from '@lexical/react/useLexicalNodeSelection'
+import { mergeRegister } from '@lexical/utils'
 import {
   $getNodeByKey,
   $getSelection,
@@ -20,103 +20,103 @@ import {
   COMMAND_PRIORITY_LOW,
   DecoratorNode,
   KEY_BACKSPACE_COMMAND,
-  KEY_DELETE_COMMAND,
-} from 'lexical';
-import * as React from 'react';
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+  KEY_DELETE_COMMAND
+} from 'lexical'
+import * as React from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
-import ExcalidrawImage from './ExcalidrawImage';
-import ExcalidrawModal from './ExcalidrawModal';
+import ExcalidrawImage from './ExcalidrawImage'
+import ExcalidrawModal from './ExcalidrawModal'
 
 function ExcalidrawComponent({
   nodeKey,
-  data,
+  data
 }: {
   data: string,
-  nodeKey: NodeKey,
+  nodeKey: NodeKey
 }): React.Node {
-  const [isModalOpen, setModalOpen] = useState<boolean>(data === '[]');
-  const [editor] = useLexicalComposerContext();
-  const buttonRef = useRef<HTMLElement | null>(null);
+  const [isModalOpen, setModalOpen] = useState<boolean>(data === '[]')
+  const [editor] = useLexicalComposerContext()
+  const buttonRef = useRef<HTMLElement | null>(null)
   const [isSelected, setSelected, clearSelection] =
-    useLexicalNodeSelection(nodeKey);
+    useLexicalNodeSelection(nodeKey)
 
   const onDelete = useCallback(
     (payload) => {
       if (isSelected && $isNodeSelection($getSelection())) {
-        const event: KeyboardEvent = payload;
-        event.preventDefault();
+        const event: KeyboardEvent = payload
+        event.preventDefault()
         editor.update(() => {
-          const node = $getNodeByKey(nodeKey);
+          const node = $getNodeByKey(nodeKey)
           if ($isExcalidrawNode(node)) {
-            node.remove();
+            node.remove()
           }
-          setSelected(false);
-        });
+          setSelected(false)
+        })
       }
-      return false;
+      return false
     },
-    [editor, isSelected, nodeKey, setSelected],
-  );
+    [editor, isSelected, nodeKey, setSelected]
+  )
 
   useEffect(() => {
     return mergeRegister(
       editor.registerCommand(
         CLICK_COMMAND,
         (event: MouseEvent) => {
-          const buttonElem = buttonRef.current;
+          const buttonElem = buttonRef.current
           // $FlowFixMe: this will work
-          const eventTarget: Element = event.target;
+          const eventTarget: Element = event.target
           if (buttonElem !== null && buttonElem.contains(eventTarget)) {
             if (!event.shiftKey) {
-              clearSelection();
+              clearSelection()
             }
-            setSelected(!isSelected);
+            setSelected(!isSelected)
             if (event.detail > 1) {
-              setModalOpen(true);
+              setModalOpen(true)
             }
-            return true;
+            return true
           }
 
-          return false;
+          return false
         },
-        COMMAND_PRIORITY_LOW,
+        COMMAND_PRIORITY_LOW
       ),
       editor.registerCommand(
         KEY_DELETE_COMMAND,
         onDelete,
-        COMMAND_PRIORITY_LOW,
+        COMMAND_PRIORITY_LOW
       ),
       editor.registerCommand(
         KEY_BACKSPACE_COMMAND,
         onDelete,
-        COMMAND_PRIORITY_LOW,
-      ),
-    );
-  }, [clearSelection, editor, isSelected, onDelete, setSelected]);
+        COMMAND_PRIORITY_LOW
+      )
+    )
+  }, [clearSelection, editor, isSelected, onDelete, setSelected])
 
   const deleteNode = useCallback(() => {
     return editor.update(() => {
-      const node = $getNodeByKey(nodeKey);
+      const node = $getNodeByKey(nodeKey)
       if ($isExcalidrawNode(node)) {
-        node.remove();
+        node.remove()
       }
-    });
-  }, [editor, nodeKey]);
+    })
+  }, [editor, nodeKey])
 
   const setData = useCallback(
     (newData: string) => {
       return editor.update(() => {
-        const node = $getNodeByKey(nodeKey);
+        const node = $getNodeByKey(nodeKey)
         if ($isExcalidrawNode(node)) {
-          node.setData(newData);
+          node.setData(newData)
         }
-      });
+      })
     },
-    [editor, nodeKey],
-  );
+    [editor, nodeKey]
+  )
 
-  const elements = useMemo(() => JSON.parse(data), [data]);
+  const elements = useMemo(() => JSON.parse(data), [data])
 
   return (
     <>
@@ -126,8 +126,8 @@ function ExcalidrawComponent({
         onDelete={deleteNode}
         onHide={() => setModalOpen(false)}
         onSave={(newData) => {
-          setData(JSON.stringify(newData));
-          setModalOpen(false);
+          setData(JSON.stringify(newData))
+          setModalOpen(false)
         }}
       />
       <button
@@ -136,54 +136,54 @@ function ExcalidrawComponent({
         <ExcalidrawImage className="image" elements={elements} />
       </button>
     </>
-  );
+  )
 }
 
 export class ExcalidrawNode extends DecoratorNode<React$Node> {
-  __data: string;
+  __data: string
 
   static getType(): string {
-    return 'excalidraw';
+    return 'excalidraw'
   }
 
   static clone(node: ExcalidrawNode): ExcalidrawNode {
-    return new ExcalidrawNode(node.__data, node.__key);
+    return new ExcalidrawNode(node.__data, node.__key)
   }
 
   constructor(data?: string = '[]', key?: NodeKey) {
-    super(key);
-    this.__data = data;
+    super(key)
+    this.__data = data
   }
 
   // View
   createDOM<EditorContext>(config: EditorConfig<EditorContext>): HTMLElement {
-    const span = document.createElement('span');
-    const theme = config.theme;
-    const className = theme.image;
+    const span = document.createElement('span')
+    const theme = config.theme
+    const className = theme.image
     if (className !== undefined) {
-      span.className = className;
+      span.className = className
     }
-    return span;
+    return span
   }
 
   updateDOM(): false {
-    return false;
+    return false
   }
 
   setData(data: string): void {
-    const self = this.getWritable();
-    self.__data = data;
+    const self = this.getWritable()
+    self.__data = data
   }
 
   decorate(editor: LexicalEditor): React$Node {
-    return <ExcalidrawComponent nodeKey={this.getKey()} data={this.__data} />;
+    return <ExcalidrawComponent nodeKey={this.getKey()} data={this.__data} />
   }
 }
 
 export function $createExcalidrawNode(): ExcalidrawNode {
-  return new ExcalidrawNode();
+  return new ExcalidrawNode()
 }
 
 export function $isExcalidrawNode(node: ?LexicalNode): boolean %checks {
-  return node instanceof ExcalidrawNode;
+  return node instanceof ExcalidrawNode
 }

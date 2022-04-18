@@ -7,22 +7,22 @@
  * @flow strict
  */
 
-import './Input.css';
+import './Input.css'
 
-import * as React from 'react';
+import * as React from 'react'
 
 type Props = $ReadOnly<{
   label: string,
   onChange: (string) => void,
   placeholder?: string,
-  value: string,
-}>;
+  value: string
+}>
 
 export default function Input({
   label,
   value,
   onChange,
-  placeholder = '',
+  placeholder = ''
 }: Props): React$Node {
   return (
     <div className="Input__wrapper">
@@ -33,9 +33,9 @@ export default function Input({
         placeholder={placeholder}
         value={value}
         onChange={(e) => {
-          onChange(e.target.value);
+          onChange(e.target.value)
         }}
       />
     </div>
-  );
+  )
 }

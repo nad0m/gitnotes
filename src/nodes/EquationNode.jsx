@@ -7,54 +7,54 @@
  * @flow strict
  */
 
-import type {EditorConfig, LexicalNode, NodeKey} from 'lexical';
+import type { EditorConfig, LexicalNode, NodeKey } from 'lexical'
 
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {mergeRegister} from '@lexical/utils';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { mergeRegister } from '@lexical/utils'
 import {
   $getNodeByKey,
   COMMAND_PRIORITY_HIGH,
   DecoratorNode,
   KEY_ESCAPE_COMMAND,
-  SELECTION_CHANGE_COMMAND,
-} from 'lexical';
-import * as React from 'react';
-import {useCallback, useEffect, useRef, useState} from 'react';
+  SELECTION_CHANGE_COMMAND
+} from 'lexical'
+import * as React from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
-import EquationEditor from '../ui/EquationEditor';
-import KatexRenderer from '../ui/KatexRenderer';
+import EquationEditor from '../ui/EquationEditor'
+import KatexRenderer from '../ui/KatexRenderer'
 
 type EquationComponentProps = {
   equation: string,
   inline: boolean,
-  nodeKey: NodeKey,
-};
+  nodeKey: NodeKey
+}
 
 function EquationComponent({
   equation,
   inline,
-  nodeKey,
+  nodeKey
 }: EquationComponentProps): React$Node {
-  const [editor] = useLexicalComposerContext();
-  const [equationValue, setEquationValue] = useState(equation);
-  const [showEquationEditor, setShowEquationEditor] = useState<boolean>(false);
-  const inputRef = useRef(null);
+  const [editor] = useLexicalComposerContext()
+  const [equationValue, setEquationValue] = useState(equation)
+  const [showEquationEditor, setShowEquationEditor] = useState<boolean>(false)
+  const inputRef = useRef(null)
 
   const onHide = useCallback(
     (restoreSelection?: boolean) => {
-      setShowEquationEditor(false);
+      setShowEquationEditor(false)
       editor.update(() => {
-        const node = $getNodeByKey(nodeKey);
+        const node = $getNodeByKey(nodeKey)
         if ($isEquationNode(node)) {
-          node.setEquation(equationValue);
+          node.setEquation(equationValue)
           if (restoreSelection) {
-            node.selectNext(0, 0);
+            node.selectNext(0, 0)
           }
         }
-      });
+      })
     },
-    [editor, equationValue, nodeKey],
-  );
+    [editor, equationValue, nodeKey]
+  )
 
   useEffect(() => {
     if (showEquationEditor) {
@@ -62,31 +62,31 @@ function EquationComponent({
         editor.registerCommand(
           SELECTION_CHANGE_COMMAND,
           (payload) => {
-            const activeElement = document.activeElement;
-            const inputElem = inputRef.current;
+            const activeElement = document.activeElement
+            const inputElem = inputRef.current
             if (inputElem !== activeElement) {
-              onHide();
+              onHide()
             }
-            return false;
+            return false
           },
-          COMMAND_PRIORITY_HIGH,
+          COMMAND_PRIORITY_HIGH
         ),
         editor.registerCommand(
           KEY_ESCAPE_COMMAND,
           (payload) => {
-            const activeElement = document.activeElement;
-            const inputElem = inputRef.current;
+            const activeElement = document.activeElement
+            const inputElem = inputRef.current
             if (inputElem === activeElement) {
-              onHide(true);
-              return true;
+              onHide(true)
+              return true
             }
-            return false;
+            return false
           },
-          COMMAND_PRIORITY_HIGH,
-        ),
-      );
+          COMMAND_PRIORITY_HIGH
+        )
+      )
     }
-  }, [editor, onHide, showEquationEditor]);
+  }, [editor, onHide, showEquationEditor])
 
   return (
     <>
@@ -102,44 +102,44 @@ function EquationComponent({
           equation={equationValue}
           inline={inline}
           onClick={() => {
-            setShowEquationEditor(true);
+            setShowEquationEditor(true)
           }}
         />
       )}
     </>
-  );
+  )
 }
 
 export class EquationNode extends DecoratorNode<React$Node> {
-  __equation: string;
-  __inline: boolean;
+  __equation: string
+  __inline: boolean
 
   static getType(): string {
-    return 'equation';
+    return 'equation'
   }
 
   static clone(node: EquationNode): EquationNode {
-    return new EquationNode(node.__equation, node.__inline, node.__key);
+    return new EquationNode(node.__equation, node.__inline, node.__key)
   }
 
   constructor(equation: string, inline?: boolean, key?: NodeKey) {
-    super(key);
-    this.__equation = equation;
-    this.__inline = inline ?? false;
+    super(key)
+    this.__equation = equation
+    this.__inline = inline ?? false
   }
 
   createDOM<EditorContext>(config: EditorConfig<EditorContext>): HTMLElement {
-    return document.createElement(this.__inline ? 'span' : 'div');
+    return document.createElement(this.__inline ? 'span' : 'div')
   }
 
   updateDOM(prevNode: EquationNode): boolean {
     // If the inline property changes, replace the element
-    return this.__inline !== prevNode.__inline;
+    return this.__inline !== prevNode.__inline
   }
 
   setEquation(equation: string): void {
-    const writable = this.getWritable();
-    writable.__equation = equation;
+    const writable = this.getWritable()
+    writable.__equation = equation
   }
 
   decorate(): React$Node {
@@ -149,18 +149,18 @@ export class EquationNode extends DecoratorNode<React$Node> {
         inline={this.__inline}
         nodeKey={this.__key}
       />
-    );
+    )
   }
 }
 
 export function $createEquationNode(
   equation: string = '',
-  inline: boolean = false,
+  inline: boolean = false
 ): EquationNode {
-  const equationNode = new EquationNode(equation, inline);
-  return equationNode;
+  const equationNode = new EquationNode(equation, inline)
+  return equationNode
 }
 
 export function $isEquationNode(node: ?LexicalNode): boolean %checks {
-  return node instanceof EquationNode;
+  return node instanceof EquationNode
 }

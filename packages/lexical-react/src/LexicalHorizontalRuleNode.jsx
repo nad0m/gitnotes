@@ -12,72 +12,72 @@ import type {
   DOMConversionOutput,
   DOMExportOutput,
   LexicalCommand,
-  LexicalNode,
-} from 'lexical';
+  LexicalNode
+} from 'lexical'
 
-import {createCommand, DecoratorNode} from 'lexical';
-import * as React from 'react';
+import { createCommand, DecoratorNode } from 'lexical'
+import * as React from 'react'
 
 export const INSERT_HORIZONTAL_RULE_COMMAND: LexicalCommand<void> =
-  createCommand();
+  createCommand()
 
 function HorizontalRuleComponent() {
-  return <hr />;
+  return <hr />
 }
 
 export class HorizontalRuleNode extends DecoratorNode<React$Node> {
   static getType(): string {
-    return 'horizontalrule';
+    return 'horizontalrule'
   }
 
   static clone(node: HorizontalRuleNode): HorizontalRuleNode {
-    return new HorizontalRuleNode(node.__key);
+    return new HorizontalRuleNode(node.__key)
   }
 
   static importDOM(): DOMConversionMap | null {
     return {
       hr: (node: Node) => ({
         conversion: convertHorizontalRuleElement,
-        priority: 0,
-      }),
-    };
+        priority: 0
+      })
+    }
   }
 
   exportDOM(): DOMExportOutput {
-    return {element: document.createElement('hr')};
+    return { element: document.createElement('hr') }
   }
 
   createDOM(): HTMLElement {
-    const div = document.createElement('div');
-    div.style.display = 'contents';
-    return div;
+    const div = document.createElement('div')
+    div.style.display = 'contents'
+    return div
   }
 
   getTextContent(): '\n' {
-    return '\n';
+    return '\n'
   }
 
   isTopLevel(): true {
-    return true;
+    return true
   }
 
   updateDOM(): false {
-    return false;
+    return false
   }
 
   decorate(): React$Node {
-    return <HorizontalRuleComponent />;
+    return <HorizontalRuleComponent />
   }
 }
 
 function convertHorizontalRuleElement(): DOMConversionOutput {
-  return {node: $createHorizontalRuleNode()};
+  return { node: $createHorizontalRuleNode() }
 }
 
 export function $createHorizontalRuleNode(): HorizontalRuleNode {
-  return new HorizontalRuleNode();
+  return new HorizontalRuleNode()
 }
 
 export function $isHorizontalRuleNode(node: ?LexicalNode): boolean %checks {
-  return node instanceof HorizontalRuleNode;
+  return node instanceof HorizontalRuleNode
 }

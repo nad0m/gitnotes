@@ -13,9 +13,9 @@ import {
   COMMAND_PRIORITY_HIGH,
   COMMAND_PRIORITY_LOW,
   COMMAND_PRIORITY_NORMAL,
-  createEditor,
-} from './LexicalEditor';
-import {$createNodeFromParse} from './LexicalParsing';
+  createEditor
+} from './LexicalEditor'
+import { $createNodeFromParse } from './LexicalParsing'
 import {
   $createEmptyGridSelection as $createGridSelection,
   $createEmptyObjectSelection as $createNodeSelection,
@@ -24,8 +24,8 @@ import {
   $getSelection,
   $isGridSelection,
   $isNodeSelection,
-  $isRangeSelection,
-} from './LexicalSelection';
+  $isRangeSelection
+} from './LexicalSelection'
 import {
   $getDecoratorNode,
   $getNearestNodeFromDOMNode,
@@ -34,25 +34,25 @@ import {
   $isLeafNode,
   $nodesOfType,
   $setCompositionKey,
-  $setSelection,
-} from './LexicalUtils';
-import {VERSION} from './LexicalVersion';
-import {$isDecoratorNode, DecoratorNode} from './nodes/LexicalDecoratorNode';
-import {$isElementNode, ElementNode} from './nodes/LexicalElementNode';
-import {$isGridCellNode, GridCellNode} from './nodes/LexicalGridCellNode';
-import {$isGridNode, GridNode} from './nodes/LexicalGridNode';
-import {$isGridRowNode, GridRowNode} from './nodes/LexicalGridRowNode';
+  $setSelection
+} from './LexicalUtils'
+import { VERSION } from './LexicalVersion'
+import { $isDecoratorNode, DecoratorNode } from './nodes/LexicalDecoratorNode'
+import { $isElementNode, ElementNode } from './nodes/LexicalElementNode'
+import { $isGridCellNode, GridCellNode } from './nodes/LexicalGridCellNode'
+import { $isGridNode, GridNode } from './nodes/LexicalGridNode'
+import { $isGridRowNode, GridRowNode } from './nodes/LexicalGridRowNode'
 import {
   $createLineBreakNode,
-  $isLineBreakNode,
-} from './nodes/LexicalLineBreakNode';
+  $isLineBreakNode
+} from './nodes/LexicalLineBreakNode'
 import {
   $createParagraphNode,
   $isParagraphNode,
-  ParagraphNode,
-} from './nodes/LexicalParagraphNode';
-import {$isRootNode} from './nodes/LexicalRootNode';
-import {$createTextNode, $isTextNode, TextNode} from './nodes/LexicalTextNode';
+  ParagraphNode
+} from './nodes/LexicalParagraphNode'
+import { $isRootNode } from './nodes/LexicalRootNode'
+import { $createTextNode, $isTextNode, TextNode } from './nodes/LexicalTextNode'
 
 export {
   $createGridSelection,
@@ -97,6 +97,6 @@ export {
   GridRowNode,
   ParagraphNode,
   TextNode,
-  VERSION,
-};
-export * from './LexicalCommands';
+  VERSION
+}
+export * from './LexicalCommands'

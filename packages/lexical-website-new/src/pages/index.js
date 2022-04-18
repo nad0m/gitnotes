@@ -6,22 +6,21 @@
  *
  */
 
-import Link from '@docusaurus/Link';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import HomepageExamples from '@site/src/components/HomepageExamples';
-import HomepageFeatures from '@site/src/components/HomepageFeatures';
-import Layout from '@theme/Layout';
-import clsx from 'clsx';
-import React from 'react';
+import Link from '@docusaurus/Link'
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
+import HomepageExamples from '@site/src/components/HomepageExamples'
+import HomepageFeatures from '@site/src/components/HomepageFeatures'
+import Layout from '@theme/Layout'
+import clsx from 'clsx'
+import React from 'react'
 
-import styles from './styles.module.css';
+import styles from './styles.module.css'
 
 function HomepageHeader() {
-  const {siteConfig} = useDocusaurusContext();
+  const { siteConfig } = useDocusaurusContext()
   return (
     <header
-      className={clsx('hero hero--dark hero--primary', styles.heroBanner)}
-    >
+      className={clsx('hero hero--dark hero--primary', styles.heroBanner)}>
       <div className="container">
         <h1 className="hero__title">
           <img
@@ -36,24 +35,22 @@ function HomepageHeader() {
         <div className={styles.buttons}>
           <Link
             className="button button--secondary margin-right--sm"
-            to="/docs/intro"
-          >
+            to="/docs/intro">
             Get Started
           </Link>
           <Link
             className="button button--outline margin-left--sm"
-            to="https://playground.lexical.dev"
-          >
+            to="https://playground.lexical.dev">
             Visit Playground
           </Link>
         </div>
       </div>
     </header>
-  );
+  )
 }
 
 export default function Home() {
-  const {siteConfig} = useDocusaurusContext();
+  const { siteConfig } = useDocusaurusContext()
   return (
     <Layout description={siteConfig.tagline}>
       <HomepageHeader />
@@ -66,5 +63,5 @@ export default function Home() {
         </div>
       </main>
     </Layout>
-  );
+  )
 }

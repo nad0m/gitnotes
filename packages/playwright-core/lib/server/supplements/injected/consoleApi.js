@@ -1,11 +1,11 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.default = exports.ConsoleAPI = void 0;
+})
+exports.default = exports.ConsoleAPI = void 0
 
-var _selectorGenerator = require("../../injected/selectorGenerator");
+var _selectorGenerator = require('../../injected/selectorGenerator')
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -24,50 +24,56 @@ var _selectorGenerator = require("../../injected/selectorGenerator");
  */
 class ConsoleAPI {
   constructor(injectedScript) {
-    this._injectedScript = void 0;
-    this._injectedScript = injectedScript;
-    if (window.playwright) return;
+    this._injectedScript = void 0
+    this._injectedScript = injectedScript
+    if (window.playwright) return
     window.playwright = {
       $: (selector, strict) => this._querySelector(selector, !!strict),
-      $$: selector => this._querySelectorAll(selector),
-      inspect: selector => this._inspect(selector),
-      selector: element => this._selector(element),
+      $$: (selector) => this._querySelectorAll(selector),
+      inspect: (selector) => this._inspect(selector),
+      selector: (element) => this._selector(element),
       resume: () => this._resume()
-    };
+    }
   }
 
   _querySelector(selector, strict) {
-    if (typeof selector !== 'string') throw new Error(`Usage: playwright.query('Playwright >> selector').`);
+    if (typeof selector !== 'string')
+      throw new Error(`Usage: playwright.query('Playwright >> selector').`)
 
-    const parsed = this._injectedScript.parseSelector(selector);
+    const parsed = this._injectedScript.parseSelector(selector)
 
-    return this._injectedScript.querySelector(parsed, document, strict);
+    return this._injectedScript.querySelector(parsed, document, strict)
   }
 
   _querySelectorAll(selector) {
-    if (typeof selector !== 'string') throw new Error(`Usage: playwright.$$('Playwright >> selector').`);
+    if (typeof selector !== 'string')
+      throw new Error(`Usage: playwright.$$('Playwright >> selector').`)
 
-    const parsed = this._injectedScript.parseSelector(selector);
+    const parsed = this._injectedScript.parseSelector(selector)
 
-    return this._injectedScript.querySelectorAll(parsed, document);
+    return this._injectedScript.querySelectorAll(parsed, document)
   }
 
   _inspect(selector) {
-    if (typeof selector !== 'string') throw new Error(`Usage: playwright.inspect('Playwright >> selector').`);
-    window.inspect(this._querySelector(selector, false));
+    if (typeof selector !== 'string')
+      throw new Error(`Usage: playwright.inspect('Playwright >> selector').`)
+    window.inspect(this._querySelector(selector, false))
   }
 
   _selector(element) {
-    if (!(element instanceof Element)) throw new Error(`Usage: playwright.selector(element).`);
-    return (0, _selectorGenerator.generateSelector)(this._injectedScript, element).selector;
+    if (!(element instanceof Element))
+      throw new Error(`Usage: playwright.selector(element).`)
+    return (0, _selectorGenerator.generateSelector)(
+      this._injectedScript,
+      element
+    ).selector
   }
 
   _resume() {
-    window._playwrightResume().catch(() => {});
+    window._playwrightResume().catch(() => {})
   }
-
 }
 
-exports.ConsoleAPI = ConsoleAPI;
-var _default = ConsoleAPI;
-exports.default = _default;
+exports.ConsoleAPI = ConsoleAPI
+var _default = ConsoleAPI
+exports.default = _default

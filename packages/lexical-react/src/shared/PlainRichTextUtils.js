@@ -7,59 +7,59 @@
  * @flow strict
  */
 
-import type {EditorState, LexicalEditor} from 'lexical';
+import type { EditorState, LexicalEditor } from 'lexical'
 
-import {$createParagraphNode, $getRoot, $getSelection} from 'lexical';
+import { $createParagraphNode, $getRoot, $getSelection } from 'lexical'
 
-export type InitialEditorStateType = null | string | EditorState | (() => void);
+export type InitialEditorStateType = null | string | EditorState | (() => void)
 
 // Convoluted logic to make this work with Flow. Order matters.
-const options = {tag: 'history-merge'};
+const options = { tag: 'history-merge' }
 const setEditorOptions: {
-  tag?: string,
-} = options;
+  tag?: string
+} = options
 const updateOptions: {
   onUpdate?: () => void,
   skipTransforms?: true,
-  tag?: string,
-} = options;
+  tag?: string
+} = options
 
 export function initializeEditor(
   editor: LexicalEditor,
-  initialEditorState?: InitialEditorStateType,
+  initialEditorState?: InitialEditorStateType
 ): void {
   if (initialEditorState === null) {
-    return;
+    return
   } else if (initialEditorState === undefined) {
     editor.update(() => {
-      const root = $getRoot();
-      const firstChild = root.getFirstChild();
+      const root = $getRoot()
+      const firstChild = root.getFirstChild()
       if (firstChild === null) {
-        const paragraph = $createParagraphNode();
-        root.append(paragraph);
-        const activeElement = document.activeElement;
+        const paragraph = $createParagraphNode()
+        root.append(paragraph)
+        const activeElement = document.activeElement
         if (
           $getSelection() !== null ||
           (activeElement !== null && activeElement === editor.getRootElement())
         ) {
-          paragraph.select();
+          paragraph.select()
         }
       }
-    }, updateOptions);
+    }, updateOptions)
   } else if (initialEditorState !== null) {
     switch (typeof initialEditorState) {
       case 'string': {
-        const parsedEditorState = editor.parseEditorState(initialEditorState);
-        editor.setEditorState(parsedEditorState, setEditorOptions);
-        break;
+        const parsedEditorState = editor.parseEditorState(initialEditorState)
+        editor.setEditorState(parsedEditorState, setEditorOptions)
+        break
       }
       case 'object': {
-        editor.setEditorState(initialEditorState, setEditorOptions);
-        break;
+        editor.setEditorState(initialEditorState, setEditorOptions)
+        break
       }
       case 'function': {
-        editor.update(initialEditorState, updateOptions);
-        break;
+        editor.update(initialEditorState, updateOptions)
+        break
       }
     }
   }

@@ -1,12 +1,12 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.parseSelector = parseSelector;
-exports.customCSSNames = void 0;
+})
+exports.parseSelector = parseSelector
+exports.customCSSNames = void 0
 
-var _cssParser = require("./cssParser");
+var _cssParser = require('./cssParser')
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -23,108 +23,143 @@ var _cssParser = require("./cssParser");
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const customCSSNames = new Set(['not', 'is', 'where', 'has', 'scope', 'light', 'visible', 'text', 'text-matches', 'text-is', 'has-text', 'above', 'below', 'right-of', 'left-of', 'near', 'nth-match']);
-exports.customCSSNames = customCSSNames;
+const customCSSNames = new Set([
+  'not',
+  'is',
+  'where',
+  'has',
+  'scope',
+  'light',
+  'visible',
+  'text',
+  'text-matches',
+  'text-is',
+  'has-text',
+  'above',
+  'below',
+  'right-of',
+  'left-of',
+  'near',
+  'nth-match'
+])
+exports.customCSSNames = customCSSNames
 
 function parseSelector(selector) {
-  const result = parseSelectorString(selector);
-  const parts = result.parts.map(part => {
+  const result = parseSelectorString(selector)
+  const parts = result.parts.map((part) => {
     if (part.name === 'css' || part.name === 'css:light') {
-      if (part.name === 'css:light') part.body = ':light(' + part.body + ')';
-      const parsedCSS = (0, _cssParser.parseCSS)(part.body, customCSSNames);
+      if (part.name === 'css:light') part.body = ':light(' + part.body + ')'
+      const parsedCSS = (0, _cssParser.parseCSS)(part.body, customCSSNames)
       return {
         name: 'css',
         body: parsedCSS.selector
-      };
+      }
     }
 
-    return part;
-  });
+    return part
+  })
   return {
     selector,
     capture: result.capture,
     parts
-  };
+  }
 }
 
 function parseSelectorString(selector) {
-  let index = 0;
-  let quote;
-  let start = 0;
+  let index = 0
+  let quote
+  let start = 0
   const result = {
     parts: []
-  };
+  }
 
   const append = () => {
-    const part = selector.substring(start, index).trim();
-    const eqIndex = part.indexOf('=');
-    let name;
-    let body;
+    const part = selector.substring(start, index).trim()
+    const eqIndex = part.indexOf('=')
+    let name
+    let body
 
-    if (eqIndex !== -1 && part.substring(0, eqIndex).trim().match(/^[a-zA-Z_0-9-+:*]+$/)) {
-      name = part.substring(0, eqIndex).trim();
-      body = part.substring(eqIndex + 1);
-    } else if (part.length > 1 && part[0] === '"' && part[part.length - 1] === '"') {
-      name = 'text';
-      body = part;
-    } else if (part.length > 1 && part[0] === "'" && part[part.length - 1] === "'") {
-      name = 'text';
-      body = part;
+    if (
+      eqIndex !== -1 &&
+      part
+        .substring(0, eqIndex)
+        .trim()
+        .match(/^[a-zA-Z_0-9-+:*]+$/)
+    ) {
+      name = part.substring(0, eqIndex).trim()
+      body = part.substring(eqIndex + 1)
+    } else if (
+      part.length > 1 &&
+      part[0] === '"' &&
+      part[part.length - 1] === '"'
+    ) {
+      name = 'text'
+      body = part
+    } else if (
+      part.length > 1 &&
+      part[0] === "'" &&
+      part[part.length - 1] === "'"
+    ) {
+      name = 'text'
+      body = part
     } else if (/^\(*\/\//.test(part) || part.startsWith('..')) {
       // If selector starts with '//' or '//' prefixed with multiple opening
       // parenthesis, consider xpath. @see https://github.com/microsoft/playwright/issues/817
       // If selector starts with '..', consider xpath as well.
-      name = 'xpath';
-      body = part;
+      name = 'xpath'
+      body = part
     } else {
-      name = 'css';
-      body = part;
+      name = 'css'
+      body = part
     }
 
-    let capture = false;
+    let capture = false
 
     if (name[0] === '*') {
-      capture = true;
-      name = name.substring(1);
+      capture = true
+      name = name.substring(1)
     }
 
     result.parts.push({
       name,
       body
-    });
+    })
 
     if (capture) {
-      if (result.capture !== undefined) throw new Error(`Only one of the selectors can capture using * modifier`);
-      result.capture = result.parts.length - 1;
+      if (result.capture !== undefined)
+        throw new Error(
+          `Only one of the selectors can capture using * modifier`
+        )
+      result.capture = result.parts.length - 1
     }
-  };
+  }
 
   if (!selector.includes('>>')) {
-    index = selector.length;
-    append();
-    return result;
+    index = selector.length
+    append()
+    return result
   }
 
   while (index < selector.length) {
-    const c = selector[index];
+    const c = selector[index]
 
     if (c === '\\' && index + 1 < selector.length) {
-      index += 2;
+      index += 2
     } else if (c === quote) {
-      quote = undefined;
-      index++;
-    } else if (!quote && (c === '"' || c === '\'' || c === '`')) {
-      quote = c;
-      index++;
+      quote = undefined
+      index++
+    } else if (!quote && (c === '"' || c === "'" || c === '`')) {
+      quote = c
+      index++
     } else if (!quote && c === '>' && selector[index + 1] === '>') {
-      append();
-      index += 2;
-      start = index;
+      append()
+      index += 2
+      start = index
     } else {
-      index++;
+      index++
     }
   }
 
-  append();
-  return result;
+  append()
+  return result
 }

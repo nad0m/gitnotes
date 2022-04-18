@@ -7,10 +7,10 @@
  * @flow strict
  */
 
-import type {LexicalEditor, RangeSelection} from 'lexical';
+import type { LexicalEditor, RangeSelection } from 'lexical'
 
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {mergeRegister} from '@lexical/utils';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { mergeRegister } from '@lexical/utils'
 import {
   $getSelection,
   $isRangeSelection,
@@ -20,51 +20,51 @@ import {
   KEY_ARROW_UP_COMMAND,
   KEY_ENTER_COMMAND,
   KEY_ESCAPE_COMMAND,
-  KEY_TAB_COMMAND,
-} from 'lexical';
+  KEY_TAB_COMMAND
+} from 'lexical'
 import React, {
   startTransition,
   useCallback,
   useEffect,
   useRef,
-  useState,
-} from 'react';
+  useState
+} from 'react'
 // $FlowFixMe
-import {createPortal} from 'react-dom';
-import useLayoutEffect from '../../shared/useLayoutEffect';
+import { createPortal } from 'react-dom'
+import useLayoutEffect from '../../shared/useLayoutEffect'
 
-import {$createMentionNode, MentionNode} from '../nodes/MentionNode';
+import { $createMentionNode, MentionNode } from '../nodes/MentionNode'
 
 type MentionMatch = {
   leadOffset: number,
   matchingString: string,
-  replaceableString: string,
-};
+  replaceableString: string
+}
 
 type Resolution = {
   match: MentionMatch,
-  range: Range,
-};
+  range: Range
+}
 
 const PUNCTUATION =
-  '\\.,\\+\\*\\?\\$\\@\\|#{}\\(\\)\\^\\-\\[\\]\\\\/!%\'"~=<>_:;';
-const NAME = '\\b[A-Z][^\\s' + PUNCTUATION + ']';
+  '\\.,\\+\\*\\?\\$\\@\\|#{}\\(\\)\\^\\-\\[\\]\\\\/!%\'"~=<>_:;'
+const NAME = '\\b[A-Z][^\\s' + PUNCTUATION + ']'
 
 const DocumentMentionsRegex = {
   NAME,
-  PUNCTUATION,
-};
+  PUNCTUATION
+}
 
 const CapitalizedNameMentionsRegex = new RegExp(
-  '(^|[^#])((?:' + DocumentMentionsRegex.NAME + '{' + 1 + ',})$)',
-);
+  '(^|[^#])((?:' + DocumentMentionsRegex.NAME + '{' + 1 + ',})$)'
+)
 
-const PUNC = DocumentMentionsRegex.PUNCTUATION;
+const PUNC = DocumentMentionsRegex.PUNCTUATION
 
-const TRIGGERS = ['@', '\\uff20'].join('');
+const TRIGGERS = ['@', '\\uff20'].join('')
 
 // Chars we expect to see in a mention (non-space, non-punctuation).
-const VALID_CHARS = '[^' + TRIGGERS + PUNC + '\\s]';
+const VALID_CHARS = '[^' + TRIGGERS + PUNC + '\\s]'
 
 // Non-standard series of chars. Each series must be preceded and followed by
 // a valid char.
@@ -75,9 +75,9 @@ const VALID_JOINS =
   '[' +
   PUNC +
   ']|' + // E.g. "-' in "Salier-Hellendag"
-  ')';
+  ')'
 
-const LENGTH_LIMIT = 75;
+const LENGTH_LIMIT = 75
 
 const AtSignMentionsRegex = new RegExp(
   '(^|\\s|\\()(' +
@@ -90,11 +90,11 @@ const AtSignMentionsRegex = new RegExp(
     '){0,' +
     LENGTH_LIMIT +
     '})' +
-    ')$',
-);
+    ')$'
+)
 
 // 50 is the longest alias length limit.
-const ALIAS_LENGTH_LIMIT = 50;
+const ALIAS_LENGTH_LIMIT = 50
 
 // Regex used to match alias.
 const AtSignMentionsRegexAliasRegex = new RegExp(
@@ -107,13 +107,13 @@ const AtSignMentionsRegexAliasRegex = new RegExp(
     '){0,' +
     ALIAS_LENGTH_LIMIT +
     '})' +
-    ')$',
-);
+    ')$'
+)
 
 // At most, 5 suggestions are shown in the popup.
-const SUGGESTION_LIST_LENGTH_LIMIT = 5;
+const SUGGESTION_LIST_LENGTH_LIMIT = 5
 
-const mentionsCache = new Map();
+const mentionsCache = new Map()
 
 const dummyMentionsData = [
   'Aayla Secura',
@@ -518,48 +518,48 @@ const dummyMentionsData = [
   'Zam Wesell',
   'Zev Senesca',
   'Ziro the Hutt',
-  'Zuckuss',
-];
+  'Zuckuss'
+]
 
 const dummyLookupService = {
   search(
     string: string,
-    callback: (results: Array<string> | null) => void,
+    callback: (results: Array<string> | null) => void
   ): void {
     setTimeout(() => {
       const results = dummyMentionsData.filter((mention) =>
-        mention.toLowerCase().includes(string.toLowerCase()),
-      );
+        mention.toLowerCase().includes(string.toLowerCase())
+      )
       if (results.length === 0) {
-        callback(null);
+        callback(null)
       } else {
-        callback(results);
+        callback(results)
       }
-    }, 500);
-  },
-};
+    }, 500)
+  }
+}
 
 function useMentionLookupService(mentionString) {
-  const [results, setResults] = useState<Array<string> | null>(null);
+  const [results, setResults] = useState<Array<string> | null>(null)
 
   useEffect(() => {
-    const cachedResults = mentionsCache.get(mentionString);
+    const cachedResults = mentionsCache.get(mentionString)
 
     if (cachedResults === null) {
-      return;
+      return
     } else if (cachedResults !== undefined) {
-      setResults(cachedResults);
-      return;
+      setResults(cachedResults)
+      return
     }
 
-    mentionsCache.set(mentionString, null);
+    mentionsCache.set(mentionString, null)
     dummyLookupService.search(mentionString, (newResults) => {
-      mentionsCache.set(mentionString, newResults);
-      setResults(newResults);
-    });
-  }, [mentionString]);
+      mentionsCache.set(mentionString, newResults)
+      setResults(newResults)
+    })
+  }, [mentionString])
 
-  return results;
+  return results
 }
 
 function MentionsTypeaheadItem({
@@ -569,7 +569,7 @@ function MentionsTypeaheadItem({
   onClick,
   onMouseEnter,
   onMouseLeave,
-  result,
+  result
 }: {
   index: number,
   isHovered: boolean,
@@ -577,16 +577,16 @@ function MentionsTypeaheadItem({
   onClick: () => void,
   onMouseEnter: () => void,
   onMouseLeave: () => void,
-  result: string,
+  result: string
 }) {
-  const liRef = useRef(null);
+  const liRef = useRef(null)
 
-  let className = 'item';
+  let className = 'item'
   if (isSelected) {
-    className += ' selected';
+    className += ' selected'
   }
   if (isHovered) {
-    className += ' hovered';
+    className += ' hovered'
   }
 
   return (
@@ -603,174 +603,174 @@ function MentionsTypeaheadItem({
       onClick={onClick}>
       {result}
     </li>
-  );
+  )
 }
 
 function MentionsTypeahead({
   close,
   editor,
-  resolution,
+  resolution
 }: {
   close: () => void,
   editor: LexicalEditor,
-  resolution: Resolution,
+  resolution: Resolution
 }): React$Node {
-  const divRef = useRef(null);
-  const match = resolution.match;
-  const results = useMentionLookupService(match.matchingString);
-  const [selectedIndex, setSelectedIndex] = useState<null | number>(null);
-  const [hoveredIndex, setHoveredIndex] = useState(null);
+  const divRef = useRef(null)
+  const match = resolution.match
+  const results = useMentionLookupService(match.matchingString)
+  const [selectedIndex, setSelectedIndex] = useState<null | number>(null)
+  const [hoveredIndex, setHoveredIndex] = useState(null)
 
   useEffect(() => {
-    const div = divRef.current;
-    const rootElement = editor.getRootElement();
+    const div = divRef.current
+    const rootElement = editor.getRootElement()
     if (results !== null && div !== null && rootElement !== null) {
-      const range = resolution.range;
-      const {left, top, height} = range.getBoundingClientRect();
-      div.style.top = `${top + height + 2}px`;
-      div.style.left = `${left - 14}px`;
-      div.style.display = 'block';
-      rootElement.setAttribute('aria-controls', 'mentions-typeahead');
+      const range = resolution.range
+      const { left, top, height } = range.getBoundingClientRect()
+      div.style.top = `${top + height + 2}px`
+      div.style.left = `${left - 14}px`
+      div.style.display = 'block'
+      rootElement.setAttribute('aria-controls', 'mentions-typeahead')
 
       return () => {
-        div.style.display = 'none';
-        rootElement.removeAttribute('aria-controls');
-      };
+        div.style.display = 'none'
+        rootElement.removeAttribute('aria-controls')
+      }
     }
-  }, [editor, resolution, results]);
+  }, [editor, resolution, results])
 
   const applyCurrentSelected = useCallback(() => {
     if (results === null || selectedIndex === null) {
-      return;
+      return
     }
-    const selectedEntry = results[selectedIndex];
+    const selectedEntry = results[selectedIndex]
 
-    close();
+    close()
 
-    createMentionNodeFromSearchResult(editor, selectedEntry, match);
-  }, [close, match, editor, results, selectedIndex]);
+    createMentionNodeFromSearchResult(editor, selectedEntry, match)
+  }, [close, match, editor, results, selectedIndex])
 
   const updateSelectedIndex = useCallback(
     (index) => {
-      const rootElem = editor.getRootElement();
+      const rootElem = editor.getRootElement()
       if (rootElem !== null) {
         rootElem.setAttribute(
           'aria-activedescendant',
-          'typeahead-item-' + index,
-        );
-        setSelectedIndex(index);
+          'typeahead-item-' + index
+        )
+        setSelectedIndex(index)
       }
     },
-    [editor],
-  );
+    [editor]
+  )
 
   useEffect(() => {
     return () => {
-      const rootElem = editor.getRootElement();
+      const rootElem = editor.getRootElement()
       if (rootElem !== null) {
-        rootElem.removeAttribute('aria-activedescendant');
+        rootElem.removeAttribute('aria-activedescendant')
       }
-    };
-  }, [editor]);
+    }
+  }, [editor])
 
   useLayoutEffect(() => {
     if (results === null) {
-      setSelectedIndex(null);
+      setSelectedIndex(null)
     } else if (selectedIndex === null) {
-      updateSelectedIndex(0);
+      updateSelectedIndex(0)
     }
-  }, [results, selectedIndex, updateSelectedIndex]);
+  }, [results, selectedIndex, updateSelectedIndex])
 
   useEffect(() => {
     return mergeRegister(
       editor.registerCommand(
         KEY_ARROW_DOWN_COMMAND,
         (payload) => {
-          const event: KeyboardEvent = payload;
+          const event: KeyboardEvent = payload
           if (results !== null && selectedIndex !== null) {
             if (
               selectedIndex < SUGGESTION_LIST_LENGTH_LIMIT - 1 &&
               selectedIndex !== results.length - 1
             ) {
-              updateSelectedIndex(selectedIndex + 1);
+              updateSelectedIndex(selectedIndex + 1)
             }
-            event.preventDefault();
-            event.stopImmediatePropagation();
+            event.preventDefault()
+            event.stopImmediatePropagation()
           }
-          return true;
+          return true
         },
-        COMMAND_PRIORITY_LOW,
+        COMMAND_PRIORITY_LOW
       ),
       editor.registerCommand(
         KEY_ARROW_UP_COMMAND,
         (payload) => {
-          const event: KeyboardEvent = payload;
+          const event: KeyboardEvent = payload
           if (results !== null && selectedIndex !== null) {
             if (selectedIndex !== 0) {
-              updateSelectedIndex(selectedIndex - 1);
+              updateSelectedIndex(selectedIndex - 1)
             }
-            event.preventDefault();
-            event.stopImmediatePropagation();
+            event.preventDefault()
+            event.stopImmediatePropagation()
           }
-          return true;
+          return true
         },
-        COMMAND_PRIORITY_LOW,
+        COMMAND_PRIORITY_LOW
       ),
       editor.registerCommand(
         KEY_ESCAPE_COMMAND,
         (payload) => {
-          const event: KeyboardEvent = payload;
+          const event: KeyboardEvent = payload
           if (results === null || selectedIndex === null) {
-            return false;
+            return false
           }
-          event.preventDefault();
-          event.stopImmediatePropagation();
-          close();
-          return true;
+          event.preventDefault()
+          event.stopImmediatePropagation()
+          close()
+          return true
         },
-        COMMAND_PRIORITY_LOW,
+        COMMAND_PRIORITY_LOW
       ),
       editor.registerCommand(
         KEY_TAB_COMMAND,
         (payload) => {
-          const event: KeyboardEvent = payload;
+          const event: KeyboardEvent = payload
           if (results === null || selectedIndex === null) {
-            return false;
+            return false
           }
-          event.preventDefault();
-          event.stopImmediatePropagation();
-          applyCurrentSelected();
-          return true;
+          event.preventDefault()
+          event.stopImmediatePropagation()
+          applyCurrentSelected()
+          return true
         },
-        COMMAND_PRIORITY_LOW,
+        COMMAND_PRIORITY_LOW
       ),
       editor.registerCommand(
         KEY_ENTER_COMMAND,
         (event: KeyboardEvent | null) => {
           if (results === null || selectedIndex === null) {
-            return false;
+            return false
           }
           if (event !== null) {
-            event.preventDefault();
-            event.stopImmediatePropagation();
+            event.preventDefault()
+            event.stopImmediatePropagation()
           }
-          applyCurrentSelected();
-          return true;
+          applyCurrentSelected()
+          return true
         },
-        COMMAND_PRIORITY_LOW,
-      ),
-    );
+        COMMAND_PRIORITY_LOW
+      )
+    )
   }, [
     applyCurrentSelected,
     close,
     editor,
     results,
     selectedIndex,
-    updateSelectedIndex,
-  ]);
+    updateSelectedIndex
+  ])
 
   if (results === null) {
-    return null;
+    return null
   }
 
   return (
@@ -786,14 +786,14 @@ function MentionsTypeahead({
             isHovered={i === hoveredIndex}
             isSelected={i === selectedIndex}
             onClick={() => {
-              setSelectedIndex(i);
-              applyCurrentSelected();
+              setSelectedIndex(i)
+              applyCurrentSelected()
             }}
             onMouseEnter={() => {
-              setHoveredIndex(i);
+              setHoveredIndex(i)
             }}
             onMouseLeave={() => {
-              setHoveredIndex(null);
+              setHoveredIndex(null)
             }}
             key={result}
             result={result}
@@ -801,103 +801,103 @@ function MentionsTypeahead({
         ))}
       </ul>
     </div>
-  );
+  )
 }
 
 function checkForCapitalizedNameMentions(
   text,
-  minMatchLength,
+  minMatchLength
 ): MentionMatch | null {
-  const match = CapitalizedNameMentionsRegex.exec(text);
+  const match = CapitalizedNameMentionsRegex.exec(text)
   if (match !== null) {
     // The strategy ignores leading whitespace but we need to know it's
     // length to add it to the leadOffset
-    const maybeLeadingWhitespace = match[1];
+    const maybeLeadingWhitespace = match[1]
 
-    const matchingString = match[2];
+    const matchingString = match[2]
     if (matchingString != null && matchingString.length >= minMatchLength) {
       return {
         leadOffset: match.index + maybeLeadingWhitespace.length,
         matchingString,
-        replaceableString: matchingString,
-      };
+        replaceableString: matchingString
+      }
     }
   }
-  return null;
+  return null
 }
 
 function checkForAtSignMentions(text, minMatchLength): MentionMatch | null {
-  let match = AtSignMentionsRegex.exec(text);
+  let match = AtSignMentionsRegex.exec(text)
 
   if (match === null) {
-    match = AtSignMentionsRegexAliasRegex.exec(text);
+    match = AtSignMentionsRegexAliasRegex.exec(text)
   }
   if (match !== null) {
     // The strategy ignores leading whitespace but we need to know it's
     // length to add it to the leadOffset
-    const maybeLeadingWhitespace = match[1];
+    const maybeLeadingWhitespace = match[1]
 
-    const matchingString = match[3];
+    const matchingString = match[3]
     if (matchingString.length >= minMatchLength) {
       return {
         leadOffset: match.index + maybeLeadingWhitespace.length,
         matchingString,
-        replaceableString: match[2],
-      };
+        replaceableString: match[2]
+      }
     }
   }
-  return null;
+  return null
 }
 
 function getPossibleMentionMatch(text): MentionMatch | null {
-  const match = checkForAtSignMentions(text, 1);
-  return match === null ? checkForCapitalizedNameMentions(text, 3) : match;
+  const match = checkForAtSignMentions(text, 1)
+  return match === null ? checkForCapitalizedNameMentions(text, 3) : match
 }
 
 function getTextUpToAnchor(selection: RangeSelection): string | null {
-  const anchor = selection.anchor;
+  const anchor = selection.anchor
   if (anchor.type !== 'text') {
-    return null;
+    return null
   }
-  const anchorNode = anchor.getNode();
+  const anchorNode = anchor.getNode()
   // We should not be attempting to extract mentions out of nodes
   // that are already being used for other core things. This is
   // especially true for immutable nodes, which can't be mutated at all.
   if (!anchorNode.isSimpleText()) {
-    return null;
+    return null
   }
-  const anchorOffset = anchor.offset;
-  return anchorNode.getTextContent().slice(0, anchorOffset);
+  const anchorOffset = anchor.offset
+  return anchorNode.getTextContent().slice(0, anchorOffset)
 }
 
 function tryToPositionRange(match: MentionMatch, range: Range): boolean {
-  const domSelection = window.getSelection();
+  const domSelection = window.getSelection()
   if (domSelection === null || !domSelection.isCollapsed) {
-    return false;
+    return false
   }
-  const anchorNode = domSelection.anchorNode;
-  const startOffset = match.leadOffset;
-  const endOffset = domSelection.anchorOffset;
+  const anchorNode = domSelection.anchorNode
+  const startOffset = match.leadOffset
+  const endOffset = domSelection.anchorOffset
   try {
-    range.setStart(anchorNode, startOffset);
-    range.setEnd(anchorNode, endOffset);
+    range.setStart(anchorNode, startOffset)
+    range.setEnd(anchorNode, endOffset)
   } catch (error) {
-    return false;
+    return false
   }
 
-  return true;
+  return true
 }
 
 function getMentionsTextToSearch(editor: LexicalEditor): string | null {
-  let text = null;
+  let text = null
   editor.getEditorState().read(() => {
-    const selection = $getSelection();
+    const selection = $getSelection()
     if (!$isRangeSelection(selection)) {
-      return;
+      return
     }
-    text = getTextUpToAnchor(selection);
-  });
-  return text;
+    text = getTextUpToAnchor(selection)
+  })
+  return text
 }
 
 /**
@@ -911,16 +911,16 @@ function getMentionsTextToSearch(editor: LexicalEditor): string | null {
 function getMentionOffset(
   documentText: string,
   entryText: string,
-  offset: number,
+  offset: number
 ): number {
-  let triggerOffset = offset;
+  let triggerOffset = offset
   for (let ii = triggerOffset; ii <= entryText.length; ii++) {
     if (documentText.substr(-ii) === entryText.substr(0, ii)) {
-      triggerOffset = ii;
+      triggerOffset = ii
     }
   }
 
-  return triggerOffset;
+  return triggerOffset
 }
 
 /**
@@ -930,127 +930,127 @@ function getMentionOffset(
 function createMentionNodeFromSearchResult(
   editor: LexicalEditor,
   entryText: string,
-  match: MentionMatch,
+  match: MentionMatch
 ): void {
   editor.update(() => {
-    const selection = $getSelection();
+    const selection = $getSelection()
     if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
-      return;
+      return
     }
-    const anchor = selection.anchor;
+    const anchor = selection.anchor
     if (anchor.type !== 'text') {
-      return;
+      return
     }
-    const anchorNode = anchor.getNode();
+    const anchorNode = anchor.getNode()
     // We should not be attempting to extract mentions out of nodes
     // that are already being used for other core things. This is
     // especially true for immutable nodes, which can't be mutated at all.
     if (!anchorNode.isSimpleText()) {
-      return;
+      return
     }
-    const selectionOffset = anchor.offset;
-    const textContent = anchorNode.getTextContent().slice(0, selectionOffset);
-    const characterOffset = match.replaceableString.length;
+    const selectionOffset = anchor.offset
+    const textContent = anchorNode.getTextContent().slice(0, selectionOffset)
+    const characterOffset = match.replaceableString.length
 
     // Given a known offset for the mention match, look backward in the
     // text to see if there's a longer match to replace.
     const mentionOffset = getMentionOffset(
       textContent,
       entryText,
-      characterOffset,
-    );
-    const startOffset = selectionOffset - mentionOffset;
+      characterOffset
+    )
+    const startOffset = selectionOffset - mentionOffset
     if (startOffset < 0) {
-      return;
+      return
     }
 
-    let nodeToReplace;
+    let nodeToReplace
     if (startOffset === 0) {
-      [nodeToReplace] = anchorNode.splitText(selectionOffset);
+      ;[nodeToReplace] = anchorNode.splitText(selectionOffset)
     } else {
-      [, nodeToReplace] = anchorNode.splitText(startOffset, selectionOffset);
+      ;[, nodeToReplace] = anchorNode.splitText(startOffset, selectionOffset)
     }
 
-    const mentionNode = $createMentionNode(entryText);
-    nodeToReplace.replace(mentionNode);
-    mentionNode.select();
-  });
+    const mentionNode = $createMentionNode(entryText)
+    nodeToReplace.replace(mentionNode)
+    mentionNode.select()
+  })
 }
 
 function isSelectionOnEntityBoundary(
   editor: LexicalEditor,
-  offset: number,
+  offset: number
 ): boolean {
   if (offset !== 0) {
-    return false;
+    return false
   }
   return editor.getEditorState().read(() => {
-    const selection = $getSelection();
+    const selection = $getSelection()
     if ($isRangeSelection(selection)) {
-      const anchor = selection.anchor;
-      const anchorNode = anchor.getNode();
-      const prevSibling = anchorNode.getPreviousSibling();
-      return $isTextNode(prevSibling) && prevSibling.isTextEntity();
+      const anchor = selection.anchor
+      const anchorNode = anchor.getNode()
+      const prevSibling = anchorNode.getPreviousSibling()
+      return $isTextNode(prevSibling) && prevSibling.isTextEntity()
     }
-    return false;
-  });
+    return false
+  })
 }
 
 function useMentions(editor: LexicalEditor): React$Node {
-  const [resolution, setResolution] = useState<Resolution | null>(null);
+  const [resolution, setResolution] = useState<Resolution | null>(null)
 
   useEffect(() => {
     if (!editor.hasNodes([MentionNode])) {
-      throw new Error('MentionsPlugin: MentionNode not registered on editor');
+      throw new Error('MentionsPlugin: MentionNode not registered on editor')
     }
-  }, [editor]);
+  }, [editor])
 
   useEffect(() => {
-    let activeRange: Range | null = document.createRange();
-    let previousText = null;
+    let activeRange: Range | null = document.createRange()
+    let previousText = null
 
     const updateListener = () => {
-      const range = activeRange;
-      const text = getMentionsTextToSearch(editor);
+      const range = activeRange
+      const text = getMentionsTextToSearch(editor)
 
       if (text === previousText || range === null) {
-        return;
+        return
       }
-      previousText = text;
+      previousText = text
 
       if (text === null) {
-        return;
+        return
       }
-      const match = getPossibleMentionMatch(text);
+      const match = getPossibleMentionMatch(text)
       if (
         match !== null &&
         !isSelectionOnEntityBoundary(editor, match.leadOffset)
       ) {
-        const isRangePositioned = tryToPositionRange(match, range);
+        const isRangePositioned = tryToPositionRange(match, range)
         if (isRangePositioned !== null) {
           startTransition(() =>
             setResolution({
               match,
-              range,
-            }),
-          );
-          return;
+              range
+            })
+          )
+          return
         }
       }
-      startTransition(() => setResolution(null));
-    };
+      startTransition(() => setResolution(null))
+    }
 
-    const removeUpdateListener = editor.registerUpdateListener(updateListener);
+    const removeUpdateListener = editor.registerUpdateListener(updateListener)
 
     return () => {
-      activeRange = null;
-      removeUpdateListener();
-    };
-  }, [editor]);
+      activeRange = null
+      removeUpdateListener()
+    }
+  }, [editor])
 
   const closeTypeahead = useCallback(() => {
-    setResolution(null);
-  }, []);
+    setResolution(null)
+  }, [])
 
   return resolution === null || editor === null
     ? null
@@ -1060,11 +1060,11 @@ function useMentions(editor: LexicalEditor): React$Node {
           resolution={resolution}
           editor={editor}
         />,
-        document.body,
-      );
+        document.body
+      )
 }
 
 export default function MentionsPlugin(): React$Node {
-  const [editor] = useLexicalComposerContext();
-  return useMentions(editor);
+  const [editor] = useLexicalComposerContext()
+  return useMentions(editor)
 }

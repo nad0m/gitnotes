@@ -7,6 +7,6 @@
  *
  */
 
-'use strict';
+'use strict'
 
-module.exports = require('./dist/LexicalText.js');
+module.exports = require('./dist/LexicalText.js')

@@ -1,9 +1,9 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.Download = void 0;
+})
+exports.Download = void 0
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -22,52 +22,51 @@ exports.Download = void 0;
  */
 class Download {
   constructor(page, url, suggestedFilename, artifact) {
-    this._page = void 0;
-    this._url = void 0;
-    this._suggestedFilename = void 0;
-    this._artifact = void 0;
-    this._page = page;
-    this._url = url;
-    this._suggestedFilename = suggestedFilename;
-    this._artifact = artifact;
+    this._page = void 0
+    this._url = void 0
+    this._suggestedFilename = void 0
+    this._artifact = void 0
+    this._page = page
+    this._url = url
+    this._suggestedFilename = suggestedFilename
+    this._artifact = artifact
   }
 
   page() {
-    return this._page;
+    return this._page
   }
 
   url() {
-    return this._url;
+    return this._url
   }
 
   suggestedFilename() {
-    return this._suggestedFilename;
+    return this._suggestedFilename
   }
 
   async path() {
-    return this._artifact.pathAfterFinished();
+    return this._artifact.pathAfterFinished()
   }
 
   async saveAs(path) {
-    return this._artifact.saveAs(path);
+    return this._artifact.saveAs(path)
   }
 
   async failure() {
-    return this._artifact.failure();
+    return this._artifact.failure()
   }
 
   async createReadStream() {
-    return this._artifact.createReadStream();
+    return this._artifact.createReadStream()
   }
 
   async cancel() {
-    return this._artifact.cancel();
+    return this._artifact.cancel()
   }
 
   async delete() {
-    return this._artifact.delete();
+    return this._artifact.delete()
   }
-
 }
 
-exports.Download = Download;
+exports.Download = Download

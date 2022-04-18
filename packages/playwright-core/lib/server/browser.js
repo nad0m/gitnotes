@@ -1,19 +1,19 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.Browser = void 0;
+})
+exports.Browser = void 0
 
-var _browserContext = require("./browserContext");
+var _browserContext = require('./browserContext')
 
-var _page = require("./page");
+var _page = require('./page')
 
-var _download = require("./download");
+var _download = require('./download')
 
-var _instrumentation = require("./instrumentation");
+var _instrumentation = require('./instrumentation')
 
-var _artifact = require("./artifact");
+var _artifact = require('./artifact')
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -32,87 +32,93 @@ var _artifact = require("./artifact");
  */
 class Browser extends _instrumentation.SdkObject {
   constructor(options) {
-    super(options.rootSdkObject, 'browser');
-    this.options = void 0;
-    this._downloads = new Map();
-    this._defaultContext = null;
-    this._startedClosing = false;
-    this._idToVideo = new Map();
-    this.attribution.browser = this;
-    this.options = options;
+    super(options.rootSdkObject, 'browser')
+    this.options = void 0
+    this._downloads = new Map()
+    this._defaultContext = null
+    this._startedClosing = false
+    this._idToVideo = new Map()
+    this.attribution.browser = this
+    this.options = options
   }
 
   _downloadCreated(page, uuid, url, suggestedFilename) {
-    const download = new _download.Download(page, this.options.downloadsPath || '', uuid, url, suggestedFilename);
+    const download = new _download.Download(
+      page,
+      this.options.downloadsPath || '',
+      uuid,
+      url,
+      suggestedFilename
+    )
 
-    this._downloads.set(uuid, download);
+    this._downloads.set(uuid, download)
   }
 
   _downloadFilenameSuggested(uuid, suggestedFilename) {
-    const download = this._downloads.get(uuid);
+    const download = this._downloads.get(uuid)
 
-    if (!download) return;
+    if (!download) return
 
-    download._filenameSuggested(suggestedFilename);
+    download._filenameSuggested(suggestedFilename)
   }
 
   _downloadFinished(uuid, error) {
-    const download = this._downloads.get(uuid);
+    const download = this._downloads.get(uuid)
 
-    if (!download) return;
-    download.artifact.reportFinished(error);
+    if (!download) return
+    download.artifact.reportFinished(error)
 
-    this._downloads.delete(uuid);
+    this._downloads.delete(uuid)
   }
 
   _videoStarted(context, videoId, path, pageOrError) {
-    const artifact = new _artifact.Artifact(context, path);
+    const artifact = new _artifact.Artifact(context, path)
 
     this._idToVideo.set(videoId, {
       context,
       artifact
-    });
+    })
 
-    context.emit(_browserContext.BrowserContext.Events.VideoStarted, artifact);
-    pageOrError.then(page => {
+    context.emit(_browserContext.BrowserContext.Events.VideoStarted, artifact)
+    pageOrError.then((page) => {
       if (page instanceof _page.Page) {
-        page._video = artifact;
-        page.emit(_page.Page.Events.Video, artifact);
+        page._video = artifact
+        page.emit(_page.Page.Events.Video, artifact)
       }
-    });
+    })
   }
 
   _takeVideo(videoId) {
-    const video = this._idToVideo.get(videoId);
+    const video = this._idToVideo.get(videoId)
 
-    this._idToVideo.delete(videoId);
+    this._idToVideo.delete(videoId)
 
-    return video === null || video === void 0 ? void 0 : video.artifact;
+    return video === null || video === void 0 ? void 0 : video.artifact
   }
 
   _didClose() {
-    for (const context of this.contexts()) context._browserClosed();
+    for (const context of this.contexts()) context._browserClosed()
 
-    if (this._defaultContext) this._defaultContext._browserClosed();
-    this.emit(Browser.Events.Disconnected);
+    if (this._defaultContext) this._defaultContext._browserClosed()
+    this.emit(Browser.Events.Disconnected)
   }
 
   async close() {
     if (!this._startedClosing) {
-      this._startedClosing = true;
-      await this.options.browserProcess.close();
+      this._startedClosing = true
+      await this.options.browserProcess.close()
     }
 
-    if (this.isConnected()) await new Promise(x => this.once(Browser.Events.Disconnected, x));
+    if (this.isConnected())
+      await new Promise((x) => this.once(Browser.Events.Disconnected, x))
   }
 
   async killForTests() {
-    await this.options.browserProcess.kill();
+    await this.options.browserProcess.kill()
   }
-
 }
 
-exports.Browser = Browser;
+exports.Browser = Browser
 Browser.Events = {
   Disconnected: 'disconnected'
-};
+}

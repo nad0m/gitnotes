@@ -6,48 +6,48 @@
  *
  */
 
-import {$createLineBreakNode, $isLineBreakNode} from 'lexical';
+import { $createLineBreakNode, $isLineBreakNode } from 'lexical'
 
-import {initializeUnitTest} from '../../../__tests__/utils';
+import { initializeUnitTest } from '../../../__tests__/utils'
 
 // No idea why we suddenly need to do this, but it fixes the tests
 // with latest experimental React version.
-global.IS_REACT_ACT_ENVIRONMENT = true;
+global.IS_REACT_ACT_ENVIRONMENT = true
 
 describe('LexicalLineBreakNode tests', () => {
   initializeUnitTest((testEnv) => {
     test('LineBreakNode.constructor', async () => {
-      const {editor} = testEnv;
+      const { editor } = testEnv
       await editor.update(() => {
-        const lineBreakNode = $createLineBreakNode();
-        expect(lineBreakNode.getType()).toEqual('linebreak');
-        expect(lineBreakNode.getTextContent()).toEqual('\n');
-      });
-    });
+        const lineBreakNode = $createLineBreakNode()
+        expect(lineBreakNode.getType()).toEqual('linebreak')
+        expect(lineBreakNode.getTextContent()).toEqual('\n')
+      })
+    })
 
     test('LineBreakNode.createDOM()', async () => {
-      const {editor} = testEnv;
+      const { editor } = testEnv
       await editor.update(() => {
-        const lineBreakNode = $createLineBreakNode();
-        const element = lineBreakNode.createDOM({});
-        expect(element.outerHTML).toBe('<br>');
-      });
-    });
+        const lineBreakNode = $createLineBreakNode()
+        const element = lineBreakNode.createDOM({})
+        expect(element.outerHTML).toBe('<br>')
+      })
+    })
 
     test('LineBreakNode.updateDOM()', async () => {
-      const {editor} = testEnv;
+      const { editor } = testEnv
       await editor.update(() => {
-        const lineBreakNode = $createLineBreakNode();
-        expect(lineBreakNode.updateDOM()).toBe(false);
-      });
-    });
+        const lineBreakNode = $createLineBreakNode()
+        expect(lineBreakNode.updateDOM()).toBe(false)
+      })
+    })
 
     test('LineBreakNode.$isLineBreakNode()', async () => {
-      const {editor} = testEnv;
+      const { editor } = testEnv
       await editor.update(() => {
-        const lineBreakNode = $createLineBreakNode();
-        expect($isLineBreakNode(lineBreakNode)).toBe(true);
-      });
-    });
-  });
-});
+        const lineBreakNode = $createLineBreakNode()
+        expect($isLineBreakNode(lineBreakNode)).toBe(true)
+      })
+    })
+  })
+})

@@ -11,121 +11,121 @@ import {
   $createLinkNode,
   $isLinkNode,
   LinkNode,
-  TOGGLE_LINK_COMMAND,
-} from '@lexical/link';
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+  TOGGLE_LINK_COMMAND
+} from '@lexical/link'
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import {
   $getSelection,
   $isElementNode,
   $setSelection,
-  COMMAND_PRIORITY_EDITOR,
-} from 'lexical';
-import {useEffect} from 'react';
+  COMMAND_PRIORITY_EDITOR
+} from 'lexical'
+import { useEffect } from 'react'
 
 function toggleLink(url: null | string) {
-  const selection = $getSelection();
+  const selection = $getSelection()
   if (selection !== null) {
-    $setSelection(selection);
+    $setSelection(selection)
   }
-  const sel = $getSelection();
+  const sel = $getSelection()
   if (sel !== null) {
-    const nodes = sel.extract();
+    const nodes = sel.extract()
     if (url === null) {
       // Remove LinkNodes
       nodes.forEach((node) => {
-        const parent = node.getParent();
+        const parent = node.getParent()
 
         if ($isLinkNode(parent)) {
-          const children = parent.getChildren();
+          const children = parent.getChildren()
           for (let i = 0; i < children.length; i++) {
-            parent.insertBefore(children[i]);
+            parent.insertBefore(children[i])
           }
-          parent.remove();
+          parent.remove()
         }
-      });
+      })
     } else {
       // Add or merge LinkNodes
       if (nodes.length === 1) {
-        const firstNode = nodes[0];
+        const firstNode = nodes[0]
         // if the first node is a LinkNode or if its
         // parent is a LinkNode, we update the URL.
         if ($isLinkNode(firstNode)) {
-          firstNode.setURL(url);
-          return;
+          firstNode.setURL(url)
+          return
         } else {
-          const parent = firstNode.getParent();
+          const parent = firstNode.getParent()
           if ($isLinkNode(parent)) {
             // set parent to be the current linkNode
             // so that other nodes in the same parent
             // aren't handled separately below.
-            parent.setURL(url);
-            return;
+            parent.setURL(url)
+            return
           }
         }
       }
 
-      let prevParent = null;
-      let linkNode = null;
+      let prevParent = null
+      let linkNode = null
       nodes.forEach((node) => {
-        const parent = node.getParent();
+        const parent = node.getParent()
         if (
           parent === linkNode ||
           parent === null ||
           ($isElementNode(node) && !node.isInline())
         ) {
-          return;
+          return
         }
         if (!parent.is(prevParent)) {
-          prevParent = parent;
-          linkNode = $createLinkNode(url);
+          prevParent = parent
+          linkNode = $createLinkNode(url)
           if ($isLinkNode(parent)) {
             if (node.getPreviousSibling() === null) {
-              parent.insertBefore(linkNode);
+              parent.insertBefore(linkNode)
             } else {
-              parent.insertAfter(linkNode);
+              parent.insertAfter(linkNode)
             }
           } else {
-            node.insertBefore(linkNode);
+            node.insertBefore(linkNode)
           }
         }
         if ($isLinkNode(node)) {
           if (linkNode !== null) {
-            const children = node.getChildren();
+            const children = node.getChildren()
             for (let i = 0; i < children.length; i++) {
-              linkNode.append(children[i]);
+              linkNode.append(children[i])
             }
           }
-          node.remove();
-          return;
+          node.remove()
+          return
         }
         if (linkNode !== null) {
-          linkNode.append(node);
+          linkNode.append(node)
         }
-      });
+      })
     }
   }
 }
 
 export default function LinkPlugin(): null {
-  const [editor] = useLexicalComposerContext();
+  const [editor] = useLexicalComposerContext()
 
   useEffect(() => {
     if (!editor.hasNodes([LinkNode])) {
-      throw new Error('LinkPlugin: LinkNode not registered on editor');
+      throw new Error('LinkPlugin: LinkNode not registered on editor')
     }
-  }, [editor]);
+  }, [editor])
 
   useEffect(() => {
     return editor.registerCommand(
       TOGGLE_LINK_COMMAND,
       (payload) => {
-        const url: string | null = payload;
-        toggleLink(url);
-        return true;
+        const url: string | null = payload
+        toggleLink(url)
+        return true
       },
-      COMMAND_PRIORITY_EDITOR,
-    );
-  }, [editor]);
+      COMMAND_PRIORITY_EDITOR
+    )
+  }, [editor])
 
-  return null;
+  return null
 }

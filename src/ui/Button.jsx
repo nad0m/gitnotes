@@ -7,22 +7,22 @@
  * @flow strict
  */
 
-import './Button.css';
+import './Button.css'
 
-import * as React from 'react';
+import * as React from 'react'
 
-import joinClasses from '../utils/join-classes';
+import joinClasses from '../utils/join-classes'
 
 export default function Button({
   children,
   onClick,
   disabled,
-  small,
+  small
 }: {
   children: React$Node,
   disabled?: boolean,
   onClick: () => void,
-  small?: boolean,
+  small?: boolean
 }): React$Node {
   return (
     <button
@@ -30,11 +30,10 @@ export default function Button({
       className={joinClasses(
         'Button__root',
         disabled && 'Button__disabled',
-        small && 'Button__small',
+        small && 'Button__small'
       )}
-      onClick={onClick}
-    >
+      onClick={onClick}>
       {children}
     </button>
-  );
+  )
 }

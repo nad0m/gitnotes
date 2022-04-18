@@ -1,19 +1,21 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.ArtifactDispatcher = void 0;
+})
+exports.ArtifactDispatcher = void 0
 
-var _dispatcher = require("./dispatcher");
+var _dispatcher = require('./dispatcher')
 
-var _streamDispatcher = require("./streamDispatcher");
+var _streamDispatcher = require('./streamDispatcher')
 
-var _fs = _interopRequireDefault(require("fs"));
+var _fs = _interopRequireDefault(require('fs'))
 
-var _utils = require("../utils/utils");
+var _utils = require('../utils/utils')
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj }
+}
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -34,92 +36,94 @@ class ArtifactDispatcher extends _dispatcher.Dispatcher {
   constructor(scope, artifact) {
     super(scope, artifact, 'Artifact', {
       absolutePath: artifact.localPath()
-    });
+    })
   }
 
   async pathAfterFinished() {
-    const path = await this._object.localPathAfterFinished();
+    const path = await this._object.localPathAfterFinished()
     return {
       value: path || undefined
-    };
+    }
   }
 
   async saveAs(params) {
     return await new Promise((resolve, reject) => {
       this._object.saveAs(async (localPath, error) => {
         if (error !== undefined) {
-          reject(new Error(error));
-          return;
+          reject(new Error(error))
+          return
         }
 
         try {
-          await (0, _utils.mkdirIfNeeded)(params.path);
-          await _fs.default.promises.copyFile(localPath, params.path);
-          resolve();
+          await (0, _utils.mkdirIfNeeded)(params.path)
+          await _fs.default.promises.copyFile(localPath, params.path)
+          resolve()
         } catch (e) {
-          reject(e);
+          reject(e)
         }
-      });
-    });
+      })
+    })
   }
 
   async saveAsStream() {
     return await new Promise((resolve, reject) => {
       this._object.saveAs(async (localPath, error) => {
         if (error !== undefined) {
-          reject(new Error(error));
-          return;
+          reject(new Error(error))
+          return
         }
 
         try {
-          const readable = _fs.default.createReadStream(localPath);
+          const readable = _fs.default.createReadStream(localPath)
 
-          const stream = new _streamDispatcher.StreamDispatcher(this._scope, readable); // Resolve with a stream, so that client starts saving the data.
+          const stream = new _streamDispatcher.StreamDispatcher(
+            this._scope,
+            readable
+          ) // Resolve with a stream, so that client starts saving the data.
 
           resolve({
             stream
-          }); // Block the Artifact until the stream is consumed.
+          }) // Block the Artifact until the stream is consumed.
 
-          await new Promise(resolve => {
-            readable.on('close', resolve);
-            readable.on('end', resolve);
-            readable.on('error', resolve);
-          });
+          await new Promise((resolve) => {
+            readable.on('close', resolve)
+            readable.on('end', resolve)
+            readable.on('error', resolve)
+          })
         } catch (e) {
-          reject(e);
+          reject(e)
         }
-      });
-    });
+      })
+    })
   }
 
   async stream() {
-    const fileName = await this._object.localPathAfterFinished();
-    if (!fileName) return {};
+    const fileName = await this._object.localPathAfterFinished()
+    if (!fileName) return {}
 
-    const readable = _fs.default.createReadStream(fileName);
+    const readable = _fs.default.createReadStream(fileName)
 
     return {
       stream: new _streamDispatcher.StreamDispatcher(this._scope, readable)
-    };
+    }
   }
 
   async failure() {
-    const error = await this._object.failureError();
+    const error = await this._object.failureError()
     return {
       error: error || undefined
-    };
+    }
   }
 
   async cancel() {
-    await this._object.cancel();
+    await this._object.cancel()
   }
 
   async delete() {
-    await this._object.delete();
+    await this._object.delete()
 
-    this._dispose();
+    this._dispose()
   }
-
 }
 
-exports.ArtifactDispatcher = ArtifactDispatcher;
+exports.ArtifactDispatcher = ArtifactDispatcher

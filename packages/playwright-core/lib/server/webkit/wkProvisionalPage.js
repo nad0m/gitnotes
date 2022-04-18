@@ -1,13 +1,13 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.WKProvisionalPage = void 0;
+})
+exports.WKProvisionalPage = void 0
 
-var _eventsHelper = require("../../utils/eventsHelper");
+var _eventsHelper = require('../../utils/eventsHelper')
 
-var _utils = require("../../utils/utils");
+var _utils = require('../../utils/utils')
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -26,44 +26,72 @@ var _utils = require("../../utils/utils");
  */
 class WKProvisionalPage {
   constructor(session, page) {
-    this._session = void 0;
-    this._wkPage = void 0;
-    this._sessionListeners = [];
-    this._mainFrameId = null;
-    this.initializationPromise = void 0;
-    this._session = session;
-    this._wkPage = page;
+    this._session = void 0
+    this._wkPage = void 0
+    this._sessionListeners = []
+    this._mainFrameId = null
+    this.initializationPromise = void 0
+    this._session = session
+    this._wkPage = page
 
-    const overrideFrameId = handler => {
-      return payload => {
+    const overrideFrameId = (handler) => {
+      return (payload) => {
         // Pretend that the events happened in the same process.
-        if (payload.frameId) payload.frameId = this._wkPage._page._frameManager.mainFrame()._id;
-        handler(payload);
-      };
-    };
+        if (payload.frameId)
+          payload.frameId = this._wkPage._page._frameManager.mainFrame()._id
+        handler(payload)
+      }
+    }
 
-    const wkPage = this._wkPage;
-    this._sessionListeners = [_eventsHelper.eventsHelper.addEventListener(session, 'Network.requestWillBeSent', overrideFrameId(e => wkPage._onRequestWillBeSent(session, e))), _eventsHelper.eventsHelper.addEventListener(session, 'Network.requestIntercepted', overrideFrameId(e => wkPage._onRequestIntercepted(session, e))), _eventsHelper.eventsHelper.addEventListener(session, 'Network.responseReceived', overrideFrameId(e => wkPage._onResponseReceived(e))), _eventsHelper.eventsHelper.addEventListener(session, 'Network.loadingFinished', overrideFrameId(e => wkPage._onLoadingFinished(e))), _eventsHelper.eventsHelper.addEventListener(session, 'Network.loadingFailed', overrideFrameId(e => wkPage._onLoadingFailed(e)))];
-    this.initializationPromise = this._wkPage._initializeSession(session, true, ({
-      frameTree
-    }) => this._handleFrameTree(frameTree));
+    const wkPage = this._wkPage
+    this._sessionListeners = [
+      _eventsHelper.eventsHelper.addEventListener(
+        session,
+        'Network.requestWillBeSent',
+        overrideFrameId((e) => wkPage._onRequestWillBeSent(session, e))
+      ),
+      _eventsHelper.eventsHelper.addEventListener(
+        session,
+        'Network.requestIntercepted',
+        overrideFrameId((e) => wkPage._onRequestIntercepted(session, e))
+      ),
+      _eventsHelper.eventsHelper.addEventListener(
+        session,
+        'Network.responseReceived',
+        overrideFrameId((e) => wkPage._onResponseReceived(e))
+      ),
+      _eventsHelper.eventsHelper.addEventListener(
+        session,
+        'Network.loadingFinished',
+        overrideFrameId((e) => wkPage._onLoadingFinished(e))
+      ),
+      _eventsHelper.eventsHelper.addEventListener(
+        session,
+        'Network.loadingFailed',
+        overrideFrameId((e) => wkPage._onLoadingFailed(e))
+      )
+    ]
+    this.initializationPromise = this._wkPage._initializeSession(
+      session,
+      true,
+      ({ frameTree }) => this._handleFrameTree(frameTree)
+    )
   }
 
   dispose() {
-    _eventsHelper.eventsHelper.removeEventListeners(this._sessionListeners);
+    _eventsHelper.eventsHelper.removeEventListeners(this._sessionListeners)
   }
 
   commit() {
-    (0, _utils.assert)(this._mainFrameId);
+    ;(0, _utils.assert)(this._mainFrameId)
 
-    this._wkPage._onFrameAttached(this._mainFrameId, null);
+    this._wkPage._onFrameAttached(this._mainFrameId, null)
   }
 
   _handleFrameTree(frameTree) {
-    (0, _utils.assert)(!frameTree.frame.parentId);
-    this._mainFrameId = frameTree.frame.id;
+    ;(0, _utils.assert)(!frameTree.frame.parentId)
+    this._mainFrameId = frameTree.frame.id
   }
-
 }
 
-exports.WKProvisionalPage = WKProvisionalPage;
+exports.WKProvisionalPage = WKProvisionalPage

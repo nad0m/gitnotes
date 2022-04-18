@@ -1,9 +1,9 @@
-'use strict';
+'use strict'
 
 Object.defineProperty(exports, '__esModule', {
-  value: true,
-});
-exports.getAccessibilityTree = getAccessibilityTree;
+  value: true
+})
+exports.getAccessibilityTree = getAccessibilityTree
 
 /**
  * Copyright 2018 Google Inc. All rights reserved.
@@ -22,15 +22,15 @@ exports.getAccessibilityTree = getAccessibilityTree;
  * limitations under the License.
  */
 async function getAccessibilityTree(session, needle) {
-  const objectId = needle ? needle._objectId : undefined;
-  const {tree} = await session.send('Accessibility.getFullAXTree', {
-    objectId,
-  });
-  const axNode = new FFAXNode(tree);
+  const objectId = needle ? needle._objectId : undefined
+  const { tree } = await session.send('Accessibility.getFullAXTree', {
+    objectId
+  })
+  const axNode = new FFAXNode(tree)
   return {
     tree: axNode,
-    needle: needle ? axNode._findNeedle() : null,
-  };
+    needle: needle ? axNode._findNeedle() : null
+  }
 }
 
 const FFRoleToARIARole = new Map(
@@ -58,81 +58,81 @@ const FFRoleToARIARole = new Map(
     entry: 'textbox',
     lexical: 'tree',
     'tree table': 'treegrid',
-    lexicalitem: 'treeitem',
-  }),
-);
+    lexicalitem: 'treeitem'
+  })
+)
 
 class FFAXNode {
   constructor(payload) {
-    this._children = void 0;
-    this._payload = void 0;
-    this._editable = void 0;
-    this._richlyEditable = void 0;
-    this._focusable = void 0;
-    this._expanded = void 0;
-    this._name = void 0;
-    this._role = void 0;
-    this._cachedHasFocusableChild = void 0;
-    this._payload = payload;
-    this._children = (payload.children || []).map((x) => new FFAXNode(x));
-    this._editable = !!payload.editable;
+    this._children = void 0
+    this._payload = void 0
+    this._editable = void 0
+    this._richlyEditable = void 0
+    this._focusable = void 0
+    this._expanded = void 0
+    this._name = void 0
+    this._role = void 0
+    this._cachedHasFocusableChild = void 0
+    this._payload = payload
+    this._children = (payload.children || []).map((x) => new FFAXNode(x))
+    this._editable = !!payload.editable
     this._richlyEditable =
-      this._editable && payload.tag !== 'textarea' && payload.tag !== 'input';
-    this._focusable = !!payload.focusable;
-    this._expanded = !!payload.expanded;
-    this._name = this._payload.name;
-    this._role = this._payload.role;
+      this._editable && payload.tag !== 'textarea' && payload.tag !== 'input'
+    this._focusable = !!payload.focusable
+    this._expanded = !!payload.expanded
+    this._name = this._payload.name
+    this._role = this._payload.role
   }
 
   _isPlainTextField() {
-    if (this._richlyEditable) return false;
-    if (this._editable) return true;
-    return this._role === 'entry';
+    if (this._richlyEditable) return false
+    if (this._editable) return true
+    return this._role === 'entry'
   }
 
   _isTextOnlyObject() {
-    const role = this._role;
-    return role === 'text leaf' || role === 'text' || role === 'statictext';
+    const role = this._role
+    return role === 'text leaf' || role === 'text' || role === 'statictext'
   }
 
   _hasFocusableChild() {
     if (this._cachedHasFocusableChild === undefined) {
-      this._cachedHasFocusableChild = false;
+      this._cachedHasFocusableChild = false
 
       for (const child of this._children) {
         if (child._focusable || child._hasFocusableChild()) {
-          this._cachedHasFocusableChild = true;
-          break;
+          this._cachedHasFocusableChild = true
+          break
         }
       }
     }
 
-    return this._cachedHasFocusableChild;
+    return this._cachedHasFocusableChild
   }
 
   children() {
-    return this._children;
+    return this._children
   }
 
   _findNeedle() {
-    if (this._payload.foundObject) return this;
+    if (this._payload.foundObject) return this
 
     for (const child of this._children) {
-      const found = child._findNeedle();
+      const found = child._findNeedle()
 
-      if (found) return found;
+      if (found) return found
     }
 
-    return null;
+    return null
   }
 
   isLeafNode() {
-    if (!this._children.length) return true; // These types of objects may have children that we use as internal
+    if (!this._children.length) return true // These types of objects may have children that we use as internal
     // implementation details, but we want to expose them as leaves to platform
     // accessibility APIs because screen readers might be confused if they find
     // any children.
 
-    if (this._isPlainTextField() || this._isTextOnlyObject()) return true; // Roles whose children are only presentational according to the ARIA and
+    if (this._isPlainTextField() || this._isTextOnlyObject()) return true // Roles whose children are only presentational according to the ARIA and
     // HTML5 Specs should be hidden from screen readers.
     // (Note that whilst ARIA buttons can have only presentational children, HTML5
     // buttons are allowed to have content.)
@@ -143,16 +143,16 @@ class FFAXNode {
       case 'slider':
       case 'separator':
       case 'progressbar':
-        return true;
+        return true
 
       default:
-        break;
+        break
     } // Here and below: Android heuristics
 
-    if (this._hasFocusableChild()) return false;
-    if (this._focusable && this._role !== 'document' && this._name) return true;
-    if (this._role === 'heading' && this._name) return true;
-    return false;
+    if (this._hasFocusableChild()) return false
+    if (this._focusable && this._role !== 'document' && this._name) return true
+    if (this._role === 'heading' && this._name) return true
+    return false
   }
 
   isControl() {
@@ -181,38 +181,38 @@ class FFAXNode {
       case 'pagetab':
       case 'entry':
       case 'tree table':
-        return true;
+        return true
 
       default:
-        return false;
+        return false
     }
   }
 
   isInteresting(insideControl) {
-    if (this._focusable || this._richlyEditable) return true; // If it's not focusable but has a control role, then it's interesting.
+    if (this._focusable || this._richlyEditable) return true // If it's not focusable but has a control role, then it's interesting.
 
-    if (this.isControl()) return true; // A non focusable child of a control is not interesting
+    if (this.isControl()) return true // A non focusable child of a control is not interesting
 
-    if (insideControl) return false;
-    return this.isLeafNode() && !!this._name.trim();
+    if (insideControl) return false
+    return this.isLeafNode() && !!this._name.trim()
   }
 
   serialize() {
     const node = {
       role: FFRoleToARIARole.get(this._role) || this._role,
-      name: this._name || '',
-    };
+      name: this._name || ''
+    }
     const userStringProperties = [
       'name',
       'description',
       'roledescription',
       'valuetext',
-      'keyshortcuts',
-    ];
+      'keyshortcuts'
+    ]
 
     for (const userStringProperty of userStringProperties) {
-      if (!(userStringProperty in this._payload)) continue;
-      node[userStringProperty] = this._payload[userStringProperty];
+      if (!(userStringProperty in this._payload)) continue
+      node[userStringProperty] = this._payload[userStringProperty]
     }
 
     const booleanProperties = [
@@ -224,48 +224,48 @@ class FFAXNode {
       'multiselectable',
       'readonly',
       'required',
-      'selected',
-    ];
+      'selected'
+    ]
 
     for (const booleanProperty of booleanProperties) {
-      if (this._role === 'document' && booleanProperty === 'focused') continue; // document focusing is strange
+      if (this._role === 'document' && booleanProperty === 'focused') continue // document focusing is strange
 
-      const value = this._payload[booleanProperty];
-      if (!value) continue;
-      node[booleanProperty] = value;
+      const value = this._payload[booleanProperty]
+      if (!value) continue
+      node[booleanProperty] = value
     }
 
-    const numericalProperties = ['level'];
+    const numericalProperties = ['level']
 
     for (const numericalProperty of numericalProperties) {
-      if (!(numericalProperty in this._payload)) continue;
-      node[numericalProperty] = this._payload[numericalProperty];
+      if (!(numericalProperty in this._payload)) continue
+      node[numericalProperty] = this._payload[numericalProperty]
     }
 
     const tokenProperties = [
       'autocomplete',
       'haspopup',
       'invalid',
-      'orientation',
-    ];
+      'orientation'
+    ]
 
     for (const tokenProperty of tokenProperties) {
-      const value = this._payload[tokenProperty];
-      if (!value || value === 'false') continue;
-      node[tokenProperty] = value;
+      const value = this._payload[tokenProperty]
+      if (!value || value === 'false') continue
+      node[tokenProperty] = value
     }
 
-    const axNode = node;
-    axNode.valueString = this._payload.value;
+    const axNode = node
+    axNode.valueString = this._payload.value
     if ('checked' in this._payload)
       axNode.checked =
         this._payload.checked === true
           ? 'checked'
           : this._payload.checked === 'mixed'
           ? 'mixed'
-          : 'unchecked';
+          : 'unchecked'
     if ('pressed' in this._payload)
-      axNode.pressed = this._payload.pressed === true ? 'pressed' : 'released';
-    return axNode;
+      axNode.pressed = this._payload.pressed === true ? 'pressed' : 'released'
+    return axNode
   }
 }

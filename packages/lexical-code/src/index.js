@@ -8,18 +8,18 @@
  */
 
 // eslint-disable-next-line simple-import-sort/imports
-import Prism from 'prismjs/components/prism-core';
-import 'prismjs/components/prism-clike';
-import 'prismjs/components/prism-javascript';
-import 'prismjs/components/prism-markup';
-import 'prismjs/components/prism-markdown';
-import 'prismjs/components/prism-c';
-import 'prismjs/components/prism-css';
-import 'prismjs/components/prism-objectivec';
-import 'prismjs/components/prism-sql';
-import 'prismjs/components/prism-python';
-import 'prismjs/components/prism-rust';
-import 'prismjs/components/prism-swift';
+import Prism from 'prismjs/components/prism-core'
+import 'prismjs/components/prism-clike'
+import 'prismjs/components/prism-javascript'
+import 'prismjs/components/prism-markup'
+import 'prismjs/components/prism-markdown'
+import 'prismjs/components/prism-c'
+import 'prismjs/components/prism-css'
+import 'prismjs/components/prism-objectivec'
+import 'prismjs/components/prism-sql'
+import 'prismjs/components/prism-python'
+import 'prismjs/components/prism-rust'
+import 'prismjs/components/prism-swift'
 
 import type {
   DOMConversionMap,
@@ -31,14 +31,14 @@ import type {
   NodeKey,
   ParagraphNode,
   RangeSelection,
-  LexicalCommand,
-} from 'lexical';
+  LexicalCommand
+} from 'lexical'
 
 import {
   addClassNamesToElement,
   removeClassNamesFromElement,
-  mergeRegister,
-} from '@lexical/utils';
+  mergeRegister
+} from '@lexical/utils'
 import {
   $createLineBreakNode,
   $createParagraphNode,
@@ -54,216 +54,213 @@ import {
   KEY_ARROW_DOWN_COMMAND,
   KEY_ARROW_UP_COMMAND,
   OUTDENT_CONTENT_COMMAND,
-  COMMAND_PRIORITY_LOW,
-} from 'lexical';
+  COMMAND_PRIORITY_LOW
+} from 'lexical'
 
-const DEFAULT_CODE_LANGUAGE = 'javascript';
+const DEFAULT_CODE_LANGUAGE = 'javascript'
 
-export const getDefaultCodeLanguage = (): string => DEFAULT_CODE_LANGUAGE;
+export const getDefaultCodeLanguage = (): string => DEFAULT_CODE_LANGUAGE
 
 export const getCodeLanguages = (): Array<string> =>
   Object.keys(Prism.languages)
     .filter(
       // Prism has several language helpers mixed into languages object
       // so filtering them out here to get langs list
-      (language) => typeof Prism.languages[language] !== 'function',
+      (language) => typeof Prism.languages[language] !== 'function'
     )
-    .sort();
+    .sort()
 
 export class CodeHighlightNode extends TextNode {
-  __highlightType: ?string;
+  __highlightType: ?string
 
   constructor(text: string, highlightType?: string, key?: NodeKey): void {
-    super(text, key);
-    this.__highlightType = highlightType;
+    super(text, key)
+    this.__highlightType = highlightType
   }
 
   static getType(): string {
-    return 'code-highlight';
+    return 'code-highlight'
   }
 
   static clone(node: CodeHighlightNode): CodeHighlightNode {
     return new CodeHighlightNode(
       node.__text,
       node.__highlightType || undefined,
-      node.__key,
-    );
+      node.__key
+    )
   }
 
   createDOM<EditorContext>(config: EditorConfig<EditorContext>): HTMLElement {
-    const element = super.createDOM(config);
-    const className = getHighlightThemeClass(
-      config.theme,
-      this.__highlightType,
-    );
-    addClassNamesToElement(element, className);
-    return element;
+    const element = super.createDOM(config)
+    const className = getHighlightThemeClass(config.theme, this.__highlightType)
+    addClassNamesToElement(element, className)
+    return element
   }
 
   updateDOM<EditorContext>(
     // $FlowFixMe
     prevNode: CodeHighlightNode,
     dom: HTMLElement,
-    config: EditorConfig<EditorContext>,
+    config: EditorConfig<EditorContext>
   ): boolean {
-    const update = super.updateDOM(prevNode, dom, config);
+    const update = super.updateDOM(prevNode, dom, config)
     const prevClassName = getHighlightThemeClass(
       config.theme,
-      prevNode.__highlightType,
-    );
+      prevNode.__highlightType
+    )
     const nextClassName = getHighlightThemeClass(
       config.theme,
-      this.__highlightType,
-    );
+      this.__highlightType
+    )
     if (prevClassName !== nextClassName) {
       if (prevClassName) {
-        removeClassNamesFromElement(dom, prevClassName);
+        removeClassNamesFromElement(dom, prevClassName)
       }
       if (nextClassName) {
-        addClassNamesToElement(dom, nextClassName);
+        addClassNamesToElement(dom, nextClassName)
       }
     }
-    return update;
+    return update
   }
 
   // Prevent formatting (bold, underline, etc)
   setFormat(format: number): this {
-    return this.getWritable();
+    return this.getWritable()
   }
 }
 
 function getHighlightThemeClass(
   theme: EditorThemeClasses,
-  highlightType: ?string,
+  highlightType: ?string
 ): ?string {
   return (
     highlightType &&
     theme &&
     theme.codeHighlight &&
     theme.codeHighlight[highlightType]
-  );
+  )
 }
 
 export function $createCodeHighlightNode(
   text: string,
-  highlightType?: string,
+  highlightType?: string
 ): CodeHighlightNode {
-  return new CodeHighlightNode(text, highlightType);
+  return new CodeHighlightNode(text, highlightType)
 }
 
 export function $isCodeHighlightNode(node: ?LexicalNode): boolean %checks {
-  return node instanceof CodeHighlightNode;
+  return node instanceof CodeHighlightNode
 }
 
-const LANGUAGE_DATA_ATTRIBUTE = 'data-highlight-language';
+const LANGUAGE_DATA_ATTRIBUTE = 'data-highlight-language'
 
 export class CodeNode extends ElementNode {
-  __language: string | void;
+  __language: string | void
 
   static getType(): string {
-    return 'code';
+    return 'code'
   }
 
   static clone(node: CodeNode): CodeNode {
-    return new CodeNode(node.__language, node.__key);
+    return new CodeNode(node.__language, node.__key)
   }
 
   constructor(language?: string, key?: NodeKey): void {
-    super(key);
-    this.__language = language;
+    super(key)
+    this.__language = language
   }
 
   // View
   createDOM<EditorContext>(config: EditorConfig<EditorContext>): HTMLElement {
-    const element = document.createElement('code');
-    addClassNamesToElement(element, config.theme.code);
-    element.setAttribute('spellcheck', 'false');
-    const language = this.getLanguage();
+    const element = document.createElement('code')
+    addClassNamesToElement(element, config.theme.code)
+    element.setAttribute('spellcheck', 'false')
+    const language = this.getLanguage()
     if (language) {
-      element.setAttribute(LANGUAGE_DATA_ATTRIBUTE, language);
+      element.setAttribute(LANGUAGE_DATA_ATTRIBUTE, language)
     }
-    return element;
+    return element
   }
   updateDOM(prevNode: CodeNode, dom: HTMLElement): boolean {
-    const language = this.__language;
-    const prevLanguage = prevNode.__language;
+    const language = this.__language
+    const prevLanguage = prevNode.__language
 
     if (language) {
       if (language !== prevLanguage) {
-        dom.setAttribute(LANGUAGE_DATA_ATTRIBUTE, language);
+        dom.setAttribute(LANGUAGE_DATA_ATTRIBUTE, language)
       }
     } else if (prevLanguage) {
-      dom.removeAttribute(LANGUAGE_DATA_ATTRIBUTE);
+      dom.removeAttribute(LANGUAGE_DATA_ATTRIBUTE)
     }
-    return false;
+    return false
   }
 
   static importDOM(): DOMConversionMap | null {
     return {
       div: (node: Node) => ({
         conversion: convertDivElement,
-        priority: 1,
+        priority: 1
       }),
       pre: (node: Node) => ({
         conversion: convertPreElement,
-        priority: 0,
+        priority: 0
       }),
       table: (node: Node) => {
         // $FlowFixMe[incompatible-type] domNode is a <table> since we matched it by nodeName
-        const table: HTMLTableElement = node;
+        const table: HTMLTableElement = node
         if (isGitHubCodeTable(table)) {
           return {
             conversion: convertTableElement,
-            priority: 4,
-          };
+            priority: 4
+          }
         }
-        return null;
+        return null
       },
       td: (node: Node) => {
         // $FlowFixMe[incompatible-type] element is a <td> since we matched it by nodeName
-        const td: HTMLTableCellElement = node;
+        const td: HTMLTableCellElement = node
         // $FlowFixMe[incompatible-type] we know this will be a table, or null.
-        const table: ?HTMLTableElement | null = td.closest('table');
+        const table: ?HTMLTableElement | null = td.closest('table')
 
         if (isGitHubCodeCell(td)) {
           return {
             conversion: convertTableCellElement,
-            priority: 4,
-          };
+            priority: 4
+          }
         }
         if (table && isGitHubCodeTable(table)) {
           // Return a no-op if it's a table cell in a code table, but not a code line.
           // Otherwise it'll fall back to the T
           return {
             conversion: convertCodeNoop,
-            priority: 4,
-          };
+            priority: 4
+          }
         }
 
-        return null;
+        return null
       },
       tr: (node: Node) => {
         // $FlowFixMe[incompatible-type] element is a <tr> since we matched it by nodeName
-        const tr: HTMLTableElement = node;
+        const tr: HTMLTableElement = node
         // $FlowFixMe[incompatible-type] we know this will be a table, or null.
-        const table: ?HTMLTableElement | null = tr.closest('table');
+        const table: ?HTMLTableElement | null = tr.closest('table')
         if (table && isGitHubCodeTable(table)) {
           return {
             conversion: convertCodeNoop,
-            priority: 4,
-          };
+            priority: 4
+          }
         }
-        return null;
-      },
-    };
+        return null
+      }
+    }
   }
 
   // Mutation
   insertNewAfter(
-    selection: RangeSelection,
+    selection: RangeSelection
   ): null | ParagraphNode | CodeHighlightNode {
-    const children = this.getChildren();
-    const childrenLength = children.length;
+    const children = this.getChildren()
+    const childrenLength = children.length
 
     if (
       childrenLength >= 2 &&
@@ -273,198 +270,198 @@ export class CodeNode extends ElementNode {
       selection.anchor.key === this.__key &&
       selection.anchor.offset === childrenLength
     ) {
-      children[childrenLength - 1].remove();
-      children[childrenLength - 2].remove();
-      const newElement = $createParagraphNode();
-      this.insertAfter(newElement);
-      return newElement;
+      children[childrenLength - 1].remove()
+      children[childrenLength - 2].remove()
+      const newElement = $createParagraphNode()
+      this.insertAfter(newElement)
+      return newElement
     }
 
     // If the selection is within the codeblock, find all leading tabs and
     // spaces of the current line. Create a new line that has all those
     // tabs and spaces, such that leading indentation is preserved.
-    const anchor = selection.anchor.getNode();
-    const firstNode = getFirstCodeHighlightNodeOfLine(anchor);
+    const anchor = selection.anchor.getNode()
+    const firstNode = getFirstCodeHighlightNodeOfLine(anchor)
     if (firstNode != null) {
-      let leadingWhitespace = 0;
-      const firstNodeText = firstNode.getTextContent();
+      let leadingWhitespace = 0
+      const firstNodeText = firstNode.getTextContent()
       while (
         leadingWhitespace < firstNodeText.length &&
         /[\t ]/.test(firstNodeText[leadingWhitespace])
       ) {
-        leadingWhitespace += 1;
+        leadingWhitespace += 1
       }
       if (leadingWhitespace > 0) {
-        const whitespace = firstNodeText.substring(0, leadingWhitespace);
-        const indentedChild = $createCodeHighlightNode(whitespace);
-        anchor.insertAfter(indentedChild);
-        selection.insertNodes([$createLineBreakNode()]);
-        indentedChild.select();
-        return indentedChild;
+        const whitespace = firstNodeText.substring(0, leadingWhitespace)
+        const indentedChild = $createCodeHighlightNode(whitespace)
+        anchor.insertAfter(indentedChild)
+        selection.insertNodes([$createLineBreakNode()])
+        indentedChild.select()
+        return indentedChild
       }
     }
 
-    return null;
+    return null
   }
 
   canInsertTab(): true {
-    return true;
+    return true
   }
 
   collapseAtStart(): true {
-    const paragraph = $createParagraphNode();
-    const children = this.getChildren();
-    children.forEach((child) => paragraph.append(child));
-    this.replace(paragraph);
-    return true;
+    const paragraph = $createParagraphNode()
+    const children = this.getChildren()
+    children.forEach((child) => paragraph.append(child))
+    this.replace(paragraph)
+    return true
   }
 
   setLanguage(language: string): void {
-    const writable = this.getWritable();
-    writable.__language = language;
+    const writable = this.getWritable()
+    writable.__language = language
   }
 
   getLanguage(): string | void {
-    return this.getLatest().__language;
+    return this.getLatest().__language
   }
 }
 
 export function $createCodeNode(language?: string): CodeNode {
-  return new CodeNode(language);
+  return new CodeNode(language)
 }
 
 export function $isCodeNode(node: ?LexicalNode): boolean %checks {
-  return node instanceof CodeNode;
+  return node instanceof CodeNode
 }
 
 export function getFirstCodeHighlightNodeOfLine(
-  anchor: LexicalNode,
+  anchor: LexicalNode
 ): ?CodeHighlightNode {
-  let currentNode = null;
-  const previousSiblings = anchor.getPreviousSiblings();
-  previousSiblings.push(anchor);
+  let currentNode = null
+  const previousSiblings = anchor.getPreviousSiblings()
+  previousSiblings.push(anchor)
   while (previousSiblings.length > 0) {
-    const node = previousSiblings.pop();
+    const node = previousSiblings.pop()
     if ($isCodeHighlightNode(node)) {
-      currentNode = node;
+      currentNode = node
     }
     if ($isLineBreakNode(node)) {
-      break;
+      break
     }
   }
 
-  return currentNode;
+  return currentNode
 }
 
 export function getLastCodeHighlightNodeOfLine(
-  anchor: LexicalNode,
+  anchor: LexicalNode
 ): ?CodeHighlightNode {
-  let currentNode = null;
-  const nextSiblings = anchor.getNextSiblings();
-  nextSiblings.unshift(anchor);
+  let currentNode = null
+  const nextSiblings = anchor.getNextSiblings()
+  nextSiblings.unshift(anchor)
   while (nextSiblings.length > 0) {
-    const node = nextSiblings.shift();
+    const node = nextSiblings.shift()
     if ($isCodeHighlightNode(node)) {
-      currentNode = node;
+      currentNode = node
     }
     if ($isLineBreakNode(node)) {
-      break;
+      break
     }
   }
 
-  return currentNode;
+  return currentNode
 }
 
 function convertPreElement(domNode: Node): DOMConversionOutput {
-  return {node: $createCodeNode()};
+  return { node: $createCodeNode() }
 }
 
 function convertDivElement(domNode: Node): DOMConversionOutput {
   // $FlowFixMe[incompatible-type] domNode is a <div> since we matched it by nodeName
-  const div: HTMLDivElement = domNode;
+  const div: HTMLDivElement = domNode
   return {
     after: (childLexicalNodes) => {
-      const domParent = domNode.parentNode;
+      const domParent = domNode.parentNode
       if (domParent != null && domNode !== domParent.lastChild) {
-        childLexicalNodes.push($createLineBreakNode());
+        childLexicalNodes.push($createLineBreakNode())
       }
-      return childLexicalNodes;
+      return childLexicalNodes
     },
-    node: isCodeElement(div) ? $createCodeNode() : null,
-  };
+    node: isCodeElement(div) ? $createCodeNode() : null
+  }
 }
 
 function convertTableElement(): DOMConversionOutput {
-  return {node: $createCodeNode()};
+  return { node: $createCodeNode() }
 }
 
 function convertCodeNoop(): DOMConversionOutput {
-  return {node: null};
+  return { node: null }
 }
 
 function convertTableCellElement(domNode: Node): DOMConversionOutput {
   // $FlowFixMe[incompatible-type] domNode is a <td> since we matched it by nodeName
-  const cell: HTMLTableCellElement = domNode;
+  const cell: HTMLTableCellElement = domNode
 
   return {
     after: (childLexicalNodes) => {
       if (cell.parentNode && cell.parentNode.nextSibling) {
         // Append newline between code lines
-        childLexicalNodes.push($createLineBreakNode());
+        childLexicalNodes.push($createLineBreakNode())
       }
-      return childLexicalNodes;
+      return childLexicalNodes
     },
-    node: null,
-  };
+    node: null
+  }
 }
 
 function isCodeElement(div: HTMLDivElement): boolean {
-  return div.style.fontFamily.match('monospace') !== null;
+  return div.style.fontFamily.match('monospace') !== null
 }
 
 function isGitHubCodeCell(cell: HTMLTableCellElement): boolean %checks {
-  return cell.classList.contains('js-file-line');
+  return cell.classList.contains('js-file-line')
 }
 
 function isGitHubCodeTable(table: HTMLTableElement): boolean %checks {
-  return table.classList.contains('js-file-line-container');
+  return table.classList.contains('js-file-line-container')
 }
 
 function textNodeTransform(node: TextNode, editor: LexicalEditor): void {
   // Since CodeNode has flat children structure we only need to check
   // if node's parent is a code node and run highlighting if so
-  const parentNode = node.getParent();
+  const parentNode = node.getParent()
   if ($isCodeNode(parentNode)) {
-    codeNodeTransform(parentNode, editor);
+    codeNodeTransform(parentNode, editor)
   } else if ($isCodeHighlightNode(node)) {
     // When code block converted into paragraph or other element
     // code highlight nodes converted back to normal text
-    node.replace($createTextNode(node.__text));
+    node.replace($createTextNode(node.__text))
   }
 }
 
 function updateCodeGutter(node: CodeNode, editor: LexicalEditor): void {
-  const codeElement = editor.getElementByKey(node.getKey());
+  const codeElement = editor.getElementByKey(node.getKey())
   if (codeElement === null) {
-    return;
+    return
   }
-  const children = node.getChildren();
-  const childrenLength = children.length;
+  const children = node.getChildren()
+  const childrenLength = children.length
   // $FlowFixMe: internal field
   if (childrenLength === codeElement.__cachedChildrenLength) {
     // Avoid updating the attribute if the children length hasn't changed.
-    return;
+    return
   }
   // $FlowFixMe: internal field
-  codeElement.__cachedChildrenLength = childrenLength;
-  let gutter = '1';
-  let count = 1;
+  codeElement.__cachedChildrenLength = childrenLength
+  let gutter = '1'
+  let count = 1
   for (let i = 0; i < childrenLength; i++) {
     if ($isLineBreakNode(children[i])) {
-      gutter += '\n' + ++count;
+      gutter += '\n' + ++count
     }
   }
-  codeElement.setAttribute('data-gutter', gutter);
+  codeElement.setAttribute('data-gutter', gutter)
 }
 
 // Using `skipTransforms` to prevent extra transforms since reformatting the code
@@ -474,15 +471,15 @@ function updateCodeGutter(node: CodeNode, editor: LexicalEditor): void {
 // trasnforms might be called at the same time (e.g. new CodeHighlight node inserted) and
 // in both cases we'll rerun whole reformatting over CodeNode, which is redundant.
 // Especially when pasting code into CodeBlock.
-let isHighlighting = false;
+let isHighlighting = false
 function codeNodeTransform(node: CodeNode, editor: LexicalEditor) {
   if (isHighlighting) {
-    return;
+    return
   }
-  isHighlighting = true;
+  isHighlighting = true
   // When new code block inserted it might not have language selected
   if (node.getLanguage() === undefined) {
-    node.setLanguage(DEFAULT_CODE_LANGUAGE);
+    node.setLanguage(DEFAULT_CODE_LANGUAGE)
   }
 
   // Using nested update call to pass `skipTransforms` since we don't want
@@ -491,166 +488,166 @@ function codeNodeTransform(node: CodeNode, editor: LexicalEditor) {
   editor.update(
     () => {
       updateAndRetainSelection(node, () => {
-        const code = node.getTextContent();
+        const code = node.getTextContent()
         const tokens = Prism.tokenize(
           code,
           Prism.languages[node.getLanguage() || ''] ||
-            Prism.languages[DEFAULT_CODE_LANGUAGE],
-        );
-        const highlightNodes = getHighlightNodes(tokens);
-        const diffRange = getDiffRange(node.getChildren(), highlightNodes);
-        const {from, to, nodesForReplacement} = diffRange;
+            Prism.languages[DEFAULT_CODE_LANGUAGE]
+        )
+        const highlightNodes = getHighlightNodes(tokens)
+        const diffRange = getDiffRange(node.getChildren(), highlightNodes)
+        const { from, to, nodesForReplacement } = diffRange
         if (from !== to || nodesForReplacement.length) {
-          node.splice(from, to - from, nodesForReplacement);
-          return true;
+          node.splice(from, to - from, nodesForReplacement)
+          return true
         }
-        return false;
-      });
+        return false
+      })
     },
     {
       onUpdate: () => {
-        isHighlighting = false;
+        isHighlighting = false
       },
-      skipTransforms: true,
-    },
-  );
+      skipTransforms: true
+    }
+  )
 }
 
 function getHighlightNodes(tokens): Array<LexicalNode> {
-  const nodes = [];
+  const nodes = []
 
   tokens.forEach((token) => {
     if (typeof token === 'string') {
-      const partials = token.split('\n');
+      const partials = token.split('\n')
       for (let i = 0; i < partials.length; i++) {
-        const text = partials[i];
+        const text = partials[i]
         if (text.length) {
-          nodes.push($createCodeHighlightNode(text));
+          nodes.push($createCodeHighlightNode(text))
         }
         if (i < partials.length - 1) {
-          nodes.push($createLineBreakNode());
+          nodes.push($createLineBreakNode())
         }
       }
     } else {
-      const {content} = token;
+      const { content } = token
       if (typeof content === 'string') {
-        nodes.push($createCodeHighlightNode(content, token.type));
+        nodes.push($createCodeHighlightNode(content, token.type))
       } else if (content.length === 1 && typeof content[0] === 'string') {
-        nodes.push($createCodeHighlightNode(content[0], token.type));
+        nodes.push($createCodeHighlightNode(content[0], token.type))
       } else {
-        nodes.push(...getHighlightNodes(content));
+        nodes.push(...getHighlightNodes(content))
       }
     }
-  });
+  })
 
-  return nodes;
+  return nodes
 }
 
 // Wrapping update function into selection retainer, that tries to keep cursor at the same
 // position as before.
 function updateAndRetainSelection(
   node: CodeNode,
-  updateFn: () => boolean,
+  updateFn: () => boolean
 ): void {
-  const selection = $getSelection();
+  const selection = $getSelection()
   if (!$isRangeSelection(selection) || !selection.anchor) {
-    return;
+    return
   }
 
-  const anchor = selection.anchor;
-  const anchorOffset = anchor.offset;
+  const anchor = selection.anchor
+  const anchorOffset = anchor.offset
   const isNewLineAnchor =
     anchor.type === 'element' &&
-    $isLineBreakNode(node.getChildAtIndex(anchor.offset - 1));
-  let textOffset = 0;
+    $isLineBreakNode(node.getChildAtIndex(anchor.offset - 1))
+  let textOffset = 0
 
   // Calculating previous text offset (all text node prior to anchor + anchor own text offset)
   if (!isNewLineAnchor) {
-    const anchorNode = anchor.getNode();
+    const anchorNode = anchor.getNode()
     textOffset =
       anchorOffset +
       anchorNode.getPreviousSiblings().reduce((offset, _node) => {
         return (
           offset + ($isLineBreakNode(_node) ? 0 : _node.getTextContentSize())
-        );
-      }, 0);
+        )
+      }, 0)
   }
 
-  const hasChanges = updateFn();
+  const hasChanges = updateFn()
   if (!hasChanges) {
-    return;
+    return
   }
 
   // Non-text anchors only happen for line breaks, otherwise
   // selection will be within text node (code highlight node)
   if (isNewLineAnchor) {
-    anchor.getNode().select(anchorOffset, anchorOffset);
-    return;
+    anchor.getNode().select(anchorOffset, anchorOffset)
+    return
   }
 
   // If it was non-element anchor then we walk through child nodes
   // and looking for a position of original text offset
   node.getChildren().some((_node) => {
     if ($isTextNode(_node)) {
-      const textContentSize = _node.getTextContentSize();
+      const textContentSize = _node.getTextContentSize()
       if (textContentSize >= textOffset) {
-        _node.select(textOffset, textOffset);
-        return true;
+        _node.select(textOffset, textOffset)
+        return true
       }
-      textOffset -= textContentSize;
+      textOffset -= textContentSize
     }
-    return false;
-  });
+    return false
+  })
 }
 
 // Finds minimal diff range between two nodes lists. It returns from/to range boundaries of prevNodes
 // that needs to be replaced with `nodes` (subset of nextNodes) to make prevNodes equal to nextNodes.
 function getDiffRange(
   prevNodes: Array<LexicalNode>,
-  nextNodes: Array<LexicalNode>,
+  nextNodes: Array<LexicalNode>
 ): {
   from: number,
   nodesForReplacement: Array<LexicalNode>,
-  to: number,
+  to: number
 } {
-  let leadingMatch = 0;
+  let leadingMatch = 0
   while (leadingMatch < prevNodes.length) {
     if (!isEqual(prevNodes[leadingMatch], nextNodes[leadingMatch])) {
-      break;
+      break
     }
-    leadingMatch++;
+    leadingMatch++
   }
 
-  const prevNodesLength = prevNodes.length;
-  const nextNodesLength = nextNodes.length;
+  const prevNodesLength = prevNodes.length
+  const nextNodesLength = nextNodes.length
   const maxTrailingMatch =
-    Math.min(prevNodesLength, nextNodesLength) - leadingMatch;
+    Math.min(prevNodesLength, nextNodesLength) - leadingMatch
 
-  let trailingMatch = 0;
+  let trailingMatch = 0
   while (trailingMatch < maxTrailingMatch) {
-    trailingMatch++;
+    trailingMatch++
     if (
       !isEqual(
         prevNodes[prevNodesLength - trailingMatch],
-        nextNodes[nextNodesLength - trailingMatch],
+        nextNodes[nextNodesLength - trailingMatch]
       )
     ) {
-      trailingMatch--;
-      break;
+      trailingMatch--
+      break
     }
   }
 
-  const from = leadingMatch;
-  const to = prevNodesLength - trailingMatch;
+  const from = leadingMatch
+  const to = prevNodesLength - trailingMatch
   const nodesForReplacement = nextNodes.slice(
     leadingMatch,
-    nextNodesLength - trailingMatch,
-  );
+    nextNodesLength - trailingMatch
+  )
   return {
     from,
     nodesForReplacement,
-    to,
-  };
+    to
+  }
 }
 
 function isEqual(nodeA: LexicalNode, nodeB: LexicalNode): boolean {
@@ -660,49 +657,49 @@ function isEqual(nodeA: LexicalNode, nodeB: LexicalNode): boolean {
     return (
       nodeA.__text === nodeB.__text &&
       nodeA.__highlightType === nodeB.__highlightType
-    );
+    )
   }
 
   if ($isLineBreakNode(nodeA) && $isLineBreakNode(nodeB)) {
-    return true;
+    return true
   }
 
-  return false;
+  return false
 }
 
 function handleMultilineIndent(type: LexicalCommand<void>): boolean {
-  const selection = $getSelection();
+  const selection = $getSelection()
 
   if (!$isRangeSelection(selection) || selection.isCollapsed()) {
-    return false;
+    return false
   }
 
   // Only run multiline indent logic on selections exclusively composed of code highlights and linebreaks
-  const nodes = selection.getNodes();
+  const nodes = selection.getNodes()
   for (let i = 0; i < nodes.length; i++) {
-    const node = nodes[i];
+    const node = nodes[i]
     if (!$isCodeHighlightNode(node) && !$isLineBreakNode(node)) {
-      return false;
+      return false
     }
   }
-  const startOfLine = getFirstCodeHighlightNodeOfLine(nodes[0]);
+  const startOfLine = getFirstCodeHighlightNodeOfLine(nodes[0])
 
   if (startOfLine != null) {
-    doIndent(startOfLine, type);
+    doIndent(startOfLine, type)
   }
 
   for (let i = 1; i < nodes.length; i++) {
-    const node = nodes[i];
+    const node = nodes[i]
     if ($isLineBreakNode(nodes[i - 1]) && $isCodeHighlightNode(node)) {
-      doIndent(node, type);
+      doIndent(node, type)
     }
   }
 
-  return true;
+  return true
 }
 
 function doIndent(node: CodeHighlightNode, type: LexicalCommand<void>) {
-  const text = node.getTextContent();
+  const text = node.getTextContent()
   if (type === INDENT_CONTENT_COMMAND) {
     // If the codeblock node doesn't start with whitespace, we don't want to
     // naively prepend a '\t'; Prism will then mangle all of our nodes when
@@ -710,19 +707,19 @@ function doIndent(node: CodeHighlightNode, type: LexicalCommand<void>) {
     // will lead to selection bugs when indenting lines that previously
     // didn't start with a whitespace character
     if (text.length > 0 && /\s/.test(text[0])) {
-      node.setTextContent('\t' + text);
+      node.setTextContent('\t' + text)
     } else {
-      const indentNode = $createCodeHighlightNode('\t');
-      node.insertBefore(indentNode);
+      const indentNode = $createCodeHighlightNode('\t')
+      node.insertBefore(indentNode)
     }
   } else {
     if (text.indexOf('\t') === 0) {
       // Same as above - if we leave empty text nodes lying around, the resulting
       // selection will be mangled
       if (text.length === 1) {
-        node.remove();
+        node.remove()
       } else {
-        node.setTextContent(text.substring(1));
+        node.setTextContent(text.substring(1))
       }
     }
   }
@@ -730,121 +727,121 @@ function doIndent(node: CodeHighlightNode, type: LexicalCommand<void>) {
 
 function handleShiftLines(
   type: LexicalCommand<KeyboardEvent>,
-  event: KeyboardEvent,
+  event: KeyboardEvent
 ): boolean {
   // We only care about the alt+arrow keys
-  const selection = $getSelection();
+  const selection = $getSelection()
   if (!$isRangeSelection(selection)) {
-    return false;
+    return false
   }
 
   // I'm not quite sure why, but it seems like calling anchor.getNode() collapses the selection here
   // So first, get the anchor and the focus, then get their nodes
-  const {anchor, focus} = selection;
-  const anchorOffset = anchor.offset;
-  const focusOffset = focus.offset;
-  const anchorNode = anchor.getNode();
-  const focusNode = focus.getNode();
-  const arrowIsUp = type === KEY_ARROW_UP_COMMAND;
+  const { anchor, focus } = selection
+  const anchorOffset = anchor.offset
+  const focusOffset = focus.offset
+  const anchorNode = anchor.getNode()
+  const focusNode = focus.getNode()
+  const arrowIsUp = type === KEY_ARROW_UP_COMMAND
 
   // Ensure the selection is within the codeblock
   if (!$isCodeHighlightNode(anchorNode) || !$isCodeHighlightNode(focusNode)) {
-    return false;
+    return false
   }
   if (!event.altKey) {
     // Handle moving selection out of the code block, given there are no
     // sibling thats can natively take the selection.
     if (selection.isCollapsed()) {
-      const codeNode = anchorNode.getParentOrThrow();
+      const codeNode = anchorNode.getParentOrThrow()
       if (
         arrowIsUp &&
         anchorOffset === 0 &&
         anchorNode.getPreviousSibling() === null
       ) {
-        const codeNodeSibling = codeNode.getPreviousSibling();
+        const codeNodeSibling = codeNode.getPreviousSibling()
         if (codeNodeSibling === null) {
-          codeNode.selectPrevious();
-          event.preventDefault();
-          return true;
+          codeNode.selectPrevious()
+          event.preventDefault()
+          return true
         }
       } else if (
         !arrowIsUp &&
         anchorOffset === anchorNode.getTextContentSize() &&
         anchorNode.getNextSibling() === null
       ) {
-        const codeNodeSibling = codeNode.getNextSibling();
+        const codeNodeSibling = codeNode.getNextSibling()
         if (codeNodeSibling === null) {
-          codeNode.selectNext();
-          event.preventDefault();
-          return true;
+          codeNode.selectNext()
+          event.preventDefault()
+          return true
         }
       }
     }
-    return false;
+    return false
   }
 
-  const start = getFirstCodeHighlightNodeOfLine(anchorNode);
-  const end = getLastCodeHighlightNodeOfLine(focusNode);
+  const start = getFirstCodeHighlightNodeOfLine(anchorNode)
+  const end = getLastCodeHighlightNodeOfLine(focusNode)
   if (start == null || end == null) {
-    return false;
+    return false
   }
 
-  const range = start.getNodesBetween(end);
+  const range = start.getNodesBetween(end)
   for (let i = 0; i < range.length; i++) {
-    const node = range[i];
+    const node = range[i]
     if (!$isCodeHighlightNode(node) && !$isLineBreakNode(node)) {
-      return false;
+      return false
     }
   }
 
   // After this point, we know the selection is within the codeblock. We may not be able to
   // actually move the lines around, but we want to return true either way to prevent
   // the event's default behavior
-  event.preventDefault();
-  event.stopPropagation(); // required to stop cursor movement under Firefox
+  event.preventDefault()
+  event.stopPropagation() // required to stop cursor movement under Firefox
 
   const linebreak = arrowIsUp
     ? start.getPreviousSibling()
-    : end.getNextSibling();
+    : end.getNextSibling()
   if (!$isLineBreakNode(linebreak)) {
-    return true;
+    return true
   }
   const sibling = arrowIsUp
     ? linebreak.getPreviousSibling()
-    : linebreak.getNextSibling();
+    : linebreak.getNextSibling()
   if (sibling == null) {
-    return true;
+    return true
   }
 
   const maybeInsertionPoint = arrowIsUp
     ? getFirstCodeHighlightNodeOfLine(sibling)
-    : getLastCodeHighlightNodeOfLine(sibling);
+    : getLastCodeHighlightNodeOfLine(sibling)
   let insertionPoint =
-    maybeInsertionPoint != null ? maybeInsertionPoint : sibling;
-  linebreak.remove();
-  range.forEach((node) => node.remove());
+    maybeInsertionPoint != null ? maybeInsertionPoint : sibling
+  linebreak.remove()
+  range.forEach((node) => node.remove())
   if (type === KEY_ARROW_UP_COMMAND) {
-    range.forEach((node) => insertionPoint.insertBefore(node));
-    insertionPoint.insertBefore(linebreak);
+    range.forEach((node) => insertionPoint.insertBefore(node))
+    insertionPoint.insertBefore(linebreak)
   } else {
-    insertionPoint.insertAfter(linebreak);
-    insertionPoint = linebreak;
+    insertionPoint.insertAfter(linebreak)
+    insertionPoint = linebreak
     range.forEach((node) => {
-      insertionPoint.insertAfter(node);
-      insertionPoint = node;
-    });
+      insertionPoint.insertAfter(node)
+      insertionPoint = node
+    })
   }
 
-  selection.setTextNodeRange(anchorNode, anchorOffset, focusNode, focusOffset);
+  selection.setTextNodeRange(anchorNode, anchorOffset, focusNode, focusOffset)
 
-  return true;
+  return true
 }
 
 export function registerCodeHighlighting(editor: LexicalEditor): () => void {
   if (!editor.hasNodes([CodeNode, CodeHighlightNode])) {
     throw new Error(
-      'CodeHighlightPlugin: CodeNode or CodeHighlightNode not registered on editor',
-    );
+      'CodeHighlightPlugin: CodeNode or CodeHighlightNode not registered on editor'
+    )
   }
 
   return mergeRegister(
@@ -852,42 +849,42 @@ export function registerCodeHighlighting(editor: LexicalEditor): () => void {
       editor.update(() => {
         for (const [key, type] of mutations) {
           if (type !== 'destroyed') {
-            const node = $getNodeByKey(key);
+            const node = $getNodeByKey(key)
             if (node !== null) {
-              updateCodeGutter(node, editor);
+              updateCodeGutter(node, editor)
             }
           }
         }
-      });
+      })
     }),
     editor.registerNodeTransform(CodeNode, (node) =>
-      codeNodeTransform(node, editor),
+      codeNodeTransform(node, editor)
     ),
     editor.registerNodeTransform(TextNode, (node) =>
-      textNodeTransform(node, editor),
+      textNodeTransform(node, editor)
     ),
     editor.registerNodeTransform(CodeHighlightNode, (node) =>
-      textNodeTransform(node, editor),
+      textNodeTransform(node, editor)
     ),
     editor.registerCommand(
       INDENT_CONTENT_COMMAND,
       (payload): boolean => handleMultilineIndent(INDENT_CONTENT_COMMAND),
-      COMMAND_PRIORITY_LOW,
+      COMMAND_PRIORITY_LOW
     ),
     editor.registerCommand(
       OUTDENT_CONTENT_COMMAND,
       (payload): boolean => handleMultilineIndent(OUTDENT_CONTENT_COMMAND),
-      COMMAND_PRIORITY_LOW,
+      COMMAND_PRIORITY_LOW
     ),
     editor.registerCommand(
       KEY_ARROW_UP_COMMAND,
       (payload): boolean => handleShiftLines(KEY_ARROW_UP_COMMAND, payload),
-      COMMAND_PRIORITY_LOW,
+      COMMAND_PRIORITY_LOW
     ),
     editor.registerCommand(
       KEY_ARROW_DOWN_COMMAND,
       (payload): boolean => handleShiftLines(KEY_ARROW_DOWN_COMMAND, payload),
-      COMMAND_PRIORITY_LOW,
-    ),
-  );
+      COMMAND_PRIORITY_LOW
+    )
+  )
 }

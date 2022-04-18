@@ -7,28 +7,28 @@
  * @flow strict
  */
 
-import type {InitialEditorStateType} from './shared/PlainRichTextUtils';
+import type { InitialEditorStateType } from './shared/PlainRichTextUtils'
 
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import * as React from 'react';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import * as React from 'react'
 
-import useCanShowPlaceholder from './shared/useCanShowPlaceholder';
-import useDecorators from './shared/useDecorators';
-import useRichTextSetup from './shared/useRichTextSetup';
+import useCanShowPlaceholder from './shared/useCanShowPlaceholder'
+import useDecorators from './shared/useDecorators'
+import useRichTextSetup from './shared/useRichTextSetup'
 
 export default function RichTextPlugin({
   contentEditable,
   placeholder,
-  initialEditorState,
+  initialEditorState
 }: $ReadOnly<{
   contentEditable: React$Node,
   initialEditorState?: InitialEditorStateType,
-  placeholder: React$Node,
+  placeholder: React$Node
 }>): React$Node {
-  const [editor] = useLexicalComposerContext();
-  const showPlaceholder = useCanShowPlaceholder(editor);
-  useRichTextSetup(editor, initialEditorState);
-  const decorators = useDecorators(editor);
+  const [editor] = useLexicalComposerContext()
+  const showPlaceholder = useCanShowPlaceholder(editor)
+  useRichTextSetup(editor, initialEditorState)
+  const decorators = useDecorators(editor)
 
   return (
     <>
@@ -36,5 +36,5 @@ export default function RichTextPlugin({
       {showPlaceholder && placeholder}
       {decorators}
     </>
-  );
+  )
 }

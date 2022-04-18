@@ -7,40 +7,40 @@
  * @flow strict
  */
 
-import React from 'react';
-import {createRoot} from 'react-dom/client';
-import ReactTestUtils from 'react-dom/test-utils';
+import React from 'react'
+import { createRoot } from 'react-dom/client'
+import ReactTestUtils from 'react-dom/test-utils'
 
-import LexicalComposer from '../../../src/LexicalComposer';
-import {useLexicalComposerContext} from '../../LexicalComposerContext';
+import LexicalComposer from '../../../src/LexicalComposer'
+import { useLexicalComposerContext } from '../../LexicalComposerContext'
 
 // No idea why we suddenly need to do this, but it fixes the tests
 // with latest experimental React version.
-global.IS_REACT_ACT_ENVIRONMENT = true;
+global.IS_REACT_ACT_ENVIRONMENT = true
 
 describe('LexicalNodeHelpers tests', () => {
-  let container = null;
-  let reactRoot;
+  let container = null
+  let reactRoot
 
   beforeEach(() => {
-    container = document.createElement('div');
-    reactRoot = createRoot(container);
-    document.body.appendChild(container);
-  });
+    container = document.createElement('div')
+    reactRoot = createRoot(container)
+    document.body.appendChild(container)
+  })
 
   afterEach(() => {
-    document.body.removeChild(container);
-    container = null;
+    document.body.removeChild(container)
+    container = null
 
-    jest.restoreAllMocks();
-  });
+    jest.restoreAllMocks()
+  })
 
   it('LexicalComposerContext', async () => {
-    const theme = {};
+    const theme = {}
 
     function TestPlugin() {
-      const [, contextTheme] = useLexicalComposerContext();
-      expect(contextTheme.getTheme()).toBe(theme);
+      const [, contextTheme] = useLexicalComposerContext()
+      expect(contextTheme.getTheme()).toBe(theme)
     }
 
     function App() {
@@ -49,16 +49,15 @@ describe('LexicalNodeHelpers tests', () => {
           initialConfig={{
             namespace: 'PlaygroundEditor',
             nodes: [],
-            theme,
-          }}
-        >
+            theme
+          }}>
           <TestPlugin />
         </LexicalComposer>
-      );
+      )
     }
 
     await ReactTestUtils.act(async () => {
-      reactRoot.render(<App />);
-    });
-  });
-});
+      reactRoot.render(<App />)
+    })
+  })
+})

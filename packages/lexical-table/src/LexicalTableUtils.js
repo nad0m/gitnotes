@@ -6,151 +6,151 @@
  *
  * @flow strict
  */
-import type {Grid} from './LexicalTableSelection';
-import type {LexicalNode} from 'lexical';
+import type { Grid } from './LexicalTableSelection'
+import type { LexicalNode } from 'lexical'
 
-import {$findMatchingParent} from '@lexical/utils';
-import {$createParagraphNode, $createTextNode} from 'lexical';
-import invariant from 'shared/invariant';
+import { $findMatchingParent } from '@lexical/utils'
+import { $createParagraphNode, $createTextNode } from 'lexical'
+import invariant from 'shared/invariant'
 
 import {
   $createTableCellNode,
   $isTableCellNode,
   TableCellHeaderStates,
-  TableCellNode,
-} from './LexicalTableCellNode';
-import {$createTableNode, $isTableNode, TableNode} from './LexicalTableNode';
+  TableCellNode
+} from './LexicalTableCellNode'
+import { $createTableNode, $isTableNode, TableNode } from './LexicalTableNode'
 import {
   $createTableRowNode,
   $isTableRowNode,
-  TableRowNode,
-} from './LexicalTableRowNode';
+  TableRowNode
+} from './LexicalTableRowNode'
 
 export function $createTableNodeWithDimensions(
   rowCount: number,
   columnCount: number,
-  includeHeaders?: boolean = true,
+  includeHeaders?: boolean = true
 ): TableNode {
-  const tableNode = $createTableNode();
+  const tableNode = $createTableNode()
 
   for (let iRow = 0; iRow < rowCount; iRow++) {
-    const tableRowNode = $createTableRowNode();
+    const tableRowNode = $createTableRowNode()
 
     for (let iColumn = 0; iColumn < columnCount; iColumn++) {
-      let headerState = TableCellHeaderStates.NO_STATUS;
+      let headerState = TableCellHeaderStates.NO_STATUS
 
       if (includeHeaders) {
-        if (iRow === 0) headerState |= TableCellHeaderStates.ROW;
-        if (iColumn === 0) headerState |= TableCellHeaderStates.COLUMN;
+        if (iRow === 0) headerState |= TableCellHeaderStates.ROW
+        if (iColumn === 0) headerState |= TableCellHeaderStates.COLUMN
       }
 
-      const tableCellNode = $createTableCellNode(headerState);
+      const tableCellNode = $createTableCellNode(headerState)
 
-      const paragraphNode = $createParagraphNode();
-      paragraphNode.append($createTextNode());
+      const paragraphNode = $createParagraphNode()
+      paragraphNode.append($createTextNode())
 
-      tableCellNode.append(paragraphNode);
-      tableRowNode.append(tableCellNode);
+      tableCellNode.append(paragraphNode)
+      tableRowNode.append(tableCellNode)
     }
 
-    tableNode.append(tableRowNode);
+    tableNode.append(tableRowNode)
   }
 
-  return tableNode;
+  return tableNode
 }
 
 export function $getTableCellNodeFromLexicalNode(
-  startingNode: LexicalNode,
+  startingNode: LexicalNode
 ): TableCellNode | null {
-  const node = $findMatchingParent(startingNode, (n) => $isTableCellNode(n));
+  const node = $findMatchingParent(startingNode, (n) => $isTableCellNode(n))
 
   if ($isTableCellNode(node)) {
-    return node;
+    return node
   }
 
-  return null;
+  return null
 }
 
 export function $getTableRowNodeFromTableCellNodeOrThrow(
-  startingNode: LexicalNode,
+  startingNode: LexicalNode
 ): TableRowNode {
-  const node = $findMatchingParent(startingNode, (n) => $isTableRowNode(n));
+  const node = $findMatchingParent(startingNode, (n) => $isTableRowNode(n))
 
   if ($isTableRowNode(node)) {
-    return node;
+    return node
   }
 
-  throw new Error('Expected table cell to be inside of table row.');
+  throw new Error('Expected table cell to be inside of table row.')
 }
 
 export function $getTableNodeFromLexicalNodeOrThrow(
-  startingNode: LexicalNode,
+  startingNode: LexicalNode
 ): TableNode {
-  const node = $findMatchingParent(startingNode, (n) => $isTableNode(n));
+  const node = $findMatchingParent(startingNode, (n) => $isTableNode(n))
 
   if ($isTableNode(node)) {
-    return node;
+    return node
   }
 
-  throw new Error('Expected table cell to be inside of table.');
+  throw new Error('Expected table cell to be inside of table.')
 }
 
 export function $getTableRowIndexFromTableCellNode(
-  tableCellNode: TableCellNode,
+  tableCellNode: TableCellNode
 ): number {
-  const tableRowNode = $getTableRowNodeFromTableCellNodeOrThrow(tableCellNode);
+  const tableRowNode = $getTableRowNodeFromTableCellNodeOrThrow(tableCellNode)
 
-  const tableNode = $getTableNodeFromLexicalNodeOrThrow(tableRowNode);
+  const tableNode = $getTableNodeFromLexicalNodeOrThrow(tableRowNode)
 
-  return tableNode.getChildren().findIndex((n) => n.is(tableRowNode));
+  return tableNode.getChildren().findIndex((n) => n.is(tableRowNode))
 }
 
 export function $getTableColumnIndexFromTableCellNode(
-  tableCellNode: TableCellNode,
+  tableCellNode: TableCellNode
 ): number {
-  const tableRowNode = $getTableRowNodeFromTableCellNodeOrThrow(tableCellNode);
+  const tableRowNode = $getTableRowNodeFromTableCellNodeOrThrow(tableCellNode)
 
-  return tableRowNode.getChildren().findIndex((n) => n.is(tableCellNode));
+  return tableRowNode.getChildren().findIndex((n) => n.is(tableCellNode))
 }
 
 export type TableCellSiblings = {
   above: ?TableCellNode,
   below: ?TableCellNode,
   left: ?TableCellNode,
-  right: ?TableCellNode,
-};
+  right: ?TableCellNode
+}
 
 export function $getTableCellSiblingsFromTableCellNode(
   tableCellNode: TableCellNode,
-  grid: Grid,
+  grid: Grid
 ): TableCellSiblings {
-  const tableNode = $getTableNodeFromLexicalNodeOrThrow(tableCellNode);
+  const tableNode = $getTableNodeFromLexicalNodeOrThrow(tableCellNode)
 
-  const {x, y} = tableNode.getCordsFromCellNode(tableCellNode, grid);
+  const { x, y } = tableNode.getCordsFromCellNode(tableCellNode, grid)
 
   return {
     above: tableNode.getCellNodeFromCords(x, y - 1, grid),
     below: tableNode.getCellNodeFromCords(x, y + 1, grid),
     left: tableNode.getCellNodeFromCords(x - 1, y, grid),
-    right: tableNode.getCellNodeFromCords(x + 1, y, grid),
-  };
+    right: tableNode.getCellNodeFromCords(x + 1, y, grid)
+  }
 }
 
 export function $removeTableRowAtIndex(
   tableNode: TableNode,
-  indexToDelete: number,
+  indexToDelete: number
 ): TableNode {
-  const tableRows = tableNode.getChildren();
+  const tableRows = tableNode.getChildren()
 
   if (indexToDelete >= tableRows.length || indexToDelete < 0) {
-    throw new Error('Expected table cell to be inside of table row.');
+    throw new Error('Expected table cell to be inside of table row.')
   }
 
-  const targetRowNode = tableRows[indexToDelete];
+  const targetRowNode = tableRows[indexToDelete]
 
-  targetRowNode.remove();
+  targetRowNode.remove()
 
-  return tableNode;
+  return tableNode
 }
 
 export function $insertTableRow(
@@ -158,128 +158,128 @@ export function $insertTableRow(
   targetIndex: number,
   shouldInsertAfter: boolean = true,
   rowCount: number,
-  grid: Grid,
+  grid: Grid
 ): TableNode {
-  const tableRows = tableNode.getChildren();
+  const tableRows = tableNode.getChildren()
 
   if (targetIndex >= tableRows.length || targetIndex < 0) {
-    throw new Error('Table row target index out of range');
+    throw new Error('Table row target index out of range')
   }
 
-  const targetRowNode = tableRows[targetIndex];
+  const targetRowNode = tableRows[targetIndex]
 
   if ($isTableRowNode(targetRowNode)) {
     for (let r = 0; r < rowCount; r++) {
-      const tableRowCells = targetRowNode.getChildren();
-      const tableColumnCount = tableRowCells.length;
+      const tableRowCells = targetRowNode.getChildren()
+      const tableColumnCount = tableRowCells.length
 
-      const newTableRowNode = $createTableRowNode();
+      const newTableRowNode = $createTableRowNode()
 
       for (let c = 0; c < tableColumnCount; c++) {
-        const tableCellFromTargetRow = tableRowCells[c];
+        const tableCellFromTargetRow = tableRowCells[c]
 
         invariant(
           $isTableCellNode(tableCellFromTargetRow),
-          'Expected table cell',
-        );
+          'Expected table cell'
+        )
 
-        const {above, below} = $getTableCellSiblingsFromTableCellNode(
+        const { above, below } = $getTableCellSiblingsFromTableCellNode(
           tableCellFromTargetRow,
-          grid,
-        );
+          grid
+        )
 
-        let headerState = TableCellHeaderStates.NO_STATUS;
+        let headerState = TableCellHeaderStates.NO_STATUS
 
         const width =
-          (above && above.getWidth()) || (below && below.getWidth()) || null;
+          (above && above.getWidth()) || (below && below.getWidth()) || null
 
         if (
           (above && above.hasHeaderState(TableCellHeaderStates.COLUMN)) ||
           (below && below.hasHeaderState(TableCellHeaderStates.COLUMN))
         ) {
-          headerState |= TableCellHeaderStates.COLUMN;
+          headerState |= TableCellHeaderStates.COLUMN
         }
 
-        const tableCellNode = $createTableCellNode(headerState, 1, width);
+        const tableCellNode = $createTableCellNode(headerState, 1, width)
 
-        tableCellNode.append($createParagraphNode());
-        newTableRowNode.append(tableCellNode);
+        tableCellNode.append($createParagraphNode())
+        newTableRowNode.append(tableCellNode)
       }
 
       if (shouldInsertAfter) {
-        targetRowNode.insertAfter(newTableRowNode);
+        targetRowNode.insertAfter(newTableRowNode)
       } else {
-        targetRowNode.insertBefore(newTableRowNode);
+        targetRowNode.insertBefore(newTableRowNode)
       }
     }
   } else {
-    throw new Error('Row before insertion index does not exist.');
+    throw new Error('Row before insertion index does not exist.')
   }
 
-  return tableNode;
+  return tableNode
 }
 
 export function $insertTableColumn(
   tableNode: TableNode,
   targetIndex: number,
   shouldInsertAfter?: boolean = true,
-  columnCount: number,
+  columnCount: number
 ): TableNode {
-  const tableRows = tableNode.getChildren();
+  const tableRows = tableNode.getChildren()
 
   for (let r = 0; r < tableRows.length; r++) {
-    const currentTableRowNode = tableRows[r];
+    const currentTableRowNode = tableRows[r]
     if ($isTableRowNode(currentTableRowNode)) {
       for (let c = 0; c < columnCount; c++) {
-        let headerState = TableCellHeaderStates.NO_STATUS;
+        let headerState = TableCellHeaderStates.NO_STATUS
 
         if (r === 0) {
-          headerState |= TableCellHeaderStates.ROW;
+          headerState |= TableCellHeaderStates.ROW
         }
 
-        const newTableCell = $createTableCellNode(headerState);
+        const newTableCell = $createTableCellNode(headerState)
 
-        newTableCell.append($createParagraphNode());
+        newTableCell.append($createParagraphNode())
 
-        const tableRowChildren = currentTableRowNode.getChildren();
+        const tableRowChildren = currentTableRowNode.getChildren()
 
         if (targetIndex >= tableRowChildren.length || targetIndex < 0) {
-          throw new Error('Table column target index out of range');
+          throw new Error('Table column target index out of range')
         }
 
-        const targetCell = tableRowChildren[targetIndex];
+        const targetCell = tableRowChildren[targetIndex]
 
         if (shouldInsertAfter) {
-          targetCell.insertAfter(newTableCell);
+          targetCell.insertAfter(newTableCell)
         } else {
-          targetCell.insertBefore(newTableCell);
+          targetCell.insertBefore(newTableCell)
         }
       }
     }
   }
 
-  return tableNode;
+  return tableNode
 }
 
 export function $deleteTableColumn(
   tableNode: TableNode,
-  targetIndex: number,
+  targetIndex: number
 ): TableNode {
-  const tableRows = tableNode.getChildren();
+  const tableRows = tableNode.getChildren()
 
   for (let i = 0; i < tableRows.length; i++) {
-    const currentTableRowNode = tableRows[i];
+    const currentTableRowNode = tableRows[i]
 
     if ($isTableRowNode(currentTableRowNode)) {
-      const tableRowChildren = currentTableRowNode.getChildren();
+      const tableRowChildren = currentTableRowNode.getChildren()
 
       if (targetIndex >= tableRowChildren.length || targetIndex < 0) {
-        throw new Error('Table column target index out of range');
+        throw new Error('Table column target index out of range')
       }
 
-      tableRowChildren[targetIndex].remove();
+      tableRowChildren[targetIndex].remove()
     }
   }
 
-  return tableNode;
+  return tableNode
 }

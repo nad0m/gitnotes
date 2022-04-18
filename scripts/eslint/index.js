@@ -5,31 +5,31 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-'use strict';
+'use strict'
 
-const minimatch = require('minimatch');
-const CLIEngine = require('eslint').CLIEngine;
-const listChangedFiles = require('../shared/listChangedFiles');
+const minimatch = require('minimatch')
+const CLIEngine = require('eslint').CLIEngine
+const listChangedFiles = require('../shared/listChangedFiles')
 
-const allPaths = ['**/*.js', '**/*.jsx'];
+const allPaths = ['**/*.js', '**/*.jsx']
 
-let changedFiles = null;
+let changedFiles = null
 
 function runESLintOnFilesWithOptions(filePatterns, onlyChanged, options) {
-  const cli = new CLIEngine(options);
-  const formatter = cli.getFormatter();
+  const cli = new CLIEngine(options)
+  const formatter = cli.getFormatter()
 
   if (onlyChanged && changedFiles === null) {
     // Calculate lazily.
-    changedFiles = [...listChangedFiles()];
+    changedFiles = [...listChangedFiles()]
   }
   const finalFilePatterns = onlyChanged
     ? intersect(changedFiles, filePatterns)
-    : filePatterns;
-  const report = cli.executeOnFiles(finalFilePatterns);
+    : filePatterns
+  const report = cli.executeOnFiles(finalFilePatterns)
 
   if (options != null && options.fix === true) {
-    CLIEngine.outputFixes(report);
+    CLIEngine.outputFixes(report)
   }
 
   // When using `ignorePattern`, eslint will show `File ignored...` warnings for any ignores.
@@ -38,43 +38,43 @@ function runESLintOnFilesWithOptions(filePatterns, onlyChanged, options) {
     if (!onlyChanged) {
       // Don't suppress the message on a full run.
       // We only expect it to happen for "only changed" runs.
-      return true;
+      return true
     }
     const ignoreMessage =
-      'File ignored because of a matching ignore pattern. Use "--no-ignore" to override.';
-    return !(item.messages[0] && item.messages[0].message === ignoreMessage);
-  });
+      'File ignored because of a matching ignore pattern. Use "--no-ignore" to override.'
+    return !(item.messages[0] && item.messages[0].message === ignoreMessage)
+  })
 
-  const ignoredMessageCount = report.results.length - messages.length;
+  const ignoredMessageCount = report.results.length - messages.length
   return {
     errorCount: report.errorCount,
     output: formatter(messages),
-    warningCount: report.warningCount - ignoredMessageCount,
-  };
+    warningCount: report.warningCount - ignoredMessageCount
+  }
 }
 
 function intersect(files, patterns) {
-  let intersection = [];
+  let intersection = []
   patterns.forEach((pattern) => {
     intersection = [
       ...intersection,
-      ...minimatch.match(files, pattern, {matchBase: true}),
-    ];
-  });
-  return [...new Set(intersection)];
+      ...minimatch.match(files, pattern, { matchBase: true })
+    ]
+  })
+  return [...new Set(intersection)]
 }
 
-function runESLint({onlyChanged, ...options}) {
+function runESLint({ onlyChanged, ...options }) {
   if (typeof onlyChanged !== 'boolean') {
-    throw new Error('Pass options.onlyChanged as a boolean.');
+    throw new Error('Pass options.onlyChanged as a boolean.')
   }
-  const {errorCount, warningCount, output} = runESLintOnFilesWithOptions(
+  const { errorCount, warningCount, output } = runESLintOnFilesWithOptions(
     allPaths,
     onlyChanged,
-    options,
-  );
-  console.log(output);
-  return errorCount === 0 && warningCount === 0;
+    options
+  )
+  console.log(output)
+  return errorCount === 0 && warningCount === 0
 }
 
-module.exports = runESLint;
+module.exports = runESLint

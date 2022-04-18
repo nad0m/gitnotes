@@ -1,9 +1,9 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.FileChooser = void 0;
+})
+exports.FileChooser = void 0
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -22,26 +22,25 @@ exports.FileChooser = void 0;
  */
 class FileChooser {
   constructor(page, elementHandle, isMultiple) {
-    this._page = void 0;
-    this._elementHandle = void 0;
-    this._isMultiple = void 0;
-    this._page = page;
-    this._elementHandle = elementHandle;
-    this._isMultiple = isMultiple;
+    this._page = void 0
+    this._elementHandle = void 0
+    this._isMultiple = void 0
+    this._page = page
+    this._elementHandle = elementHandle
+    this._isMultiple = isMultiple
   }
 
   element() {
-    return this._elementHandle;
+    return this._elementHandle
   }
 
   isMultiple() {
-    return this._isMultiple;
+    return this._isMultiple
   }
 
   page() {
-    return this._page;
+    return this._page
   }
-
 }
 
-exports.FileChooser = FileChooser;
+exports.FileChooser = FileChooser

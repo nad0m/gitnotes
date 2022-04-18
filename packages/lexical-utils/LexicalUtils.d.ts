@@ -5,38 +5,38 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-import type {LexicalNode, ElementNode} from 'lexical';
+import type { LexicalNode, ElementNode } from 'lexical'
 export type DFSNode = $ReadOnly<{
-  depth: number;
-  node: LexicalNode;
-}>;
+  depth: number
+  node: LexicalNode
+}>
 declare function addClassNamesToElement(
   element: HTMLElement,
   ...classNames: Array<typeof undefined | boolean | null | string>
-): void;
+): void
 declare function removeClassNamesFromElement(
   element: HTMLElement,
   ...classNames: Array<string>
-): void;
+): void
 declare function $dfs(
   startingNode?: LexicalNode,
-  endingNode?: LexicalNode,
-): Array<DFSNode>;
-declare function $getDepth(node: LexicalNode): number;
+  endingNode?: LexicalNode
+): Array<DFSNode>
+declare function $getDepth(node: LexicalNode): number
 declare function $getNearestNodeOfType<T extends LexicalNode>(
   node: LexicalNode,
-  klass: Class<T>,
-): T | null;
-export type DOMNodeToLexicalConversion = (element: Node) => LexicalNode;
+  klass: Class<T>
+): T | null
+export type DOMNodeToLexicalConversion = (element: Node) => LexicalNode
 export type DOMNodeToLexicalConversionMap = {
-  [string]: DOMNodeToLexicalConversion;
-};
+  [string]: DOMNodeToLexicalConversion
+}
 declare function $findMatchingParent(
   startingNode: LexicalNode,
-  findFn: (LexicalNode) => boolean,
-): LexicalNode | null;
-type Func = () => void;
-declare function mergeRegister(...func: Array<Func>): () => void;
+  findFn: (LexicalNode) => boolean
+): LexicalNode | null
+type Func = () => void
+declare function mergeRegister(...func: Array<Func>): () => void
 declare function $getNearestBlockElementAncestorOrThrow(
-  startNode: LexicalNode,
-): ElementNode;
+  startNode: LexicalNode
+): ElementNode

@@ -1,9 +1,9 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.metadataToCallLog = metadataToCallLog;
+})
+exports.metadataToCallLog = metadataToCallLog
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -21,21 +21,36 @@ exports.metadataToCallLog = metadataToCallLog;
  * limitations under the License.
  */
 function metadataToCallLog(metadata, status) {
-  var _metadata$params, _metadata$params2;
+  var _metadata$params, _metadata$params2
 
-  let title = metadata.apiName || metadata.method;
-  if (metadata.method === 'waitForEventInfo') title += `(${metadata.params.info.event})`;
-  title = title.replace('object.expect', 'expect');
-  if (metadata.error) status = 'error';
+  let title = metadata.apiName || metadata.method
+  if (metadata.method === 'waitForEventInfo')
+    title += `(${metadata.params.info.event})`
+  title = title.replace('object.expect', 'expect')
+  if (metadata.error) status = 'error'
   const params = {
-    url: (_metadata$params = metadata.params) === null || _metadata$params === void 0 ? void 0 : _metadata$params.url,
-    selector: (_metadata$params2 = metadata.params) === null || _metadata$params2 === void 0 ? void 0 : _metadata$params2.selector
-  };
-  let duration = metadata.endTime ? metadata.endTime - metadata.startTime : undefined;
+    url:
+      (_metadata$params = metadata.params) === null ||
+      _metadata$params === void 0
+        ? void 0
+        : _metadata$params.url,
+    selector:
+      (_metadata$params2 = metadata.params) === null ||
+      _metadata$params2 === void 0
+        ? void 0
+        : _metadata$params2.selector
+  }
+  let duration = metadata.endTime
+    ? metadata.endTime - metadata.startTime
+    : undefined
 
-  if (typeof duration === 'number' && metadata.pauseStartTime && metadata.pauseEndTime) {
-    duration -= metadata.pauseEndTime - metadata.pauseStartTime;
-    duration = Math.max(duration, 0);
+  if (
+    typeof duration === 'number' &&
+    metadata.pauseStartTime &&
+    metadata.pauseEndTime
+  ) {
+    duration -= metadata.pauseEndTime - metadata.pauseStartTime
+    duration = Math.max(duration, 0)
   }
 
   const callLog = {
@@ -46,6 +61,6 @@ function metadataToCallLog(metadata, status) {
     error: metadata.error,
     params,
     duration
-  };
-  return callLog;
+  }
+  return callLog
 }

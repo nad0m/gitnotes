@@ -7,56 +7,56 @@
  * @flow strict
  */
 
-import type {State} from 'lexical';
+import type { State } from 'lexical'
 
 import {
   $isRootTextContentEmpty,
   $isRootTextContentEmptyCurry,
-  $rootTextContentCurry,
-} from '@lexical/text';
-import {$createParagraphNode, $createTextNode, $getRoot} from 'lexical';
-import {initializeUnitTest} from 'lexical/src/__tests__/utils';
+  $rootTextContentCurry
+} from '@lexical/text'
+import { $createParagraphNode, $createTextNode, $getRoot } from 'lexical'
+import { initializeUnitTest } from 'lexical/src/__tests__/utils'
 
 // No idea why we suddenly need to do this, but it fixes the tests
 // with latest experimental React version.
-global.IS_REACT_ACT_ENVIRONMENT = true;
+global.IS_REACT_ACT_ENVIRONMENT = true
 
 describe('LexicalRootHelpers tests', () => {
   initializeUnitTest((testEnv) => {
     it('textContent', async () => {
-      const editor = testEnv.editor;
-      expect(editor.getEditorState().read($rootTextContentCurry)).toBe('');
+      const editor = testEnv.editor
+      expect(editor.getEditorState().read($rootTextContentCurry)).toBe('')
       await editor.update((state: State) => {
-        const root = $getRoot();
-        const paragraph = $createParagraphNode();
-        const text = $createTextNode('foo');
-        root.append(paragraph);
-        paragraph.append(text);
-        expect($rootTextContentCurry()).toBe('foo');
-      });
-      expect(editor.getEditorState().read($rootTextContentCurry)).toBe('foo');
-    });
+        const root = $getRoot()
+        const paragraph = $createParagraphNode()
+        const text = $createTextNode('foo')
+        root.append(paragraph)
+        paragraph.append(text)
+        expect($rootTextContentCurry()).toBe('foo')
+      })
+      expect(editor.getEditorState().read($rootTextContentCurry)).toBe('foo')
+    })
 
     it('isBlank', async () => {
-      const editor = testEnv.editor;
+      const editor = testEnv.editor
       expect(
         editor
           .getEditorState()
-          .read($isRootTextContentEmptyCurry(editor.isComposing())),
-      ).toBe(true);
+          .read($isRootTextContentEmptyCurry(editor.isComposing()))
+      ).toBe(true)
       await editor.update((state: State) => {
-        const root = $getRoot();
-        const paragraph = $createParagraphNode();
-        const text = $createTextNode('foo');
-        root.append(paragraph);
-        paragraph.append(text);
-        expect($isRootTextContentEmpty(editor.isComposing())).toBe(false);
-      });
+        const root = $getRoot()
+        const paragraph = $createParagraphNode()
+        const text = $createTextNode('foo')
+        root.append(paragraph)
+        paragraph.append(text)
+        expect($isRootTextContentEmpty(editor.isComposing())).toBe(false)
+      })
       expect(
         editor
           .getEditorState()
-          .read($isRootTextContentEmptyCurry(editor.isComposing())),
-      ).toBe(false);
-    });
-  });
-});
+          .read($isRootTextContentEmptyCurry(editor.isComposing()))
+      ).toBe(false)
+    })
+  })
+})

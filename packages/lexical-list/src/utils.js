@@ -7,115 +7,115 @@
  * @flow strict
  */
 
-import type {ListNode} from './';
-import type {LexicalNode} from 'lexical';
+import type { ListNode } from './'
+import type { LexicalNode } from 'lexical'
 
-import invariant from 'shared/invariant';
+import invariant from 'shared/invariant'
 
-import {$isListItemNode, $isListNode, ListItemNode} from './';
+import { $isListItemNode, $isListNode, ListItemNode } from './'
 
 export function $getListDepth(listNode: ListNode): number {
-  let depth = 1;
-  let parent = listNode.getParent();
+  let depth = 1
+  let parent = listNode.getParent()
   while (parent != null) {
     if ($isListItemNode(parent)) {
-      const parentList = parent.getParent();
+      const parentList = parent.getParent()
       if ($isListNode(parentList)) {
-        depth++;
-        parent = parentList.getParent();
-        continue;
+        depth++
+        parent = parentList.getParent()
+        continue
       }
-      invariant(false, 'A ListItemNode must have a ListNode for a parent.');
+      invariant(false, 'A ListItemNode must have a ListNode for a parent.')
     }
-    return depth;
+    return depth
   }
-  return depth;
+  return depth
 }
 
 export function $getTopListNode(listItem: ListItemNode): ListNode {
-  let list = listItem.getParent();
+  let list = listItem.getParent()
   if (!$isListNode(list)) {
-    invariant(false, 'A ListItemNode must have a ListNode for a parent.');
+    invariant(false, 'A ListItemNode must have a ListNode for a parent.')
   }
-  let parent = list;
+  let parent = list
   while (parent !== null) {
-    parent = parent.getParent();
+    parent = parent.getParent()
     if ($isListNode(parent)) {
-      list = parent;
+      list = parent
     }
   }
-  return list;
+  return list
 }
 
 export function $isLastItemInList(listItem: ListItemNode): boolean {
-  let isLast = true;
-  const firstChild = listItem.getFirstChild();
+  let isLast = true
+  const firstChild = listItem.getFirstChild()
   if ($isListNode(firstChild)) {
-    return false;
+    return false
   }
-  let parent = listItem;
+  let parent = listItem
   while (parent !== null) {
     if ($isListItemNode(parent)) {
       if (parent.getNextSiblings().length > 0) {
-        isLast = false;
+        isLast = false
       }
     }
-    parent = parent.getParent();
+    parent = parent.getParent()
   }
-  return isLast;
+  return isLast
 }
 
 // This should probably be $getAllChildrenOfType
 export function $getAllListItems(node: ListNode): Array<ListItemNode> {
-  let listItemNodes: Array<ListItemNode> = [];
+  let listItemNodes: Array<ListItemNode> = []
   //$FlowFixMe - the result of this will always be an array of ListItemNodes.
   const listChildren: Array<ListItemNode> = node
     .getChildren()
-    .filter($isListItemNode);
+    .filter($isListItemNode)
   for (let i = 0; i < listChildren.length; i++) {
-    const listItemNode = listChildren[i];
-    const firstChild = listItemNode.getFirstChild();
+    const listItemNode = listChildren[i]
+    const firstChild = listItemNode.getFirstChild()
     if ($isListNode(firstChild)) {
-      listItemNodes = listItemNodes.concat($getAllListItems(firstChild));
+      listItemNodes = listItemNodes.concat($getAllListItems(firstChild))
     } else {
-      listItemNodes.push(listItemNode);
+      listItemNodes.push(listItemNode)
     }
   }
-  return listItemNodes;
+  return listItemNodes
 }
 
 export function isNestedListNode(node: ?LexicalNode): boolean %checks {
-  return $isListItemNode(node) && $isListNode(node.getFirstChild());
+  return $isListItemNode(node) && $isListNode(node.getFirstChild())
 }
 
 export function findNearestListItemNode(
-  node: LexicalNode,
+  node: LexicalNode
 ): ListItemNode | null {
-  let currentNode = node;
+  let currentNode = node
   while (currentNode !== null) {
     if ($isListItemNode(currentNode)) {
-      return currentNode;
+      return currentNode
     }
-    currentNode = currentNode.getParent();
+    currentNode = currentNode.getParent()
   }
-  return null;
+  return null
 }
 
 export function getUniqueListItemNodes(
-  nodeList: Array<LexicalNode>,
+  nodeList: Array<LexicalNode>
 ): Array<ListItemNode> {
-  const keys = new Set<ListItemNode>();
+  const keys = new Set<ListItemNode>()
   for (let i = 0; i < nodeList.length; i++) {
-    const node = nodeList[i];
+    const node = nodeList[i]
     if ($isListItemNode(node)) {
-      keys.add(node);
+      keys.add(node)
     }
   }
-  return Array.from(keys);
+  return Array.from(keys)
 }
 
 export function $removeHighestEmptyListParent(
-  sublist: ListItemNode | ListNode,
+  sublist: ListItemNode | ListNode
 ) {
   // Nodes may be repeatedly indented, to create deeply nested lists that each
   // contain just one bullet.
@@ -123,19 +123,19 @@ export function $removeHighestEmptyListParent(
   // way to do that is crawl back up the tree until we find a node that has siblings
   // (e.g. is actually part of the list contents) and delete that, or delete
   // the root of the list (if no list nodes have siblings.)
-  let emptyListPtr = sublist;
+  let emptyListPtr = sublist
   while (
     emptyListPtr.getNextSibling() == null &&
     emptyListPtr.getPreviousSibling() == null
   ) {
-    const parent = emptyListPtr.getParent();
+    const parent = emptyListPtr.getParent()
     if (
       parent == null ||
       !($isListItemNode(emptyListPtr) || $isListNode(emptyListPtr))
     ) {
-      break;
+      break
     }
-    emptyListPtr = parent;
+    emptyListPtr = parent
   }
-  emptyListPtr.remove();
+  emptyListPtr.remove()
 }

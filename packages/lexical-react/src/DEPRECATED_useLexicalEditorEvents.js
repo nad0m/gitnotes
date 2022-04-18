@@ -7,14 +7,14 @@
  * @flow strict
  */
 
-import type {InputEvents} from './shared/useEditorEvents';
-import type {LexicalEditor} from 'lexical';
+import type { InputEvents } from './shared/useEditorEvents'
+import type { LexicalEditor } from 'lexical'
 
-import useEditorEvents from './shared/useEditorEvents';
+import useEditorEvents from './shared/useEditorEvents'
 
 export default function useLexicalEditorEvents(
   events: InputEvents,
-  editor: LexicalEditor,
+  editor: LexicalEditor
 ): void {
-  useEditorEvents(events, editor);
+  useEditorEvents(events, editor)
 }

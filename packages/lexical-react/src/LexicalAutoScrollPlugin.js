@@ -7,44 +7,44 @@
  * @flow strict
  */
 
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {$getSelection, $isRangeSelection} from 'lexical';
-import useLayoutEffect from 'shared/useLayoutEffect';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { $getSelection, $isRangeSelection } from 'lexical'
+import useLayoutEffect from 'shared/useLayoutEffect'
 
 type Props = $ReadOnly<{
-  scrollRef: {current: HTMLElement | null},
-}>;
+  scrollRef: { current: HTMLElement | null }
+}>
 
 export default function LexicalAutoScrollPlugin({
-  scrollRef,
+  scrollRef
 }: Props): React$Node {
-  const [editor] = useLexicalComposerContext();
+  const [editor] = useLexicalComposerContext()
   useLayoutEffect(() => {
-    return editor.registerUpdateListener(({tags, editorState}) => {
-      const scrollElement = scrollRef.current;
+    return editor.registerUpdateListener(({ tags, editorState }) => {
+      const scrollElement = scrollRef.current
       if (scrollElement === null || !tags.has('scroll-into-view')) {
-        return;
+        return
       }
 
-      const selection = editorState.read(() => $getSelection());
+      const selection = editorState.read(() => $getSelection())
       if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
-        return;
+        return
       }
 
-      const anchorElement = editor.getElementByKey(selection.anchor.key);
+      const anchorElement = editor.getElementByKey(selection.anchor.key)
       if (anchorElement === null) {
-        return;
+        return
       }
 
-      const scrollRect = scrollElement.getBoundingClientRect();
-      const rect = anchorElement.getBoundingClientRect();
+      const scrollRect = scrollElement.getBoundingClientRect()
+      const rect = anchorElement.getBoundingClientRect()
       if (rect.bottom > scrollRect.bottom) {
-        anchorElement.scrollIntoView(false);
+        anchorElement.scrollIntoView(false)
       } else if (rect.top < scrollRect.top) {
-        anchorElement.scrollIntoView();
+        anchorElement.scrollIntoView()
       }
-    });
-  }, [editor, scrollRef]);
+    })
+  }, [editor, scrollRef])
 
-  return null;
+  return null
 }

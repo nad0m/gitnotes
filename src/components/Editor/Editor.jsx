@@ -1,31 +1,31 @@
-import ExampleTheme from "./themes/ExampleTheme";
-import LexicalComposer from "@lexical/react/LexicalComposer";
-import playground from "@lexical/react/package.json"
-import RichTextPlugin from "@lexical/react/LexicalRichTextPlugin";
-import ContentEditable from "@lexical/react/LexicalContentEditable";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
-import AutoFocusPlugin from "@lexical/react/LexicalAutoFocusPlugin";
-import TablesPlugin from "@lexical/react/LexicalTablePlugin";
-import TableCellActionMenuPlugin from "./plugins/TableActionMenuPlugin";
-import TableCellResizer from "./plugins/TableCellResizer";
-import ToolbarPlugin from "./plugins/ToolbarPlugin";
-import { HeadingNode, QuoteNode } from "@lexical/rich-text";
-import { TableCellNode, TableNode, TableRowNode } from "@lexical/table";
-import { ListItemNode, ListNode } from "@lexical/list";
-import { CodeHighlightNode, CodeNode } from "@lexical/code";
-import { AutoLinkNode, LinkNode } from "@lexical/link";
-import LinkPlugin from "@lexical/react/LexicalLinkPlugin";
-import ListPlugin from "@lexical/react/LexicalListPlugin";
-import LexicalMarkdownShortcutPlugin from "@lexical/react/LexicalMarkdownShortcutPlugin";
+import ExampleTheme from './themes/ExampleTheme'
+import LexicalComposer from '@lexical/react/LexicalComposer'
+import playground from '@lexical/react/package.json'
+import RichTextPlugin from '@lexical/react/LexicalRichTextPlugin'
+import ContentEditable from '@lexical/react/LexicalContentEditable'
+import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
+import AutoFocusPlugin from '@lexical/react/LexicalAutoFocusPlugin'
+import TablesPlugin from '@lexical/react/LexicalTablePlugin'
+import TableCellActionMenuPlugin from './plugins/TableActionMenuPlugin'
+import TableCellResizer from './plugins/TableCellResizer'
+import ToolbarPlugin from './plugins/ToolbarPlugin'
+import { HeadingNode, QuoteNode } from '@lexical/rich-text'
+import { TableCellNode, TableNode, TableRowNode } from '@lexical/table'
+import { ListItemNode, ListNode } from '@lexical/list'
+import { CodeHighlightNode, CodeNode } from '@lexical/code'
+import { AutoLinkNode, LinkNode } from '@lexical/link'
+import LinkPlugin from '@lexical/react/LexicalLinkPlugin'
+import ListPlugin from '@lexical/react/LexicalListPlugin'
+import LexicalMarkdownShortcutPlugin from '@lexical/react/LexicalMarkdownShortcutPlugin'
 
-import ListMaxIndentLevelPlugin from "./plugins/ListMaxIndentLevelPlugin";
-import CodeHighlightPlugin from "./plugins/CodeHighlightPlugin";
-import AutoLinkPlugin from "./plugins/AutoLinkPlugin";
+import ListMaxIndentLevelPlugin from './plugins/ListMaxIndentLevelPlugin'
+import CodeHighlightPlugin from './plugins/CodeHighlightPlugin'
+import AutoLinkPlugin from './plugins/AutoLinkPlugin'
 
-import "./styles.css"
+import './styles.css'
 
 function Placeholder() {
-  return <div className="editor-placeholder">Enter some rich text...</div>;
+  return <div className="editor-placeholder">Enter some rich text...</div>
 }
 
 const editorConfig = {
@@ -33,7 +33,7 @@ const editorConfig = {
   theme: ExampleTheme,
   // Handling of errors during update
   onError(error) {
-    throw error;
+    throw error
   },
   // Any custom nodes go here
   nodes: [
@@ -49,7 +49,7 @@ const editorConfig = {
     AutoLinkNode,
     LinkNode
   ]
-};
+}
 
 export const Editor = () => {
   return (
@@ -75,5 +75,5 @@ export const Editor = () => {
         </div>
       </div>
     </LexicalComposer>
-  );
+  )
 }

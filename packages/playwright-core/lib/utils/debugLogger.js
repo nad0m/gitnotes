@@ -1,15 +1,17 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.RecentLogsCollector = exports.debugLogger = void 0;
+})
+exports.RecentLogsCollector = exports.debugLogger = void 0
 
-var _debug = _interopRequireDefault(require("debug"));
+var _debug = _interopRequireDefault(require('debug'))
 
-var _fs = _interopRequireDefault(require("fs"));
+var _fs = _interopRequireDefault(require('fs'))
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj }
+}
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -27,84 +29,87 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * limitations under the License.
  */
 const debugLoggerColorMap = {
-  'api': 45,
+  api: 45,
   // cyan
-  'protocol': 34,
+  protocol: 34,
   // green
-  'install': 34,
+  install: 34,
   // green
-  'download': 34,
+  download: 34,
   // green
-  'browser': 0,
+  browser: 0,
   // reset
-  'proxy': 92,
+  proxy: 92,
   // purple
-  'error': 160,
+  error: 160,
   // red,
   'channel:command': 33,
   // blue
   'channel:response': 202,
   // orange
   'channel:event': 207 // magenta
-
-};
+}
 
 class DebugLogger {
   constructor() {
-    this._debuggers = new Map();
+    this._debuggers = new Map()
 
     if (process.env.DEBUG_FILE) {
-      const ansiRegex = new RegExp(['[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]*)*)?\\u0007)', '(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-ntqry=><~]))'].join('|'), 'g');
+      const ansiRegex = new RegExp(
+        [
+          '[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:[a-zA-Z\\d]*(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]*)*)?\\u0007)',
+          '(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-ntqry=><~]))'
+        ].join('|'),
+        'g'
+      )
 
-      const stream = _fs.default.createWriteStream(process.env.DEBUG_FILE);
+      const stream = _fs.default.createWriteStream(process.env.DEBUG_FILE)
 
-      _debug.default.log = data => {
-        stream.write(data.replace(ansiRegex, ''));
-        stream.write('\n');
-      };
+      _debug.default.log = (data) => {
+        stream.write(data.replace(ansiRegex, ''))
+        stream.write('\n')
+      }
     }
   }
 
   log(name, message) {
-    let cachedDebugger = this._debuggers.get(name);
+    let cachedDebugger = this._debuggers.get(name)
 
     if (!cachedDebugger) {
-      cachedDebugger = (0, _debug.default)(`pw:${name}`);
+      cachedDebugger = (0, _debug.default)(`pw:${name}`)
 
-      this._debuggers.set(name, cachedDebugger);
+      this._debuggers.set(name, cachedDebugger)
 
-      cachedDebugger.color = debugLoggerColorMap[name];
+      cachedDebugger.color = debugLoggerColorMap[name]
     }
 
-    cachedDebugger(message);
+    cachedDebugger(message)
   }
 
   isEnabled(name) {
-    return _debug.default.enabled(`pw:${name}`);
+    return _debug.default.enabled(`pw:${name}`)
   }
-
 }
 
-const debugLogger = new DebugLogger();
-exports.debugLogger = debugLogger;
-const kLogCount = 150;
+const debugLogger = new DebugLogger()
+exports.debugLogger = debugLogger
+const kLogCount = 150
 
 class RecentLogsCollector {
   constructor() {
-    this._logs = [];
+    this._logs = []
   }
 
   log(message) {
-    this._logs.push(message);
+    this._logs.push(message)
 
-    if (this._logs.length === kLogCount * 2) this._logs.splice(0, kLogCount);
+    if (this._logs.length === kLogCount * 2) this._logs.splice(0, kLogCount)
   }
 
   recentLogs() {
-    if (this._logs.length > kLogCount) return this._logs.slice(-kLogCount);
-    return this._logs;
+    if (this._logs.length > kLogCount) return this._logs.slice(-kLogCount)
+    return this._logs
   }
-
 }
 
-exports.RecentLogsCollector = RecentLogsCollector;
+exports.RecentLogsCollector = RecentLogsCollector

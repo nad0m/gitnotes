@@ -13,10 +13,10 @@ import type {
   LexicalNode,
   NodeKey,
   ParagraphNode,
-  LexicalEditor,
-} from 'lexical';
-import {ElementNode} from 'lexical';
-export type InitialEditorStateType = null | string | EditorState | (() => void);
+  LexicalEditor
+} from 'lexical'
+import { ElementNode } from 'lexical'
+export type InitialEditorStateType = null | string | EditorState | (() => void)
 
 declare export class QuoteNode extends ElementNode {
   static getType(): string;
@@ -27,11 +27,11 @@ declare export class QuoteNode extends ElementNode {
   insertNewAfter(): ParagraphNode;
   collapseAtStart(): true;
 }
-declare export function $createQuoteNode(): QuoteNode;
+declare export function $createQuoteNode(): QuoteNode
 declare export function $isQuoteNode(
-  node: ?LexicalNode,
-): boolean %checks(node instanceof QuoteNode);
-export type HeadingTagType = 'h1' | 'h2' | 'h3' | 'h4' | 'h5';
+  node: ?LexicalNode
+): boolean %checks(node instanceof QuoteNode)
+export type HeadingTagType = 'h1' | 'h2' | 'h3' | 'h4' | 'h5'
 declare export class HeadingNode extends ElementNode {
   __tag: HeadingTagType;
   static getType(): string;
@@ -45,12 +45,12 @@ declare export class HeadingNode extends ElementNode {
   collapseAtStart(): true;
 }
 declare export function $createHeadingNode(
-  headingTag: HeadingTagType,
-): HeadingNode;
+  headingTag: HeadingTagType
+): HeadingNode
 declare export function $isHeadingNode(
-  node: ?LexicalNode,
-): boolean %checks(node instanceof HeadingNode);
+  node: ?LexicalNode
+): boolean %checks(node instanceof HeadingNode)
 declare export function registerRichText(
   editor: LexicalEditor,
-  initialEditorState?: InitialEditorStateType,
-): () => void;
+  initialEditorState?: InitialEditorStateType
+): () => void

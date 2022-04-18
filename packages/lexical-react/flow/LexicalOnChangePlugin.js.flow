@@ -7,8 +7,8 @@
  * @flow strict
  */
 
-import type {EditorState, LexicalEditor} from 'lexical';
+import type { EditorState, LexicalEditor } from 'lexical'
 
 declare export default function OnChangePlugin({
-  onChange: (editorState: EditorState, editor: LexicalEditor) => void,
-}): null;
+  onChange: (editorState: EditorState, editor: LexicalEditor) => void
+}): null

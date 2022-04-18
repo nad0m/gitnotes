@@ -7,17 +7,17 @@
  * @flow strict
  */
 
-import type {HistoryState} from './DEPRECATED_useLexicalHistory';
-import type {EditorState, LexicalEditor} from 'lexical';
+import type { HistoryState } from './DEPRECATED_useLexicalHistory'
+import type { EditorState, LexicalEditor } from 'lexical'
 
-import {useLexicalHistory} from './DEPRECATED_useLexicalHistory';
-import usePlainTextSetup from './shared/usePlainTextSetup';
+import { useLexicalHistory } from './DEPRECATED_useLexicalHistory'
+import usePlainTextSetup from './shared/usePlainTextSetup'
 
 export default function useLexicalPlainText(
   editor: LexicalEditor,
   externalHistoryState?: HistoryState,
-  initialEditorState?: null | string | EditorState | (() => void),
+  initialEditorState?: null | string | EditorState | (() => void)
 ): void {
-  usePlainTextSetup(editor, initialEditorState);
-  useLexicalHistory(editor, externalHistoryState);
+  usePlainTextSetup(editor, initialEditorState)
+  useLexicalHistory(editor, externalHistoryState)
 }

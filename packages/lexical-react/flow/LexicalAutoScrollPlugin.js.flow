@@ -7,8 +7,8 @@
  * @flow strict
  */
 type Props = $ReadOnly<{
-  scrollRef: {current: HTMLElement | null},
-}>;
+  scrollRef: { current: HTMLElement | null }
+}>
 declare export default function LexicalAutoScrollPlugin(
-  props: Props,
-): React$Node;
+  props: Props
+): React$Node

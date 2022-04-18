@@ -7,109 +7,109 @@
  * @flow strict
  */
 
-import type {TableSelection} from '@lexical/table';
-import type {ElementNode, NodeKey} from 'lexical';
+import type { TableSelection } from '@lexical/table'
+import type { ElementNode, NodeKey } from 'lexical'
 
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import {
   $createTableNodeWithDimensions,
   applyTableHandlers,
   INSERT_TABLE_COMMAND,
   TableCellNode,
   TableNode,
-  TableRowNode,
-} from '@lexical/table';
+  TableRowNode
+} from '@lexical/table'
 import {
   $createParagraphNode,
   $getNodeByKey,
   $getSelection,
   $isRangeSelection,
   $isRootNode,
-  COMMAND_PRIORITY_EDITOR,
-} from 'lexical';
-import {useEffect} from 'react';
-import invariant from 'shared/invariant';
+  COMMAND_PRIORITY_EDITOR
+} from 'lexical'
+import { useEffect } from 'react'
+import invariant from 'shared/invariant'
 
 export default function TablePlugin(): React$Node {
-  const [editor] = useLexicalComposerContext();
+  const [editor] = useLexicalComposerContext()
 
   useEffect(() => {
     if (!editor.hasNodes([TableNode, TableCellNode, TableRowNode])) {
       invariant(
         false,
-        'TablePlugin: TableNode, TableCellNode or TableRowNode not registered on editor',
-      );
+        'TablePlugin: TableNode, TableCellNode or TableRowNode not registered on editor'
+      )
     }
     return editor.registerCommand(
       INSERT_TABLE_COMMAND,
       (payload) => {
-        const {columns, rows} = payload;
-        const selection = $getSelection();
+        const { columns, rows } = payload
+        const selection = $getSelection()
         if (!$isRangeSelection(selection)) {
-          return true;
+          return true
         }
-        const focus = selection.focus;
-        const focusNode = focus.getNode();
+        const focus = selection.focus
+        const focusNode = focus.getNode()
 
         if (focusNode !== null) {
           const tableNode = $createTableNodeWithDimensions(
             Number(rows),
-            Number(columns),
-          );
+            Number(columns)
+          )
           if ($isRootNode(focusNode)) {
-            const target = focusNode.getChildAtIndex(focus.offset);
+            const target = focusNode.getChildAtIndex(focus.offset)
             if (target !== null) {
-              target.insertBefore(tableNode);
+              target.insertBefore(tableNode)
             } else {
-              focusNode.append(tableNode);
+              focusNode.append(tableNode)
             }
-            tableNode.insertBefore($createParagraphNode());
+            tableNode.insertBefore($createParagraphNode())
           } else {
-            const topLevelNode = focusNode.getTopLevelElementOrThrow();
-            topLevelNode.insertAfter(tableNode);
+            const topLevelNode = focusNode.getTopLevelElementOrThrow()
+            topLevelNode.insertAfter(tableNode)
           }
-          tableNode.insertAfter($createParagraphNode());
+          tableNode.insertAfter($createParagraphNode())
           const firstCell = tableNode
             .getFirstChildOrThrow<ElementNode>()
-            .getFirstChildOrThrow<ElementNode>();
-          firstCell.select();
+            .getFirstChildOrThrow<ElementNode>()
+          firstCell.select()
         }
-        return true;
+        return true
       },
-      COMMAND_PRIORITY_EDITOR,
-    );
-  }, [editor]);
+      COMMAND_PRIORITY_EDITOR
+    )
+  }, [editor])
 
   useEffect(() => {
-    const tableSelections = new Map<NodeKey, TableSelection>();
+    const tableSelections = new Map<NodeKey, TableSelection>()
 
     return editor.registerMutationListener(TableNode, (nodeMutations) => {
       for (const [nodeKey, mutation] of nodeMutations) {
         if (mutation === 'created') {
           editor.update(() => {
-            const tableElement = editor.getElementByKey(nodeKey);
-            const tableNode = $getNodeByKey(nodeKey);
+            const tableElement = editor.getElementByKey(nodeKey)
+            const tableNode = $getNodeByKey(nodeKey)
 
             if (tableElement && tableNode) {
               const tableSelection = applyTableHandlers(
                 tableNode,
                 tableElement,
-                editor,
-              );
+                editor
+              )
 
-              tableSelections.set(nodeKey, tableSelection);
+              tableSelections.set(nodeKey, tableSelection)
             }
-          });
+          })
         } else if (mutation === 'destroyed') {
-          const tableSelection = tableSelections.get(nodeKey);
+          const tableSelection = tableSelections.get(nodeKey)
           if (tableSelection) {
-            tableSelection.removeListeners();
-            tableSelections.delete(nodeKey);
+            tableSelection.removeListeners()
+            tableSelections.delete(nodeKey)
           }
         }
       }
-    });
-  }, [editor]);
+    })
+  }, [editor])
 
-  return null;
+  return null
 }

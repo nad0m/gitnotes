@@ -5,17 +5,17 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-'use strict';
+'use strict'
 
-const minimist = require('minimist');
-const runESLint = require('../eslint');
+const minimist = require('minimist')
+const runESLint = require('../eslint')
 
-console.log('Linting all files...');
+console.log('Linting all files...')
 
-const cliOptions = minimist(process.argv.slice(2));
-if (runESLint({onlyChanged: false, ...cliOptions})) {
-  console.log('Lint passed.');
+const cliOptions = minimist(process.argv.slice(2))
+if (runESLint({ onlyChanged: false, ...cliOptions })) {
+  console.log('Lint passed.')
 } else {
-  console.log('Lint failed.');
-  process.exit(1);
+  console.log('Lint failed.')
+  process.exit(1)
 }

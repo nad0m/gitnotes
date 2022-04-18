@@ -73,29 +73,29 @@ and `set*()` methods on your node for this property. Inside these methods, you'l
 that ensure consistency with Lexical's internal immutable system. These methods are `getWritable()` and `getLatest()`.
 
 ```js
-import type {NodeKey} from 'lexical';
+import type { NodeKey } from 'lexical'
 
 class MyCustomNode extends SomeOtherNode {
-  __foo: string;
+  __foo: string
 
   constructor(foo: string, key?: NodeKey) {
-    super(key);
-    this.__foo = foo;
+    super(key)
+    this.__foo = foo
   }
 
   setFoo(foo: string) {
     // getWritable() creates a clone of the node
     // if needed, to ensure we don't try and mutate
     // a stale version of this node.
-    const self = this.getWritable();
-    self.__foo = foo;
+    const self = this.getWritable()
+    self.__foo = foo
   }
 
   getFoo(): string {
     // getLatest() ensures we are getting the most
     // up-to-date value from the EditorState.
-    const self = this.getLatest();
-    return self.__foo;
+    const self = this.getLatest()
+    return self.__foo
   }
 }
 ```
@@ -109,34 +109,34 @@ Expanding on the exmaple above with these methods:
 
 ```js
 class MyCustomNode extends SomeOtherNode {
-  __foo: string;
+  __foo: string
 
   static getType(): string {
-    return 'custom-node';
+    return 'custom-node'
   }
 
   static clone(node: MyCustomNode): MyCustomNode {
-    return new MyCustomNode(node.__foo, node.__key);
+    return new MyCustomNode(node.__foo, node.__key)
   }
 
   constructor(foo: string, key?: NodeKey) {
-    super(key);
-    this.__foo = foo;
+    super(key)
+    this.__foo = foo
   }
 
   setFoo(foo: string) {
     // getWritable() creates a clone of the node
     // if needed, to ensure we don't try and mutate
     // a stale version of this node.
-    const self = this.getWritable();
-    self.__foo = foo;
+    const self = this.getWritable()
+    self.__foo = foo
   }
 
   getFoo(): string {
     // getLatest() ensures we are getting the most
     // up-to-date value from the EditorState.
-    const self = this.getLatest();
-    return self.__foo;
+    const self = this.getLatest()
+    return self.__foo
   }
 }
 ```
@@ -152,27 +152,27 @@ As mentioned above, Lexical exposes three base nodes that can be extended.
 Below is an example of how you might extend `ElementNode`:
 
 ```js
-import {ElementNode} from 'lexical';
+import { ElementNode } from 'lexical'
 
 export class CustomParagraph extends ElementNode {
   static getType(): string {
-    return 'custom-paragraph';
+    return 'custom-paragraph'
   }
 
   static clone(node: ParagraphNode): ParagraphNode {
-    return new CustomParagraph(node.__key);
+    return new CustomParagraph(node.__key)
   }
 
   createDOM(): HTMLElement {
     // Define the DOM element here
-    const dom = document.createElement('p');
-    return dom;
+    const dom = document.createElement('p')
+    return dom
   }
 
   updateDOM(prevNode: CustomParagraph, dom: HTMLElement): boolean {
     // Returning false tells Lexical that this node does not need its
     // DOM element replacing with a new copy from createDOM.
-    return false;
+    return false
   }
 }
 ```
@@ -183,11 +183,11 @@ are that of your custom node. Here's how you might do this for the above example
 
 ```js
 export function $createCustomParagraphNode(): ParagraphNode {
-  return new CustomParagraph();
+  return new CustomParagraph()
 }
 
 export function $isCustomParagraphNode(node: ?LexicalNode): boolean {
-  return node instanceof CustomParagraph;
+  return node instanceof CustomParagraph
 }
 ```
 
@@ -195,46 +195,46 @@ export function $isCustomParagraphNode(node: ?LexicalNode): boolean {
 
 ```js
 export class ColoredNode extends TextNode {
-  __color: string;
+  __color: string
 
   constructor(text: string, color: string, key?: NodeKey): void {
-    super(text, key);
-    this.__color = color;
+    super(text, key)
+    this.__color = color
   }
 
   static getType(): string {
-    return 'colored';
+    return 'colored'
   }
 
   static clone(node: ColoredNode): ColoredNode {
-    return new ColoredNode(node.__text, node.__color, node.__key);
+    return new ColoredNode(node.__text, node.__color, node.__key)
   }
 
   createDOM(config: EditorConfig): HTMLElement {
-    const element = super.createDOM(config);
-    element.style.color = this.__color;
-    return element;
+    const element = super.createDOM(config)
+    element.style.color = this.__color
+    return element
   }
 
   updateDOM(
     prevNode: ColoredNode,
     dom: HTMLElement,
-    config: EditorConfig,
+    config: EditorConfig
   ): boolean {
-    const isUpdated = super.updateDOM(prevNode, dom, config);
+    const isUpdated = super.updateDOM(prevNode, dom, config)
     if (prevNode.__color !== this.__color) {
-      dom.style.color = this.__color;
+      dom.style.color = this.__color
     }
-    return isUpdated;
+    return isUpdated
   }
 }
 
 export function $createColoredNode(text: string, color: string): ColoredNode {
-  return new ColoredNode(text, color);
+  return new ColoredNode(text, color)
 }
 
 export function $isColoredNode(node: ?LexicalNode): boolean {
-  return node instanceof ColoredNode;
+  return node instanceof ColoredNode
 }
 ```
 
@@ -242,39 +242,39 @@ export function $isColoredNode(node: ?LexicalNode): boolean {
 
 ```js
 export class VideoNode extends DecoratorNode<React$Node> {
-  __id: string;
+  __id: string
 
   static getType(): string {
-    return 'video';
+    return 'video'
   }
 
   static clone(node: VideoNode): VideoNode {
-    return new VideoNode(node.__id, node.__key);
+    return new VideoNode(node.__id, node.__key)
   }
 
   constructor(id: string, key?: NodeKey) {
-    super(key);
-    this.__id = id;
+    super(key)
+    this.__id = id
   }
 
   createDOM(): HTMLElement {
-    return document.createElement('div');
+    return document.createElement('div')
   }
 
   updateDOM(): false {
-    return false;
+    return false
   }
 
   decorate(): React$Node {
-    return <VideoPlayer videoID={this.__id} />;
+    return <VideoPlayer videoID={this.__id} />
   }
 }
 
 export function $createVideoNode(id: string): VideoNode {
-  return new VideoNode(id);
+  return new VideoNode(id)
 }
 
 export function $isVideoNode(node: ?LexicalNode): boolean {
-  return node instanceof VideoNode;
+  return node instanceof VideoNode
 }
 ```

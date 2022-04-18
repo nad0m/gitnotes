@@ -6,15 +6,15 @@
  *
  */
 
-type ChangeHandler = (url: string | null, prevUrl: string | null) => void;
+type ChangeHandler = (url: string | null, prevUrl: string | null) => void
 type LinkMatcherResult = {
-  text: string;
-  url: string;
-  length: number;
-  index: number;
-};
-export type LinkMatcher = (text: string) => LinkMatcherResult | null;
+  text: string
+  url: string
+  length: number
+  index: number
+}
+export type LinkMatcher = (text: string) => LinkMatcherResult | null
 export default function LexicalAutoLinkPlugin(props: {
-  matchers: Array<LinkMatcher>;
-  onChange?: ChangeHandler;
-}): JSX.Element | null;
+  matchers: Array<LinkMatcher>
+  onChange?: ChangeHandler
+}): JSX.Element | null

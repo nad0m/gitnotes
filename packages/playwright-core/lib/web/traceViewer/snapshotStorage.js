@@ -1,13 +1,13 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.BaseSnapshotStorage = void 0;
+})
+exports.BaseSnapshotStorage = void 0
 
-var _events = require("events");
+var _events = require('events')
 
-var _snapshotRenderer = require("./snapshotRenderer");
+var _snapshotRenderer = require('./snapshotRenderer')
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -26,57 +26,65 @@ var _snapshotRenderer = require("./snapshotRenderer");
  */
 class BaseSnapshotStorage extends _events.EventEmitter {
   constructor(...args) {
-    super(...args);
-    this._resources = [];
-    this._frameSnapshots = new Map();
+    super(...args)
+    this._resources = []
+    this._frameSnapshots = new Map()
   }
 
   clear() {
-    this._resources = [];
+    this._resources = []
 
-    this._frameSnapshots.clear();
+    this._frameSnapshots.clear()
   }
 
   addResource(resource) {
-    this._resources.push(resource);
+    this._resources.push(resource)
   }
 
   addFrameSnapshot(snapshot) {
-    let frameSnapshots = this._frameSnapshots.get(snapshot.frameId);
+    let frameSnapshots = this._frameSnapshots.get(snapshot.frameId)
 
     if (!frameSnapshots) {
       frameSnapshots = {
         raw: [],
         renderer: []
-      };
+      }
 
-      this._frameSnapshots.set(snapshot.frameId, frameSnapshots);
+      this._frameSnapshots.set(snapshot.frameId, frameSnapshots)
 
-      if (snapshot.isMainFrame) this._frameSnapshots.set(snapshot.pageId, frameSnapshots);
+      if (snapshot.isMainFrame)
+        this._frameSnapshots.set(snapshot.pageId, frameSnapshots)
     }
 
-    frameSnapshots.raw.push(snapshot);
-    const renderer = new _snapshotRenderer.SnapshotRenderer(this._resources, frameSnapshots.raw, frameSnapshots.raw.length - 1);
-    frameSnapshots.renderer.push(renderer);
-    this.emit('snapshot', renderer);
+    frameSnapshots.raw.push(snapshot)
+    const renderer = new _snapshotRenderer.SnapshotRenderer(
+      this._resources,
+      frameSnapshots.raw,
+      frameSnapshots.raw.length - 1
+    )
+    frameSnapshots.renderer.push(renderer)
+    this.emit('snapshot', renderer)
   }
 
   resources() {
-    return this._resources.slice();
+    return this._resources.slice()
   }
 
   snapshotByName(pageOrFrameId, snapshotName) {
-    const snapshot = this._frameSnapshots.get(pageOrFrameId);
+    const snapshot = this._frameSnapshots.get(pageOrFrameId)
 
-    return snapshot === null || snapshot === void 0 ? void 0 : snapshot.renderer.find(r => r.snapshotName === snapshotName);
+    return snapshot === null || snapshot === void 0
+      ? void 0
+      : snapshot.renderer.find((r) => r.snapshotName === snapshotName)
   }
 
   snapshotByIndex(frameId, index) {
-    const snapshot = this._frameSnapshots.get(frameId);
+    const snapshot = this._frameSnapshots.get(frameId)
 
-    return snapshot === null || snapshot === void 0 ? void 0 : snapshot.renderer[index];
+    return snapshot === null || snapshot === void 0
+      ? void 0
+      : snapshot.renderer[index]
   }
-
 }
 
-exports.BaseSnapshotStorage = BaseSnapshotStorage;
+exports.BaseSnapshotStorage = BaseSnapshotStorage

@@ -6,7 +6,7 @@
  *
  * @flow
  */
-'use strict';
+'use strict'
 
 /*:: import type { ErrorMap } from './Types' */
 
@@ -17,16 +17,16 @@
  *   { 0: 'MUCH ERROR', 1: 'SUCH WRONG' }
  */
 function invertObject(targetObj /* : ErrorMap */) /* : ErrorMap */ {
-  const result = {};
-  const mapKeys = Object.keys(targetObj);
+  const result = {}
+  const mapKeys = Object.keys(targetObj)
 
   for (const originalKey of mapKeys) {
-    const originalVal = targetObj[originalKey];
+    const originalVal = targetObj[originalKey]
 
-    result[originalVal] = originalKey;
+    result[originalVal] = originalKey
   }
 
-  return result;
+  return result
 }
 
-module.exports = invertObject;
+module.exports = invertObject

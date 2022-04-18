@@ -7,16 +7,16 @@
  *
  */
 
-'use strict';
+'use strict'
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require('prism-react-renderer/themes/github');
-const darkCodeTheme = require('prism-react-renderer/themes/dracula');
-const importPlugin = require('remark-import-partial');
+const lightCodeTheme = require('prism-react-renderer/themes/github')
+const darkCodeTheme = require('prism-react-renderer/themes/dracula')
+const importPlugin = require('remark-import-partial')
 
-const TITLE = 'Lexical';
-const GITHUB_REPO_URL = 'https://github.com/facebook/lexical'; // TODO: Update when repo name updated
+const TITLE = 'Lexical'
+const GITHUB_REPO_URL = 'https://github.com/facebook/lexical' // TODO: Update when repo name updated
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -35,19 +35,19 @@ const config = {
       ({
         blog: {
           editUrl: `${GITHUB_REPO_URL}/tree/main/packages/lexical-website-new/blog/`,
-          showReadingTime: true, // TODO: Update when directory finalized
+          showReadingTime: true // TODO: Update when directory finalized
         },
         docs: {
           editUrl: `${GITHUB_REPO_URL}/tree/main/packages/lexical-website-new/docs/`,
           remarkPlugins: [importPlugin],
           // TODO: Update when directory finalized
-          sidebarPath: require.resolve('./sidebars.js'),
+          sidebarPath: require.resolve('./sidebars.js')
         },
         theme: {
-          customCss: require.resolve('./src/css/custom.css'),
-        },
-      }),
-    ],
+          customCss: require.resolve('./src/css/custom.css')
+        }
+      })
+    ]
   ],
 
   // Usually your GitHub org/user name.
@@ -65,32 +65,32 @@ const config = {
             items: [
               {
                 label: 'Introduction',
-                to: '/docs/intro',
-              },
+                to: '/docs/intro'
+              }
             ],
-            title: 'Docs',
+            title: 'Docs'
           },
           {
             items: [
               {
                 href: 'https://stackoverflow.com/questions/tagged/lexicaljs',
-                label: 'Stack Overflow',
+                label: 'Stack Overflow'
               },
               {
                 href: 'https://twitter.com/lexicaljs',
-                label: 'Twitter',
-              },
+                label: 'Twitter'
+              }
             ],
-            title: 'Community',
+            title: 'Community'
           },
           {
             items: [
               {
                 href: 'https://github.com/facebook/lexical',
-                label: 'GitHub',
-              },
+                label: 'GitHub'
+              }
             ],
-            title: 'More',
+            title: 'More'
           },
           {
             // Please do not remove the privacy and terms, it's a legal requirement.
@@ -99,56 +99,56 @@ const config = {
                 href: 'https://opensource.facebook.com/legal/privacy/',
                 label: 'Privacy',
                 rel: 'noreferrer noopener',
-                target: '_blank',
+                target: '_blank'
               },
               {
                 href: 'https://opensource.facebook.com/legal/terms/',
                 label: 'Terms',
                 rel: 'noreferrer noopener',
-                target: '_blank',
-              },
+                target: '_blank'
+              }
             ],
 
-            title: 'Legal',
-          },
+            title: 'Legal'
+          }
         ],
-        style: 'dark',
+        style: 'dark'
       },
       navbar: {
         items: [
           {
             label: 'Playground',
             position: 'left',
-            to: 'https://playground.lexical.dev/',
+            to: 'https://playground.lexical.dev/'
           },
           {
             docId: 'intro',
             label: 'Docs',
             position: 'left',
-            type: 'doc',
+            type: 'doc'
           },
-          {label: 'Community', position: 'left', to: '/community'},
+          { label: 'Community', position: 'left', to: '/community' },
           {
             href: GITHUB_REPO_URL,
             label: 'GitHub',
-            position: 'right',
-          },
+            position: 'right'
+          }
         ],
         logo: {
           alt: 'Lexical',
           src: 'img/logo.svg',
-          srcDark: 'img/logo-dark.svg',
-        },
+          srcDark: 'img/logo-dark.svg'
+        }
       },
       prism: {
         darkTheme: darkCodeTheme,
-        theme: lightCodeTheme,
-      },
+        theme: lightCodeTheme
+      }
     }),
 
   title: TITLE,
 
-  url: 'https://lexical.dev',
-};
+  url: 'https://lexical.dev'
+}
 
-module.exports = config;
+module.exports = config

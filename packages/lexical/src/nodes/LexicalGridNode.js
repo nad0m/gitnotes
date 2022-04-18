@@ -7,12 +7,12 @@
  * @flow strict
  */
 
-import type {LexicalNode} from '../LexicalNode';
+import type { LexicalNode } from '../LexicalNode'
 
-import {ElementNode} from './LexicalElementNode';
+import { ElementNode } from './LexicalElementNode'
 
 export class GridNode extends ElementNode {}
 
 export function $isGridNode(node: ?LexicalNode): boolean %checks {
-  return node instanceof GridNode;
+  return node instanceof GridNode
 }

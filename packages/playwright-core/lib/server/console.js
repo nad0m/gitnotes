@@ -1,11 +1,11 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.ConsoleMessage = void 0;
+})
+exports.ConsoleMessage = void 0
 
-var _instrumentation = require("./instrumentation");
+var _instrumentation = require('./instrumentation')
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -24,38 +24,38 @@ var _instrumentation = require("./instrumentation");
  */
 class ConsoleMessage extends _instrumentation.SdkObject {
   constructor(parent, type, text, args, location) {
-    super(parent, 'console-message');
-    this._type = void 0;
-    this._text = void 0;
-    this._args = void 0;
-    this._location = void 0;
-    this._type = type;
-    this._text = text;
-    this._args = args;
+    super(parent, 'console-message')
+    this._type = void 0
+    this._text = void 0
+    this._args = void 0
+    this._location = void 0
+    this._type = type
+    this._text = text
+    this._args = args
     this._location = location || {
       url: '',
       lineNumber: 0,
       columnNumber: 0
-    };
+    }
   }
 
   type() {
-    return this._type;
+    return this._type
   }
 
   text() {
-    if (this._text === undefined) this._text = this._args.map(arg => arg.preview()).join(' ');
-    return this._text;
+    if (this._text === undefined)
+      this._text = this._args.map((arg) => arg.preview()).join(' ')
+    return this._text
   }
 
   args() {
-    return this._args;
+    return this._args
   }
 
   location() {
-    return this._location;
+    return this._location
   }
-
 }
 
-exports.ConsoleMessage = ConsoleMessage;
+exports.ConsoleMessage = ConsoleMessage

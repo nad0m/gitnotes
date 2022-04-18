@@ -1,13 +1,13 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.CRPDF = void 0;
+})
+exports.CRPDF = void 0
 
-var _utils = require("../../utils/utils");
+var _utils = require('../../utils/utils')
 
-var _crProtocolHelper = require("./crProtocolHelper");
+var _crProtocolHelper = require('./crProtocolHelper')
 
 /**
  * Copyright 2017 Google Inc. All rights reserved.
@@ -70,38 +70,38 @@ const PagePaperFormats = {
     width: 4.13,
     height: 5.83
   }
-};
+}
 const unitToPixels = {
-  'px': 1,
-  'in': 96,
-  'cm': 37.8,
-  'mm': 3.78
-};
+  px: 1,
+  in: 96,
+  cm: 37.8,
+  mm: 3.78
+}
 
 function convertPrintParameterToInches(text) {
-  if (text === undefined) return undefined;
-  let unit = text.substring(text.length - 2).toLowerCase();
-  let valueText = '';
+  if (text === undefined) return undefined
+  let unit = text.substring(text.length - 2).toLowerCase()
+  let valueText = ''
 
   if (unitToPixels.hasOwnProperty(unit)) {
-    valueText = text.substring(0, text.length - 2);
+    valueText = text.substring(0, text.length - 2)
   } else {
     // In case of unknown unit try to parse the whole parameter as number of pixels.
     // This is consistent with phantom's paperSize behavior.
-    unit = 'px';
-    valueText = text;
+    unit = 'px'
+    valueText = text
   }
 
-  const value = Number(valueText);
-  (0, _utils.assert)(!isNaN(value), 'Failed to parse parameter value: ' + text);
-  const pixels = value * unitToPixels[unit];
-  return pixels / 96;
+  const value = Number(valueText)
+  ;(0, _utils.assert)(!isNaN(value), 'Failed to parse parameter value: ' + text)
+  const pixels = value * unitToPixels[unit]
+  return pixels / 96
 }
 
 class CRPDF {
   constructor(client) {
-    this._client = void 0;
-    this._client = client;
+    this._client = void 0
+    this._client = client
   }
 
   async generate(options = {}) {
@@ -115,24 +115,24 @@ class CRPDF {
       pageRanges = '',
       preferCSSPageSize = false,
       margin = {}
-    } = options;
-    let paperWidth = 8.5;
-    let paperHeight = 11;
+    } = options
+    let paperWidth = 8.5
+    let paperHeight = 11
 
     if (options.format) {
-      const format = PagePaperFormats[options.format.toLowerCase()];
-      (0, _utils.assert)(format, 'Unknown paper format: ' + options.format);
-      paperWidth = format.width;
-      paperHeight = format.height;
+      const format = PagePaperFormats[options.format.toLowerCase()]
+      ;(0, _utils.assert)(format, 'Unknown paper format: ' + options.format)
+      paperWidth = format.width
+      paperHeight = format.height
     } else {
-      paperWidth = convertPrintParameterToInches(options.width) || paperWidth;
-      paperHeight = convertPrintParameterToInches(options.height) || paperHeight;
+      paperWidth = convertPrintParameterToInches(options.width) || paperWidth
+      paperHeight = convertPrintParameterToInches(options.height) || paperHeight
     }
 
-    const marginTop = convertPrintParameterToInches(margin.top) || 0;
-    const marginLeft = convertPrintParameterToInches(margin.left) || 0;
-    const marginBottom = convertPrintParameterToInches(margin.bottom) || 0;
-    const marginRight = convertPrintParameterToInches(margin.right) || 0;
+    const marginTop = convertPrintParameterToInches(margin.top) || 0
+    const marginLeft = convertPrintParameterToInches(margin.left) || 0
+    const marginBottom = convertPrintParameterToInches(margin.bottom) || 0
+    const marginRight = convertPrintParameterToInches(margin.right) || 0
     const result = await this._client.send('Page.printToPDF', {
       transferMode: 'ReturnAsStream',
       landscape,
@@ -149,10 +149,13 @@ class CRPDF {
       marginRight,
       pageRanges,
       preferCSSPageSize
-    });
-    return await (0, _crProtocolHelper.readProtocolStream)(this._client, result.stream, null);
+    })
+    return await (0, _crProtocolHelper.readProtocolStream)(
+      this._client,
+      result.stream,
+      null
+    )
   }
-
 }
 
-exports.CRPDF = CRPDF;
+exports.CRPDF = CRPDF

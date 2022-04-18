@@ -1,17 +1,19 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.GridClient = void 0;
+})
+exports.GridClient = void 0
 
-var _ws = _interopRequireDefault(require("ws"));
+var _ws = _interopRequireDefault(require('ws'))
 
-var _connection = require("../client/connection");
+var _connection = require('../client/connection')
 
-var _utils = require("../utils/utils");
+var _utils = require('../utils/utils')
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj }
+}
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -30,42 +32,50 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 class GridClient {
   static async connect(gridURL) {
-    const params = new URLSearchParams();
-    params.set('pwVersion', (0, _utils.getPlaywrightVersion)(true
-    /* majorMinorOnly */
-    ));
-    const ws = new _ws.default(`${gridURL}/claimWorker?` + params.toString());
-    const errorText = await Promise.race([new Promise(f => ws.once('message', () => f(undefined))), new Promise(f => ws.once('close', (code, reason) => f(reason)))]);
-    if (errorText) throw errorText;
-    const connection = new _connection.Connection();
-    connection.markAsRemote();
+    const params = new URLSearchParams()
+    params.set(
+      'pwVersion',
+      (0, _utils.getPlaywrightVersion)(
+        true
+        /* majorMinorOnly */
+      )
+    )
+    const ws = new _ws.default(`${gridURL}/claimWorker?` + params.toString())
+    const errorText = await Promise.race([
+      new Promise((f) => ws.once('message', () => f(undefined))),
+      new Promise((f) => ws.once('close', (code, reason) => f(reason)))
+    ])
+    if (errorText) throw errorText
+    const connection = new _connection.Connection()
+    connection.markAsRemote()
 
-    connection.onmessage = message => ws.send(JSON.stringify(message));
+    connection.onmessage = (message) => ws.send(JSON.stringify(message))
 
-    ws.on('message', message => connection.dispatch(JSON.parse(message.toString())));
-    ws.on('close', (code, reason) => connection.close(reason));
-    const playwright = await connection.initializePlaywright();
+    ws.on('message', (message) =>
+      connection.dispatch(JSON.parse(message.toString()))
+    )
+    ws.on('close', (code, reason) => connection.close(reason))
+    const playwright = await connection.initializePlaywright()
 
-    playwright._enablePortForwarding();
+    playwright._enablePortForwarding()
 
-    return new GridClient(ws, playwright);
+    return new GridClient(ws, playwright)
   }
 
   constructor(ws, playwright) {
-    this._ws = void 0;
-    this._playwright = void 0;
-    this._ws = ws;
-    this._playwright = playwright;
+    this._ws = void 0
+    this._playwright = void 0
+    this._ws = ws
+    this._playwright = playwright
   }
 
   playwright() {
-    return this._playwright;
+    return this._playwright
   }
 
   close() {
-    this._ws.close();
+    this._ws.close()
   }
-
 }
 
-exports.GridClient = GridClient;
+exports.GridClient = GridClient

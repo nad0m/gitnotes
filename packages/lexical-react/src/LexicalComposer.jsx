@@ -7,16 +7,16 @@
  * @flow strict
  */
 
-import type {LexicalComposerContextType} from './LexicalComposerContext';
-import type {EditorThemeClasses, LexicalEditor, LexicalNode} from 'lexical';
+import type { LexicalComposerContextType } from './LexicalComposerContext'
+import type { EditorThemeClasses, LexicalEditor, LexicalNode } from 'lexical'
 
 import {
   createLexicalComposerContext,
-  LexicalComposerContext,
-} from '@lexical/react/LexicalComposerContext';
-import {createEditor} from 'lexical';
-import React, {useMemo} from 'react';
-import useLayoutEffect from 'shared/useLayoutEffect';
+  LexicalComposerContext
+} from '@lexical/react/LexicalComposerContext'
+import { createEditor } from 'lexical'
+import React, { useMemo } from 'react'
+import useLayoutEffect from 'shared/useLayoutEffect'
 
 type Props = {
   children: React$Node,
@@ -26,13 +26,13 @@ type Props = {
     nodes?: $ReadOnlyArray<Class<LexicalNode>>,
     onError: (error: Error, editor: LexicalEditor) => void,
     readOnly?: boolean,
-    theme?: EditorThemeClasses,
-  }>,
-};
+    theme?: EditorThemeClasses
+  }>
+}
 
 export default function LexicalComposer({
   initialConfig,
-  children,
+  children
 }: Props): React$MixedElement {
   const composerContext = useMemo(
     () => {
@@ -41,14 +41,14 @@ export default function LexicalComposer({
         namespace,
         editor__DEPRECATED: initialEditor,
         nodes,
-        onError,
-      } = initialConfig;
+        onError
+      } = initialConfig
 
       const context: LexicalComposerContextType = createLexicalComposerContext(
         null,
-        theme,
-      );
-      let editor = initialEditor || null;
+        theme
+      )
+      let editor = initialEditor || null
 
       if (editor === null) {
         const newEditor = createEditor<LexicalComposerContextType>({
@@ -57,30 +57,30 @@ export default function LexicalComposer({
           nodes,
           onError: (error) => onError(error, newEditor),
           readOnly: true,
-          theme,
-        });
-        editor = newEditor;
+          theme
+        })
+        editor = newEditor
       }
 
-      return [editor, context];
+      return [editor, context]
     },
 
     // We only do this for init
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
+    []
+  )
 
   useLayoutEffect(() => {
-    const isReadOnly = initialConfig.readOnly;
-    const [editor] = composerContext;
-    editor.setReadOnly(isReadOnly || false);
+    const isReadOnly = initialConfig.readOnly
+    const [editor] = composerContext
+    editor.setReadOnly(isReadOnly || false)
     // We only do this for init
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [])
 
   return (
     <LexicalComposerContext.Provider value={composerContext}>
       {children}
     </LexicalComposerContext.Provider>
-  );
+  )
 }

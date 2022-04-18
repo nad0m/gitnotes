@@ -7,51 +7,51 @@
  * @flow strict
  */
 
-import type {LexicalCommand} from 'lexical';
+import type { LexicalCommand } from 'lexical'
 
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import {
   $createParagraphNode,
   $getSelection,
   $isRangeSelection,
   COMMAND_PRIORITY_EDITOR,
-  createCommand,
-} from 'lexical';
-import {useEffect} from 'react';
+  createCommand
+} from 'lexical'
+import { useEffect } from 'react'
 
-import {$createTweetNode, TweetNode} from '../nodes/TweetNode.jsx';
+import { $createTweetNode, TweetNode } from '../nodes/TweetNode.jsx'
 
-export const INSERT_TWEET_COMMAND: LexicalCommand<string> = createCommand();
+export const INSERT_TWEET_COMMAND: LexicalCommand<string> = createCommand()
 
 export default function TwitterPlugin(): React$Node {
-  const [editor] = useLexicalComposerContext();
+  const [editor] = useLexicalComposerContext()
 
   useEffect(() => {
     if (!editor.hasNodes([TweetNode])) {
-      throw new Error('TwitterPlugin: TweetNode not registered on editor');
+      throw new Error('TwitterPlugin: TweetNode not registered on editor')
     }
 
     return editor.registerCommand(
       INSERT_TWEET_COMMAND,
       (payload) => {
-        const selection = $getSelection();
+        const selection = $getSelection()
         if ($isRangeSelection(selection)) {
-          const focusNode = selection.focus.getNode();
+          const focusNode = selection.focus.getNode()
           if (focusNode !== null) {
-            const tweetNode = $createTweetNode(payload);
+            const tweetNode = $createTweetNode(payload)
             selection.focus
               .getNode()
               .getTopLevelElementOrThrow()
-              .insertAfter(tweetNode);
-            const paragraphNode = $createParagraphNode();
-            tweetNode.insertAfter(paragraphNode);
-            paragraphNode.select();
+              .insertAfter(tweetNode)
+            const paragraphNode = $createParagraphNode()
+            tweetNode.insertAfter(paragraphNode)
+            paragraphNode.select()
           }
         }
-        return true;
+        return true
       },
-      COMMAND_PRIORITY_EDITOR,
-    );
-  }, [editor]);
-  return null;
+      COMMAND_PRIORITY_EDITOR
+    )
+  }, [editor])
+  return null
 }

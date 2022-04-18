@@ -7,9 +7,9 @@
  * @flow strict
  */
 
-import type {EditorThemeClasses} from 'lexical';
+import type { EditorThemeClasses } from 'lexical'
 
-import './PlaygroundEditorTheme.css';
+import './PlaygroundEditorTheme.css'
 
 const theme: EditorThemeClasses = {
   characterLimit: 'PlaygroundEditorTheme__characterLimit',
@@ -44,7 +44,7 @@ const theme: EditorThemeClasses = {
     symbol: 'PlaygroundEditorTheme__tokenProperty',
     tag: 'PlaygroundEditorTheme__tokenProperty',
     url: 'PlaygroundEditorTheme__tokenOperator',
-    variable: 'PlaygroundEditorTheme__tokenVariable',
+    variable: 'PlaygroundEditorTheme__tokenVariable'
   },
   hashtag: 'PlaygroundEditorTheme__hashtag',
   heading: {
@@ -52,23 +52,23 @@ const theme: EditorThemeClasses = {
     h2: 'PlaygroundEditorTheme__h2',
     h3: 'PlaygroundEditorTheme__h3',
     h4: 'PlaygroundEditorTheme__h4',
-    h5: 'PlaygroundEditorTheme__h5',
+    h5: 'PlaygroundEditorTheme__h5'
   },
   image: 'editor-image',
   link: 'PlaygroundEditorTheme__link',
   list: {
     listitem: 'PlaygroundEditorTheme__listItem',
     nested: {
-      listitem: 'PlaygroundEditorTheme__nestedListItem',
+      listitem: 'PlaygroundEditorTheme__nestedListItem'
     },
     olDepth: [
       'PlaygroundEditorTheme__ol1',
       'PlaygroundEditorTheme__ol2',
       'PlaygroundEditorTheme__ol3',
       'PlaygroundEditorTheme__ol4',
-      'PlaygroundEditorTheme__ol5',
+      'PlaygroundEditorTheme__ol5'
     ],
-    ul: 'PlaygroundEditorTheme__ul',
+    ul: 'PlaygroundEditorTheme__ul'
   },
   ltr: 'PlaygroundEditorTheme__ltr',
   paragraph: 'PlaygroundEditorTheme__paragraph',
@@ -83,8 +83,8 @@ const theme: EditorThemeClasses = {
     italic: 'PlaygroundEditorTheme__textItalic',
     strikethrough: 'PlaygroundEditorTheme__textStrikethrough',
     underline: 'PlaygroundEditorTheme__textUnderline',
-    underlineStrikethrough: 'PlaygroundEditorTheme__textUnderlineStrikethrough',
-  },
-};
+    underlineStrikethrough: 'PlaygroundEditorTheme__textUnderlineStrikethrough'
+  }
+}
 
-export default theme;
+export default theme

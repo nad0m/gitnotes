@@ -1,13 +1,13 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.CodeGenerator = void 0;
+})
+exports.CodeGenerator = void 0
 
-var _events = require("events");
+var _events = require('events')
 
-var _utils = require("./utils");
+var _utils = require('./utils')
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -25,21 +25,27 @@ var _utils = require("./utils");
  * limitations under the License.
  */
 class CodeGenerator extends _events.EventEmitter {
-  constructor(browserName, generateHeaders, launchOptions, contextOptions, deviceName, saveStorage) {
-    super(); // Make a copy of options to modify them later.
+  constructor(
+    browserName,
+    generateHeaders,
+    launchOptions,
+    contextOptions,
+    deviceName,
+    saveStorage
+  ) {
+    super() // Make a copy of options to modify them later.
 
-    this._currentAction = null;
-    this._lastAction = null;
-    this._actions = [];
-    this._enabled = void 0;
-    this._options = void 0;
+    this._currentAction = null
+    this._lastAction = null
+    this._actions = []
+    this._enabled = void 0
+    this._options = void 0
     launchOptions = {
       headless: false,
       ...launchOptions
-    };
-    contextOptions = { ...contextOptions
-    };
-    this._enabled = generateHeaders;
+    }
+    contextOptions = { ...contextOptions }
+    this._enabled = generateHeaders
     this._options = {
       browserName,
       generateHeaders,
@@ -47,108 +53,133 @@ class CodeGenerator extends _events.EventEmitter {
       contextOptions,
       deviceName,
       saveStorage
-    };
-    this.restart();
+    }
+    this.restart()
   }
 
   restart() {
-    this._currentAction = null;
-    this._lastAction = null;
-    this._actions = [];
-    this.emit('change');
+    this._currentAction = null
+    this._lastAction = null
+    this._actions = []
+    this.emit('change')
   }
 
   setEnabled(enabled) {
-    this._enabled = enabled;
+    this._enabled = enabled
   }
 
   addAction(action) {
-    if (!this._enabled) return;
-    this.willPerformAction(action);
-    this.didPerformAction(action);
+    if (!this._enabled) return
+    this.willPerformAction(action)
+    this.didPerformAction(action)
   }
 
   willPerformAction(action) {
-    if (!this._enabled) return;
-    this._currentAction = action;
+    if (!this._enabled) return
+    this._currentAction = action
   }
 
   performedActionFailed(action) {
-    if (!this._enabled) return;
-    if (this._currentAction === action) this._currentAction = null;
+    if (!this._enabled) return
+    if (this._currentAction === action) this._currentAction = null
   }
 
   didPerformAction(actionInContext) {
-    if (!this._enabled) return;
-    const {
-      action,
-      pageAlias
-    } = actionInContext;
-    let eraseLastAction = false;
+    if (!this._enabled) return
+    const { action, pageAlias } = actionInContext
+    let eraseLastAction = false
 
     if (this._lastAction && this._lastAction.pageAlias === pageAlias) {
-      const {
-        action: lastAction
-      } = this._lastAction; // We augment last action based on the type.
+      const { action: lastAction } = this._lastAction // We augment last action based on the type.
 
-      if (this._lastAction && action.name === 'fill' && lastAction.name === 'fill') {
-        if (action.selector === lastAction.selector) eraseLastAction = true;
+      if (
+        this._lastAction &&
+        action.name === 'fill' &&
+        lastAction.name === 'fill'
+      ) {
+        if (action.selector === lastAction.selector) eraseLastAction = true
       }
 
-      if (lastAction && action.name === 'click' && lastAction.name === 'click') {
-        if (action.selector === lastAction.selector && action.clickCount > lastAction.clickCount) eraseLastAction = true;
+      if (
+        lastAction &&
+        action.name === 'click' &&
+        lastAction.name === 'click'
+      ) {
+        if (
+          action.selector === lastAction.selector &&
+          action.clickCount > lastAction.clickCount
+        )
+          eraseLastAction = true
       }
 
-      if (lastAction && action.name === 'navigate' && lastAction.name === 'navigate') {
+      if (
+        lastAction &&
+        action.name === 'navigate' &&
+        lastAction.name === 'navigate'
+      ) {
         if (action.url === lastAction.url) {
           // Already at a target URL.
-          this._currentAction = null;
-          return;
+          this._currentAction = null
+          return
         }
       } // Check and uncheck erase click.
 
-
-      if (lastAction && (action.name === 'check' || action.name === 'uncheck') && lastAction.name === 'click') {
-        if (action.selector === lastAction.selector) eraseLastAction = true;
+      if (
+        lastAction &&
+        (action.name === 'check' || action.name === 'uncheck') &&
+        lastAction.name === 'click'
+      ) {
+        if (action.selector === lastAction.selector) eraseLastAction = true
       }
     }
 
-    this._lastAction = actionInContext;
-    this._currentAction = null;
-    if (eraseLastAction) this._actions.pop();
+    this._lastAction = actionInContext
+    this._currentAction = null
+    if (eraseLastAction) this._actions.pop()
 
-    this._actions.push(actionInContext);
+    this._actions.push(actionInContext)
 
-    this.emit('change');
+    this.emit('change')
   }
 
   commitLastAction() {
-    if (!this._enabled) return;
-    const action = this._lastAction;
-    if (action) action.committed = true;
+    if (!this._enabled) return
+    const action = this._lastAction
+    if (action) action.committed = true
   }
 
   signal(pageAlias, frame, signal) {
-    if (!this._enabled) return; // We'll need to pass acceptDownloads for any generated downloads code to work.
+    if (!this._enabled) return // We'll need to pass acceptDownloads for any generated downloads code to work.
 
-    if (signal.name === 'download') this._options.contextOptions.acceptDownloads = true; // Signal either arrives while action is being performed or shortly after.
+    if (signal.name === 'download')
+      this._options.contextOptions.acceptDownloads = true // Signal either arrives while action is being performed or shortly after.
 
     if (this._currentAction) {
-      this._currentAction.action.signals.push(signal);
+      this._currentAction.action.signals.push(signal)
 
-      return;
+      return
     }
 
     if (this._lastAction && !this._lastAction.committed) {
-      const signals = this._lastAction.action.signals;
-      if (signal.name === 'navigation' && signals.length && signals[signals.length - 1].name === 'download') return;
-      if (signal.name === 'download' && signals.length && signals[signals.length - 1].name === 'navigation') signals.length = signals.length - 1;
-      signal.isAsync = true;
+      const signals = this._lastAction.action.signals
+      if (
+        signal.name === 'navigation' &&
+        signals.length &&
+        signals[signals.length - 1].name === 'download'
+      )
+        return
+      if (
+        signal.name === 'download' &&
+        signals.length &&
+        signals[signals.length - 1].name === 'navigation'
+      )
+        signals.length = signals.length - 1
+      signal.isAsync = true
 
-      this._lastAction.action.signals.push(signal);
+      this._lastAction.action.signals.push(signal)
 
-      this.emit('change');
-      return;
+      this.emit('change')
+      return
     }
 
     if (signal.name === 'navigation') {
@@ -161,23 +192,24 @@ class CodeGenerator extends _events.EventEmitter {
           url: frame.url(),
           signals: []
         }
-      });
+      })
     }
   }
 
   generateText(languageGenerator) {
-    const text = [];
-    if (this._options.generateHeaders) text.push(languageGenerator.generateHeader(this._options));
+    const text = []
+    if (this._options.generateHeaders)
+      text.push(languageGenerator.generateHeader(this._options))
 
     for (const action of this._actions) {
-      const actionText = languageGenerator.generateAction(action);
-      if (actionText) text.push(actionText);
+      const actionText = languageGenerator.generateAction(action)
+      if (actionText) text.push(actionText)
     }
 
-    if (this._options.generateHeaders) text.push(languageGenerator.generateFooter(this._options.saveStorage));
-    return text.join('\n');
+    if (this._options.generateHeaders)
+      text.push(languageGenerator.generateFooter(this._options.saveStorage))
+    return text.join('\n')
   }
-
 }
 
-exports.CodeGenerator = CodeGenerator;
+exports.CodeGenerator = CodeGenerator

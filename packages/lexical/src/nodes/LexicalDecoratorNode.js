@@ -7,43 +7,43 @@
  * @flow strict
  */
 
-import type {LexicalEditor} from '../LexicalEditor';
-import type {NodeKey} from '../LexicalNode';
+import type { LexicalEditor } from '../LexicalEditor'
+import type { NodeKey } from '../LexicalNode'
 
-import invariant from 'shared/invariant';
+import invariant from 'shared/invariant'
 
-import {LexicalNode} from '../LexicalNode';
+import { LexicalNode } from '../LexicalNode'
 
 export class DecoratorNode extends LexicalNode {
   constructor(key?: NodeKey): void {
-    super(key);
+    super(key)
 
     // ensure custom nodes implement required methods
     if (__DEV__) {
-      const proto = Object.getPrototypeOf(this);
-      ['decorate'].forEach((method) => {
+      const proto = Object.getPrototypeOf(this)
+      ;['decorate'].forEach((method) => {
         if (!proto.hasOwnProperty(method)) {
           console.warn(
-            `${this.constructor.name} must implement "${method}" method`,
-          );
+            `${this.constructor.name} must implement "${method}" method`
+          )
         }
-      });
+      })
     }
   }
 
   decorate(editor: LexicalEditor): mixed {
-    invariant(false, 'decorate: base method not extended');
+    invariant(false, 'decorate: base method not extended')
   }
 
   isIsolated(): boolean {
-    return false;
+    return false
   }
 
   isTopLevel(): boolean {
-    return false;
+    return false
   }
 }
 
 export function $isDecoratorNode(node: ?LexicalNode): boolean %checks {
-  return node instanceof DecoratorNode;
+  return node instanceof DecoratorNode
 }

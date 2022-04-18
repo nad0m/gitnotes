@@ -15,7 +15,7 @@
  */
 
 const {
-  installDefaultBrowsersForNpmInstall,
-} = require('playwright-core/lib/utils/registry');
+  installDefaultBrowsersForNpmInstall
+} = require('playwright-core/lib/utils/registry')
 
-installDefaultBrowsersForNpmInstall();
+installDefaultBrowsersForNpmInstall()

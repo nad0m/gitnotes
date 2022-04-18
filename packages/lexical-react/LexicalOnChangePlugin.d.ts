@@ -6,7 +6,7 @@
  *
  */
 
-import type {EditorState, LexicalEditor} from 'lexical';
+import type { EditorState, LexicalEditor } from 'lexical'
 export default function OnChangePlugin(arg0: {
-  onChange: (editorState: EditorState, editor: LexicalEditor) => void;
-}): null;
+  onChange: (editorState: EditorState, editor: LexicalEditor) => void
+}): null

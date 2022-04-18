@@ -6,39 +6,39 @@
  *
  */
 
-import type {State} from 'lexical';
+import type { State } from 'lexical'
 
 import {
   $createParagraphNode,
   $createTextNode,
   $getNodeByKey,
   $getRoot,
-  $getSelection,
-} from 'lexical';
-import React from 'react';
-import {createRoot} from 'react-dom/client';
-import ReactTestUtils from 'react-dom/test-utils';
+  $getSelection
+} from 'lexical'
+import React from 'react'
+import { createRoot } from 'react-dom/client'
+import ReactTestUtils from 'react-dom/test-utils'
 
 import {
   $createTestSegmentedNode,
-  createTestEditor,
-} from '../../../__tests__/utils';
+  createTestEditor
+} from '../../../__tests__/utils'
 import {
   IS_BOLD,
   IS_CODE,
   IS_ITALIC,
   IS_STRIKETHROUGH,
-  IS_UNDERLINE,
-} from '../../../LexicalConstants';
+  IS_UNDERLINE
+} from '../../../LexicalConstants'
 import {
   $getCompositionKey,
   $setCompositionKey,
-  getEditorStateTextContent,
-} from '../../../LexicalUtils';
+  getEditorStateTextContent
+} from '../../../LexicalUtils'
 
 // No idea why we suddenly need to do this, but it fixes the tests
 // with latest experimental React version.
-global.IS_REACT_ACT_ENVIRONMENT = true;
+global.IS_REACT_ACT_ENVIRONMENT = true
 
 const editorConfig = Object.freeze({
   theme: {
@@ -48,339 +48,339 @@ const editorConfig = Object.freeze({
       italic: 'my-italic-class',
       strikethrough: 'my-strikethrough-class',
       underline: 'my-underline-class',
-      underlineStrikethrough: 'my-underline-strikethrough-class',
-    },
-  },
-});
+      underlineStrikethrough: 'my-underline-strikethrough-class'
+    }
+  }
+})
 
 describe('LexicalTextNode tests', () => {
-  let container = null;
+  let container = null
 
   beforeEach(async () => {
-    container = document.createElement('div');
-    document.body.appendChild(container);
-    await init();
-  });
+    container = document.createElement('div')
+    document.body.appendChild(container)
+    await init()
+  })
 
   afterEach(() => {
-    document.body.removeChild(container);
-    container = null;
-  });
+    document.body.removeChild(container)
+    container = null
+  })
 
   async function update(fn) {
-    editor.update(fn);
-    return Promise.resolve().then();
+    editor.update(fn)
+    return Promise.resolve().then()
   }
 
   function useLexicalEditor(rootElementRef) {
-    const editor = React.useMemo(() => createTestEditor(), []);
+    const editor = React.useMemo(() => createTestEditor(), [])
 
     React.useEffect(() => {
-      const rootElement = rootElementRef.current;
+      const rootElement = rootElementRef.current
 
-      editor.setRootElement(rootElement);
-    }, [rootElementRef, editor]);
+      editor.setRootElement(rootElement)
+    }, [rootElementRef, editor])
 
-    return editor;
+    return editor
   }
 
-  let editor = null;
+  let editor = null
 
   async function init() {
-    const ref = React.createRef();
+    const ref = React.createRef()
 
     function TestBase() {
-      editor = useLexicalEditor(ref);
-      return <div ref={ref} contentEditable={true} />;
+      editor = useLexicalEditor(ref)
+      return <div ref={ref} contentEditable={true} />
     }
 
     ReactTestUtils.act(() => {
-      createRoot(container).render(<TestBase />);
-    });
+      createRoot(container).render(<TestBase />)
+    })
 
     // Insert initial block
     await update(() => {
-      const paragraph = $createParagraphNode();
-      const text = $createTextNode();
-      text.toggleUnmergeable();
-      paragraph.append(text);
-      $getRoot().append(paragraph);
-    });
+      const paragraph = $createParagraphNode()
+      const text = $createTextNode()
+      text.toggleUnmergeable()
+      paragraph.append(text)
+      $getRoot().append(paragraph)
+    })
   }
 
   describe('root.getTextContent()', () => {
     test('writable nodes', async () => {
-      let nodeKey;
+      let nodeKey
 
       await update(() => {
-        const textNode = $createTextNode('Text');
-        nodeKey = textNode.getKey();
-        expect(textNode.getTextContent()).toBe('Text');
-        expect(textNode.getTextContent(true)).toBe('Text');
-        expect(textNode.__text).toBe('Text');
+        const textNode = $createTextNode('Text')
+        nodeKey = textNode.getKey()
+        expect(textNode.getTextContent()).toBe('Text')
+        expect(textNode.getTextContent(true)).toBe('Text')
+        expect(textNode.__text).toBe('Text')
 
-        $getRoot().getFirstChild().append(textNode);
-      });
+        $getRoot().getFirstChild().append(textNode)
+      })
       expect(
         editor.getEditorState().read((state: State) => {
-          const root = $getRoot();
-          return root.__cachedText;
-        }),
-      );
-      expect(getEditorStateTextContent(editor.getEditorState())).toBe('Text');
+          const root = $getRoot()
+          return root.__cachedText
+        })
+      )
+      expect(getEditorStateTextContent(editor.getEditorState())).toBe('Text')
 
       // Make sure that the editor content is still set after further reconciliations
       await update(() => {
-        $getNodeByKey(nodeKey).markDirty();
-      });
-      expect(getEditorStateTextContent(editor.getEditorState())).toBe('Text');
-    });
+        $getNodeByKey(nodeKey).markDirty()
+      })
+      expect(getEditorStateTextContent(editor.getEditorState())).toBe('Text')
+    })
 
     test('inert nodes', async () => {
-      let nodeKey;
+      let nodeKey
 
       await update(() => {
-        const textNode = $createTextNode('Inert text').setMode('inert');
-        nodeKey = textNode.getKey();
-        expect(textNode.getTextContent()).toBe('');
-        expect(textNode.getTextContent(true)).toBe('Inert text');
-        expect(textNode.__text).toBe('Inert text');
+        const textNode = $createTextNode('Inert text').setMode('inert')
+        nodeKey = textNode.getKey()
+        expect(textNode.getTextContent()).toBe('')
+        expect(textNode.getTextContent(true)).toBe('Inert text')
+        expect(textNode.__text).toBe('Inert text')
 
-        $getRoot().getFirstChild().append(textNode);
-      });
+        $getRoot().getFirstChild().append(textNode)
+      })
 
-      expect(getEditorStateTextContent(editor.getEditorState())).toBe('');
+      expect(getEditorStateTextContent(editor.getEditorState())).toBe('')
 
       // Make sure that the editor content is still empty after further reconciliations
       await update(() => {
-        $getNodeByKey(nodeKey).markDirty();
-      });
-      expect(getEditorStateTextContent(editor.getEditorState())).toBe('');
-    });
+        $getNodeByKey(nodeKey).markDirty()
+      })
+      expect(getEditorStateTextContent(editor.getEditorState())).toBe('')
+    })
 
     test('prepend node', async () => {
       await update(() => {
-        const textNode = $createTextNode('World').toggleUnmergeable();
-        $getRoot().getFirstChild().append(textNode);
-      });
+        const textNode = $createTextNode('World').toggleUnmergeable()
+        $getRoot().getFirstChild().append(textNode)
+      })
 
       await update(() => {
-        const textNode = $createTextNode('Hello ').toggleUnmergeable();
-        const previousTextNode = $getRoot().getFirstChild().getFirstChild();
-        previousTextNode.insertBefore(textNode);
-      });
+        const textNode = $createTextNode('Hello ').toggleUnmergeable()
+        const previousTextNode = $getRoot().getFirstChild().getFirstChild()
+        previousTextNode.insertBefore(textNode)
+      })
 
       expect(getEditorStateTextContent(editor.getEditorState())).toBe(
-        'Hello World',
-      );
-    });
-  });
+        'Hello World'
+      )
+    })
+  })
 
   describe('setTextContent()', () => {
     test('writable nodes', async () => {
       await update(() => {
-        const textNode = $createTextNode('My new text node');
-        textNode.setTextContent('My newer text node');
+        const textNode = $createTextNode('My new text node')
+        textNode.setTextContent('My newer text node')
 
-        expect(textNode.getTextContent()).toBe('My newer text node');
-      });
-    });
+        expect(textNode.getTextContent()).toBe('My newer text node')
+      })
+    })
 
     test('inert nodes', async () => {
       await update(() => {
-        const textNode = $createTextNode('My inert text node');
-        textNode.setMode('inert');
+        const textNode = $createTextNode('My inert text node')
+        textNode.setMode('inert')
 
-        expect(textNode.getTextContent()).toBe('');
-        expect(textNode.getTextContent(true)).toBe('My inert text node');
-      });
-    });
-  });
+        expect(textNode.getTextContent()).toBe('')
+        expect(textNode.getTextContent(true)).toBe('My inert text node')
+      })
+    })
+  })
 
   describe.each([
     [
       'bold',
       IS_BOLD,
       (node) => node.hasFormat('bold'),
-      (node) => node.toggleFormat('bold'),
+      (node) => node.toggleFormat('bold')
     ],
     [
       'italic',
       IS_ITALIC,
       (node) => node.hasFormat('italic'),
-      (node) => node.toggleFormat('italic'),
+      (node) => node.toggleFormat('italic')
     ],
     [
       'strikethrough',
       IS_STRIKETHROUGH,
       (node) => node.hasFormat('strikethrough'),
-      (node) => node.toggleFormat('strikethrough'),
+      (node) => node.toggleFormat('strikethrough')
     ],
     [
       'underline',
       IS_UNDERLINE,
       (node) => node.hasFormat('underline'),
-      (node) => node.toggleFormat('underline'),
+      (node) => node.toggleFormat('underline')
     ],
     [
       'code',
       IS_CODE,
       (node) => node.hasFormat('code'),
-      (node) => node.toggleFormat('code'),
-    ],
+      (node) => node.toggleFormat('code')
+    ]
   ])('%s flag', (formatFlag, stateFormat, flagPredicate, flagToggle) => {
     test(`getFormatFlags(${formatFlag})`, async () => {
       await update(() => {
-        const root = $getRoot();
-        const paragraphNode = root.getFirstChild();
-        const textNode = paragraphNode.getFirstChild();
+        const root = $getRoot()
+        const paragraphNode = root.getFirstChild()
+        const textNode = paragraphNode.getFirstChild()
 
-        const newFormat = textNode.getFormatFlags(formatFlag, null);
-        expect(newFormat).toBe(stateFormat);
+        const newFormat = textNode.getFormatFlags(formatFlag, null)
+        expect(newFormat).toBe(stateFormat)
 
-        textNode.setFormat(newFormat);
-        const newFormat2 = textNode.getFormatFlags(formatFlag, null);
-        expect(newFormat2).toBe(0);
-      });
-    });
+        textNode.setFormat(newFormat)
+        const newFormat2 = textNode.getFormatFlags(formatFlag, null)
+        expect(newFormat2).toBe(0)
+      })
+    })
 
     test(`predicate for ${formatFlag}`, async () => {
       await update(() => {
-        const root = $getRoot();
-        const paragraphNode = root.getFirstChild();
-        const textNode = paragraphNode.getFirstChild();
+        const root = $getRoot()
+        const paragraphNode = root.getFirstChild()
+        const textNode = paragraphNode.getFirstChild()
 
-        textNode.setFormat(stateFormat);
-        expect(flagPredicate(textNode)).toBe(true);
-      });
-    });
+        textNode.setFormat(stateFormat)
+        expect(flagPredicate(textNode)).toBe(true)
+      })
+    })
 
     test(`toggling for ${formatFlag}`, async () => {
       // Toggle method hasn't been implemented for this flag.
       if (flagToggle === null) {
-        return;
+        return
       }
 
       await update(() => {
-        const root = $getRoot();
-        const paragraphNode = root.getFirstChild();
-        const textNode = paragraphNode.getFirstChild();
+        const root = $getRoot()
+        const paragraphNode = root.getFirstChild()
+        const textNode = paragraphNode.getFirstChild()
 
-        expect(flagPredicate(textNode)).toBe(false);
-        flagToggle(textNode);
-        expect(flagPredicate(textNode)).toBe(true);
-        flagToggle(textNode);
-        expect(flagPredicate(textNode)).toBe(false);
-      });
-    });
-  });
+        expect(flagPredicate(textNode)).toBe(false)
+        flagToggle(textNode)
+        expect(flagPredicate(textNode)).toBe(true)
+        flagToggle(textNode)
+        expect(flagPredicate(textNode)).toBe(false)
+      })
+    })
+  })
 
   test('selectPrevious()', async () => {
     await update(() => {
-      const paragraphNode = $createParagraphNode();
-      const textNode = $createTextNode('Hello World');
-      const textNode2 = $createTextNode('Goodbye Earth');
+      const paragraphNode = $createParagraphNode()
+      const textNode = $createTextNode('Hello World')
+      const textNode2 = $createTextNode('Goodbye Earth')
 
-      paragraphNode.append(textNode, textNode2);
-      $getRoot().append(paragraphNode);
+      paragraphNode.append(textNode, textNode2)
+      $getRoot().append(paragraphNode)
 
-      let selection = textNode2.selectPrevious();
+      let selection = textNode2.selectPrevious()
 
-      expect(selection.anchor.getNode()).toBe(textNode);
-      expect(selection.anchor.offset).toBe(11);
-      expect(selection.focus.getNode()).toBe(textNode);
-      expect(selection.focus.offset).toBe(11);
+      expect(selection.anchor.getNode()).toBe(textNode)
+      expect(selection.anchor.offset).toBe(11)
+      expect(selection.focus.getNode()).toBe(textNode)
+      expect(selection.focus.offset).toBe(11)
 
-      selection = textNode.selectPrevious();
-      expect(selection.anchor.getNode()).toBe(paragraphNode);
-      expect(selection.anchor.offset).toBe(0);
-    });
-  });
+      selection = textNode.selectPrevious()
+      expect(selection.anchor.getNode()).toBe(paragraphNode)
+      expect(selection.anchor.offset).toBe(0)
+    })
+  })
 
   test('selectNext()', async () => {
     await update(() => {
-      const paragraphNode = $createParagraphNode();
-      const textNode = $createTextNode('Hello World');
-      const textNode2 = $createTextNode('Goodbye Earth');
+      const paragraphNode = $createParagraphNode()
+      const textNode = $createTextNode('Hello World')
+      const textNode2 = $createTextNode('Goodbye Earth')
 
-      paragraphNode.append(textNode, textNode2);
-      $getRoot().append(paragraphNode);
+      paragraphNode.append(textNode, textNode2)
+      $getRoot().append(paragraphNode)
 
-      let selection = textNode.selectNext(1, 3);
+      let selection = textNode.selectNext(1, 3)
 
-      expect(selection.anchor.getNode()).toBe(textNode2);
-      expect(selection.anchor.offset).toBe(1);
-      expect(selection.focus.getNode()).toBe(textNode2);
-      expect(selection.focus.offset).toBe(3);
+      expect(selection.anchor.getNode()).toBe(textNode2)
+      expect(selection.anchor.offset).toBe(1)
+      expect(selection.focus.getNode()).toBe(textNode2)
+      expect(selection.focus.offset).toBe(3)
 
-      selection = textNode2.selectNext();
-      expect(selection.anchor.getNode()).toBe(paragraphNode);
-      expect(selection.anchor.offset).toBe(2);
-    });
-  });
+      selection = textNode2.selectNext()
+      expect(selection.anchor.getNode()).toBe(paragraphNode)
+      expect(selection.anchor.offset).toBe(2)
+    })
+  })
 
   describe('select()', () => {
     test.each([
       [
         [2, 4],
-        [2, 4],
+        [2, 4]
       ],
       [
         [4, 2],
-        [4, 2],
+        [4, 2]
       ],
       [
         [undefined, 2],
-        [11, 2],
+        [11, 2]
       ],
       [
         [2, undefined],
-        [2, 11],
+        [2, 11]
       ],
       [
         [undefined, undefined],
-        [11, 11],
-      ],
+        [11, 11]
+      ]
     ])(
       'select(...%p)',
       async (
         [anchorOffset, focusOffset],
-        [expectedAnchorOffset, expectedFocusOffset],
+        [expectedAnchorOffset, expectedFocusOffset]
       ) => {
         await update(() => {
-          const paragraphNode = $createParagraphNode();
-          const textNode = $createTextNode('Hello World');
-          paragraphNode.append(textNode);
-          $getRoot().append(paragraphNode);
+          const paragraphNode = $createParagraphNode()
+          const textNode = $createTextNode('Hello World')
+          paragraphNode.append(textNode)
+          $getRoot().append(paragraphNode)
 
-          const selection = textNode.select(anchorOffset, focusOffset);
+          const selection = textNode.select(anchorOffset, focusOffset)
 
-          expect(selection.focus.getNode()).toBe(textNode);
-          expect(selection.anchor.offset).toBe(expectedAnchorOffset);
-          expect(selection.focus.getNode()).toBe(textNode);
-          expect(selection.focus.offset).toBe(expectedFocusOffset);
-        });
-      },
-    );
-  });
+          expect(selection.focus.getNode()).toBe(textNode)
+          expect(selection.anchor.offset).toBe(expectedAnchorOffset)
+          expect(selection.focus.getNode()).toBe(textNode)
+          expect(selection.focus.offset).toBe(expectedFocusOffset)
+        })
+      }
+    )
+  })
 
   describe('splitText()', () => {
     test('convert segmented node into plain text', async () => {
       await update(() => {
-        const segmentedNode = $createTestSegmentedNode('Hello World');
-        const paragraphNode = $createParagraphNode();
-        paragraphNode.append(segmentedNode);
+        const segmentedNode = $createTestSegmentedNode('Hello World')
+        const paragraphNode = $createParagraphNode()
+        paragraphNode.append(segmentedNode)
 
-        const [middle, next] = segmentedNode.splitText(5);
+        const [middle, next] = segmentedNode.splitText(5)
 
-        const children = paragraphNode.getAllTextNodes();
-        expect(paragraphNode.getTextContent()).toBe('Hello World');
-        expect(children[0].isSimpleText()).toBe(true);
-        expect(children[0].getTextContent()).toBe('Hello');
-        expect(middle).toBe(children[0]);
-        expect(next).toBe(children[1]);
-      });
-    });
+        const children = paragraphNode.getAllTextNodes()
+        expect(paragraphNode.getTextContent()).toBe('Hello World')
+        expect(children[0].isSimpleText()).toBe(true)
+        expect(children[0].getTextContent()).toBe('Hello')
+        expect(middle).toBe(children[0])
+        expect(next).toBe(children[1])
+      })
+    })
 
     test.each([
       ['a', [], ['a']],
@@ -391,36 +391,36 @@ describe('LexicalTextNode tests', () => {
       ['Hello World', [3, 3], ['Hel', 'lo World']],
       ['Hello World', [3, 7], ['Hel', 'lo W', 'orld']],
       ['Hello World', [7, 3], ['Hel', 'lo W', 'orld']],
-      ['Hello World', [3, 7, 99], ['Hel', 'lo W', 'orld']],
+      ['Hello World', [3, 7, 99], ['Hel', 'lo W', 'orld']]
     ])(
       '"%s" splitText(...%p)',
       async (initialString, splitOffsets, splitStrings) => {
         await update(() => {
-          const paragraphNode = $createParagraphNode();
-          const textNode = $createTextNode(initialString);
-          paragraphNode.append(textNode);
+          const paragraphNode = $createParagraphNode()
+          const textNode = $createTextNode(initialString)
+          paragraphNode.append(textNode)
 
-          const splitNodes = textNode.splitText(...splitOffsets);
+          const splitNodes = textNode.splitText(...splitOffsets)
 
-          expect(paragraphNode.getChildren()).toHaveLength(splitStrings.length);
+          expect(paragraphNode.getChildren()).toHaveLength(splitStrings.length)
           expect(splitNodes.map((node) => node.getTextContent())).toEqual(
-            splitStrings,
-          );
-        });
-      },
-    );
+            splitStrings
+          )
+        })
+      }
+    )
 
     test('splitText moves composition key to last node', async () => {
       await update(() => {
-        const paragraphNode = $createParagraphNode();
-        const textNode = $createTextNode('12345');
-        paragraphNode.append(textNode);
-        $setCompositionKey(textNode.getKey());
+        const paragraphNode = $createParagraphNode()
+        const textNode = $createTextNode('12345')
+        paragraphNode.append(textNode)
+        $setCompositionKey(textNode.getKey())
 
-        const [, splitNode2] = textNode.splitText(1);
-        expect($getCompositionKey()).toBe(splitNode2.getKey());
-      });
-    });
+        const [, splitNode2] = textNode.splitText(1)
+        expect($getCompositionKey()).toBe(splitNode2.getKey())
+      })
+    })
 
     test.each([
       [
@@ -431,8 +431,8 @@ describe('LexicalTextNode tests', () => {
           anchorNodeIndex: 0,
           anchorOffset: 3,
           focusNodeIndex: 0,
-          focusOffset: 3,
-        },
+          focusOffset: 3
+        }
       ],
       [
         'Hello',
@@ -442,8 +442,8 @@ describe('LexicalTextNode tests', () => {
           anchorNodeIndex: 1,
           anchorOffset: 1,
           focusNodeIndex: 1,
-          focusOffset: 1,
-        },
+          focusOffset: 1
+        }
       ],
       [
         'Hello World',
@@ -453,8 +453,8 @@ describe('LexicalTextNode tests', () => {
           anchorNodeIndex: 0,
           anchorOffset: 2,
           focusNodeIndex: 1,
-          focusOffset: 3,
-        },
+          focusOffset: 3
+        }
       ],
       [
         'Hello World',
@@ -464,8 +464,8 @@ describe('LexicalTextNode tests', () => {
           anchorNodeIndex: 0,
           anchorOffset: 2,
           focusNodeIndex: 0,
-          focusOffset: 4,
-        },
+          focusOffset: 4
+        }
       ],
       [
         'Hello World',
@@ -475,8 +475,8 @@ describe('LexicalTextNode tests', () => {
           anchorNodeIndex: 1,
           anchorOffset: 3,
           focusNodeIndex: 0,
-          focusOffset: 2,
-        },
+          focusOffset: 2
+        }
       ],
       [
         'Hello World',
@@ -486,8 +486,8 @@ describe('LexicalTextNode tests', () => {
           anchorNodeIndex: 0,
           anchorOffset: 2,
           focusNodeIndex: 2,
-          focusOffset: 3,
-        },
+          focusOffset: 3
+        }
       ],
       [
         'Hello World',
@@ -497,8 +497,8 @@ describe('LexicalTextNode tests', () => {
           anchorNodeIndex: 2,
           anchorOffset: 3,
           focusNodeIndex: 0,
-          focusOffset: 2,
-        },
+          focusOffset: 2
+        }
       ],
       [
         'Hello World',
@@ -508,36 +508,36 @@ describe('LexicalTextNode tests', () => {
           anchorNodeIndex: 2,
           anchorOffset: 3,
           focusNodeIndex: 2,
-          focusOffset: 3,
-        },
-      ],
+          focusOffset: 3
+        }
+      ]
     ])(
       '"%s" splitText(...%p) with select(...%p)',
       async (
         initialString,
         splitOffsets,
         selectionOffsets,
-        {anchorNodeIndex, anchorOffset, focusNodeIndex, focusOffset},
+        { anchorNodeIndex, anchorOffset, focusNodeIndex, focusOffset }
       ) => {
         await update(() => {
-          const paragraphNode = $createParagraphNode();
-          const textNode = $createTextNode(initialString);
-          paragraphNode.append(textNode);
-          $getRoot().append(paragraphNode);
+          const paragraphNode = $createParagraphNode()
+          const textNode = $createTextNode(initialString)
+          paragraphNode.append(textNode)
+          $getRoot().append(paragraphNode)
 
-          const selection = textNode.select(...selectionOffsets);
-          const childrenNodes = textNode.splitText(...splitOffsets);
+          const selection = textNode.select(...selectionOffsets)
+          const childrenNodes = textNode.splitText(...splitOffsets)
 
           expect(selection.anchor.getNode()).toBe(
-            childrenNodes[anchorNodeIndex],
-          );
-          expect(selection.anchor.offset).toBe(anchorOffset);
-          expect(selection.focus.getNode()).toBe(childrenNodes[focusNodeIndex]);
-          expect(selection.focus.offset).toBe(focusOffset);
-        });
-      },
-    );
-  });
+            childrenNodes[anchorNodeIndex]
+          )
+          expect(selection.anchor.offset).toBe(anchorOffset)
+          expect(selection.focus.getNode()).toBe(childrenNodes[focusNodeIndex])
+          expect(selection.focus.offset).toBe(focusOffset)
+        })
+      }
+    )
+  })
 
   describe('createDOM()', () => {
     test.each([
@@ -546,88 +546,88 @@ describe('LexicalTextNode tests', () => {
         'bold',
         IS_BOLD,
         'My text node',
-        '<strong class="my-bold-class">My text node</strong>',
+        '<strong class="my-bold-class">My text node</strong>'
       ],
       ['bold + empty', IS_BOLD, '', `<strong class="my-bold-class"></strong>`],
       [
         'underline',
         IS_UNDERLINE,
         'My text node',
-        '<span class="my-underline-class">My text node</span>',
+        '<span class="my-underline-class">My text node</span>'
       ],
       [
         'strikethrough',
         IS_STRIKETHROUGH,
         'My text node',
-        '<span class="my-strikethrough-class">My text node</span>',
+        '<span class="my-strikethrough-class">My text node</span>'
       ],
       [
         'italic',
         IS_ITALIC,
         'My text node',
-        '<em class="my-italic-class">My text node</em>',
+        '<em class="my-italic-class">My text node</em>'
       ],
       [
         'code',
         IS_CODE,
         'My text node',
-        '<code><span class="my-code-class">My text node</span></code>',
+        '<code><span class="my-code-class">My text node</span></code>'
       ],
       [
         'underline + strikethrough',
         IS_UNDERLINE | IS_STRIKETHROUGH,
         'My text node',
         '<span class="my-underline-strikethrough-class">' +
-          'My text node</span>',
+          'My text node</span>'
       ],
       [
         'code + italic',
         IS_CODE | IS_ITALIC,
         'My text node',
-        '<code><em class="my-code-class my-italic-class">My text node</em></code>',
+        '<code><em class="my-code-class my-italic-class">My text node</em></code>'
       ],
       [
         'code + underline + strikethrough',
         IS_CODE | IS_UNDERLINE | IS_STRIKETHROUGH,
         'My text node',
         '<code><span class="my-underline-strikethrough-class my-code-class">' +
-          'My text node</span></code>',
+          'My text node</span></code>'
       ],
       [
         'code + underline + strikethrough + bold + italic',
         IS_CODE | IS_UNDERLINE | IS_STRIKETHROUGH | IS_BOLD | IS_ITALIC,
         'My text node',
-        '<code><strong class="my-underline-strikethrough-class my-bold-class my-code-class my-italic-class">My text node</strong></code>',
-      ],
+        '<code><strong class="my-underline-strikethrough-class my-bold-class my-code-class my-italic-class">My text node</strong></code>'
+      ]
     ])('%s text format type', async (_type, format, contents, expectedHTML) => {
       await update(() => {
-        const textNode = $createTextNode(contents);
-        textNode.setFormat(format);
-        const element = textNode.createDOM(editorConfig);
-        expect(element.outerHTML).toBe(expectedHTML);
-      });
-    });
+        const textNode = $createTextNode(contents)
+        textNode.setFormat(format)
+        const element = textNode.createDOM(editorConfig)
+        expect(element.outerHTML).toBe(expectedHTML)
+      })
+    })
 
     describe('has parent node', () => {
       test.each([
         ['no formatting', null, 'My text node', '<span>My text node</span>'],
-        ['no formatting + empty string', null, '', `<span></span>`],
+        ['no formatting + empty string', null, '', `<span></span>`]
       ])(
         '%s text format type',
         async (_type, format, contents, expectedHTML) => {
           await update(() => {
-            const paragraphNode = $createParagraphNode();
-            const textNode = $createTextNode(contents);
-            textNode.setFormat(format);
-            paragraphNode.append(textNode);
+            const paragraphNode = $createParagraphNode()
+            const textNode = $createTextNode(contents)
+            textNode.setFormat(format)
+            paragraphNode.append(textNode)
 
-            const element = textNode.createDOM(editorConfig);
-            expect(element.outerHTML).toBe(expectedHTML);
-          });
-        },
-      );
-    });
-  });
+            const element = textNode.createDOM(editorConfig)
+            expect(element.outerHTML).toBe(expectedHTML)
+          })
+        }
+      )
+    })
+  })
 
   describe('updateDOM()', () => {
     test.each([
@@ -636,122 +636,122 @@ describe('LexicalTextNode tests', () => {
         {
           format: IS_BOLD,
           mode: 'normal',
-          text: 'My text node',
+          text: 'My text node'
         },
         {
           format: IS_ITALIC,
           mode: 'normal',
-          text: 'My text node',
+          text: 'My text node'
         },
         {
           expectedHTML: null,
-          result: true,
-        },
+          result: true
+        }
       ],
       [
         'no change in tags',
         {
           format: IS_BOLD,
           mode: 'normal',
-          text: 'My text node',
+          text: 'My text node'
         },
         {
           format: IS_BOLD,
           mode: 'normal',
-          text: 'My text node',
+          text: 'My text node'
         },
         {
           expectedHTML: '<strong class="my-bold-class">My text node</strong>',
-          result: false,
-        },
+          result: false
+        }
       ],
       [
         'change in text',
         {
           format: IS_BOLD,
           mode: 'normal',
-          text: 'My text node',
+          text: 'My text node'
         },
         {
           format: IS_BOLD,
           mode: 'normal',
-          text: 'My new text node',
+          text: 'My new text node'
         },
         {
           expectedHTML:
             '<strong class="my-bold-class">My new text node</strong>',
-          result: false,
-        },
+          result: false
+        }
       ],
       [
         'removing code block',
         {
           format: IS_CODE | IS_BOLD,
           mode: 'normal',
-          text: 'My text node',
+          text: 'My text node'
         },
         {
           format: IS_BOLD,
           mode: 'normal',
-          text: 'My new text node',
+          text: 'My new text node'
         },
         {
           expectedHTML: null,
-          result: true,
-        },
-      ],
+          result: true
+        }
+      ]
     ])(
       '%s',
       async (
         _desc,
-        {text: prevText, mode: prevMode, format: prevFormat},
-        {text: nextText, mode: nextMode, format: nextFormat},
-        {result, expectedHTML},
+        { text: prevText, mode: prevMode, format: prevFormat },
+        { text: nextText, mode: nextMode, format: nextFormat },
+        { result, expectedHTML }
       ) => {
         await update(() => {
-          const prevTextNode = $createTextNode(prevText);
-          prevTextNode.setMode(prevMode);
-          prevTextNode.setFormat(prevFormat);
-          const element = prevTextNode.createDOM(editorConfig);
+          const prevTextNode = $createTextNode(prevText)
+          prevTextNode.setMode(prevMode)
+          prevTextNode.setFormat(prevFormat)
+          const element = prevTextNode.createDOM(editorConfig)
 
-          const textNode = $createTextNode(nextText);
-          textNode.setMode(nextMode);
-          textNode.setFormat(nextFormat);
+          const textNode = $createTextNode(nextText)
+          textNode.setMode(nextMode)
+          textNode.setFormat(nextFormat)
 
           expect(textNode.updateDOM(prevTextNode, element, editorConfig)).toBe(
-            result,
-          );
+            result
+          )
           // Only need to bother about DOM element contents if updateDOM()
           // returns false.
           if (!result) {
-            expect(element.outerHTML).toBe(expectedHTML);
+            expect(element.outerHTML).toBe(expectedHTML)
           }
-        });
-      },
-    );
-  });
+        })
+      }
+    )
+  })
 
   test('mergeWithSibling', async () => {
     await update(() => {
-      const paragraph = $getRoot().getFirstChild();
-      const textNode1 = $createTextNode('1');
-      const textNode2 = $createTextNode('2');
-      const textNode3 = $createTextNode('3');
-      paragraph.append(textNode1, textNode2, textNode3);
-      textNode2.select();
+      const paragraph = $getRoot().getFirstChild()
+      const textNode1 = $createTextNode('1')
+      const textNode2 = $createTextNode('2')
+      const textNode3 = $createTextNode('3')
+      paragraph.append(textNode1, textNode2, textNode3)
+      textNode2.select()
 
-      const selection = $getSelection();
-      textNode2.mergeWithSibling(textNode1);
-      expect(selection.anchor.getNode()).toBe(textNode2);
-      expect(selection.anchor.offset).toBe(1);
-      expect(selection.focus.offset).toBe(1);
+      const selection = $getSelection()
+      textNode2.mergeWithSibling(textNode1)
+      expect(selection.anchor.getNode()).toBe(textNode2)
+      expect(selection.anchor.offset).toBe(1)
+      expect(selection.focus.offset).toBe(1)
 
-      textNode2.mergeWithSibling(textNode3);
-      expect(selection.anchor.getNode()).toBe(textNode2);
-      expect(selection.anchor.offset).toBe(1);
-      expect(selection.focus.offset).toBe(1);
-    });
+      textNode2.mergeWithSibling(textNode3)
+      expect(selection.anchor.getNode()).toBe(textNode2)
+      expect(selection.anchor.offset).toBe(1)
+      expect(selection.focus.offset).toBe(1)
+    })
 
-    expect(getEditorStateTextContent(editor.getEditorState())).toBe('123');
-  });
-});
+    expect(getEditorStateTextContent(editor.getEditorState())).toBe('123')
+  })
+})

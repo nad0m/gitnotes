@@ -11,21 +11,21 @@ import type {
   AutoFormatTriggerState,
   MarkdownCriteriaArray,
   MarkdownCriteriaWithPatternMatchResults,
-  ScanningContext,
-} from './utils';
-import type {TextNodeWithOffset} from '@lexical/text';
+  ScanningContext
+} from './utils'
+import type { TextNodeWithOffset } from '@lexical/text'
 import type {
   DecoratorNode,
   EditorState,
   GridSelection,
   LexicalEditor,
   NodeSelection,
-  RangeSelection,
-} from 'lexical';
+  RangeSelection
+} from 'lexical'
 
-import {$isCodeNode} from '@lexical/code';
-import {$isListItemNode} from '@lexical/list';
-import {$getSelection, $isRangeSelection, $isTextNode} from 'lexical';
+import { $isCodeNode } from '@lexical/code'
+import { $isListItemNode } from '@lexical/list'
+import { $getSelection, $isRangeSelection, $isTextNode } from 'lexical'
 
 import {
   getAllMarkdownCriteria,
@@ -36,54 +36,54 @@ import {
   getPatternMatchResultsForCriteria,
   getTextNodeWithOffsetOrThrow,
   transformTextNodeForMarkdownCriteria,
-  triggers,
-} from './utils';
+  triggers
+} from './utils'
 
 function getTextNodeForAutoFormatting(
-  selection: null | RangeSelection | NodeSelection | GridSelection,
+  selection: null | RangeSelection | NodeSelection | GridSelection
 ): null | TextNodeWithOffset {
   if (!$isRangeSelection(selection)) {
-    return null;
+    return null
   }
-  const node = selection.anchor.getNode();
+  const node = selection.anchor.getNode()
 
   if (!$isTextNode(node)) {
-    return null;
+    return null
   }
-  return {node, offset: selection.anchor.offset};
+  return { node, offset: selection.anchor.offset }
 }
 
 export function updateAutoFormatting<T>(
   editor: LexicalEditor,
   scanningContext: ScanningContext,
-  createHorizontalRuleNode: () => DecoratorNode<T>,
+  createHorizontalRuleNode: () => DecoratorNode<T>
 ): void {
   editor.update(
     () => {
       const elementNode =
-        getTextNodeWithOffsetOrThrow(scanningContext).node.getParentOrThrow();
+        getTextNodeWithOffsetOrThrow(scanningContext).node.getParentOrThrow()
 
       transformTextNodeForMarkdownCriteria(
         scanningContext,
         elementNode,
-        createHorizontalRuleNode,
-      );
+        createHorizontalRuleNode
+      )
     },
     {
-      tag: 'history-push',
-    },
-  );
+      tag: 'history-push'
+    }
+  )
 }
 
 function getCriteriaWithPatternMatchResults(
   markdownCriteriaArray: MarkdownCriteriaArray,
-  scanningContext: ScanningContext,
+  scanningContext: ScanningContext
 ): MarkdownCriteriaWithPatternMatchResults {
-  const currentTriggerState = scanningContext.triggerState;
+  const currentTriggerState = scanningContext.triggerState
 
-  const count = markdownCriteriaArray.length;
+  const count = markdownCriteriaArray.length
   for (let i = 0; i < count; i++) {
-    const markdownCriteria = markdownCriteriaArray[i];
+    const markdownCriteria = markdownCriteriaArray[i]
 
     // Skip code block nodes, unless the autoFormatKind calls for toggling the code block.
     if (
@@ -94,29 +94,29 @@ function getCriteriaWithPatternMatchResults(
       const patternMatchResults = getPatternMatchResultsForCriteria(
         markdownCriteria,
         scanningContext,
-        getParentElementNodeOrThrow(scanningContext),
-      );
+        getParentElementNodeOrThrow(scanningContext)
+      )
       if (patternMatchResults != null) {
         return {
           markdownCriteria,
-          patternMatchResults,
-        };
+          patternMatchResults
+        }
       }
     }
   }
-  return {markdownCriteria: null, patternMatchResults: null};
+  return { markdownCriteria: null, patternMatchResults: null }
 }
 
 function findScanningContextWithValidMatch(
   editor: LexicalEditor,
-  currentTriggerState: AutoFormatTriggerState,
+  currentTriggerState: AutoFormatTriggerState
 ): null | ScanningContext {
-  let scanningContext = null;
+  let scanningContext = null
   editor.getEditorState().read(() => {
-    const textNodeWithOffset = getTextNodeForAutoFormatting($getSelection());
+    const textNodeWithOffset = getTextNodeForAutoFormatting($getSelection())
 
     if (textNodeWithOffset === null) {
-      return;
+      return
     }
 
     // Please see the declaration of ScanningContext for a detailed explanation.
@@ -124,49 +124,49 @@ function findScanningContextWithValidMatch(
       editor,
       true,
       textNodeWithOffset,
-      currentTriggerState,
-    );
+      currentTriggerState
+    )
 
     const criteriaWithPatternMatchResults = getCriteriaWithPatternMatchResults(
       // Do not apply paragraph node changes like blockQuote or H1 to listNodes. Also, do not attempt to transform a list into a list using * or -.
       currentTriggerState.isParentAListItemNode === false
         ? getAllMarkdownCriteria()
         : getAllMarkdownCriteriaForTextNodes(),
-      initialScanningContext,
-    );
+      initialScanningContext
+    )
 
     if (
       criteriaWithPatternMatchResults.markdownCriteria === null ||
       criteriaWithPatternMatchResults.patternMatchResults === null
     ) {
-      return;
+      return
     }
-    scanningContext = initialScanningContext;
+    scanningContext = initialScanningContext
     // Lazy fill-in the particular format criteria and any matching result information.
     scanningContext.markdownCriteria =
-      criteriaWithPatternMatchResults.markdownCriteria;
+      criteriaWithPatternMatchResults.markdownCriteria
     scanningContext.patternMatchResults =
-      criteriaWithPatternMatchResults.patternMatchResults;
-  });
-  return scanningContext;
+      criteriaWithPatternMatchResults.patternMatchResults
+  })
+  return scanningContext
 }
 
 export function getTriggerState(
-  editorState: EditorState,
+  editorState: EditorState
 ): null | AutoFormatTriggerState {
-  let criteria: null | AutoFormatTriggerState = null;
+  let criteria: null | AutoFormatTriggerState = null
 
   editorState.read(() => {
-    const selection = $getSelection();
+    const selection = $getSelection()
     if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
-      return;
+      return
     }
-    const node = selection.anchor.getNode();
-    const parentNode = node.getParent();
+    const node = selection.anchor.getNode()
+    const parentNode = node.getParent()
 
-    const isParentAListItemNode = $isListItemNode(parentNode);
+    const isParentAListItemNode = $isListItemNode(parentNode)
 
-    const hasParentNode = parentNode !== null;
+    const hasParentNode = parentNode !== null
 
     criteria = {
       anchorOffset: selection.anchor.offset,
@@ -176,33 +176,32 @@ export function getTriggerState(
       isSelectionCollapsed: true,
       isSimpleText: $isTextNode(node) && node.isSimpleText(),
       nodeKey: node.getKey(),
-      textContent: node.getTextContent(),
-    };
-  });
+      textContent: node.getTextContent()
+    }
+  })
 
-  return criteria;
+  return criteria
 }
 
 export function findScanningContext(
   editor: LexicalEditor,
   currentTriggerState: null | AutoFormatTriggerState,
-  priorTriggerState: null | AutoFormatTriggerState,
+  priorTriggerState: null | AutoFormatTriggerState
 ): null | ScanningContext {
   if (currentTriggerState == null || priorTriggerState == null) {
-    return null;
+    return null
   }
 
-  const triggerArray = getAllTriggers();
-  const triggerCount = triggers.length;
+  const triggerArray = getAllTriggers()
+  const triggerCount = triggers.length
   for (let ti = 0; ti < triggerCount; ti++) {
-    const triggerString = triggerArray[ti].triggerString;
+    const triggerString = triggerArray[ti].triggerString
     // The below checks needs to execute relativey quickly, so perform the light-weight ones first.
     // The substr check is a quick way to avoid autoformat parsing in that it looks for the autoformat
     // trigger which is the trigger string (" ").
-    const triggerStringLength = triggerString.length;
-    const currentTextContentLength = currentTriggerState.textContent.length;
-    const triggerOffset =
-      currentTriggerState.anchorOffset - triggerStringLength;
+    const triggerStringLength = triggerString.length
+    const currentTextContentLength = currentTriggerState.textContent.length
+    const triggerOffset = currentTriggerState.anchorOffset - triggerStringLength
 
     // Todo: these checks help w/ performance, yet we can do more.
     // We might consider looking for ** + space or __ + space and so on to boost performance
@@ -216,14 +215,14 @@ export function findScanningContext(
         triggerOffset + triggerStringLength <= currentTextContentLength &&
         currentTriggerState.textContent.substr(
           triggerOffset,
-          triggerStringLength,
+          triggerStringLength
         ) === triggerString && // Some code differentiation needed if trigger kind is not a simple space character.
         currentTriggerState.textContent !== priorTriggerState.textContent) ===
       false
     ) {
-      return null;
+      return null
     }
   }
 
-  return findScanningContextWithValidMatch(editor, currentTriggerState);
+  return findScanningContextWithValidMatch(editor, currentTriggerState)
 }

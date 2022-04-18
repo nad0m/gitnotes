@@ -1,6 +1,8 @@
-import { GithubAuthProvider, signInWithPopup, getAuth } from "firebase/auth"
+import { GithubAuthProvider, signInWithPopup, getAuth } from 'firebase/auth'
 
-export const signInWithGithub = async (onSuccess: (token: string) => void): Promise<void> => {
+export const signInWithGithub = async (
+  onSuccess: (token: string) => void
+): Promise<void> => {
   const provider = new GithubAuthProvider()
   provider.addScope('repo')
   const result = await signInWithPopup(getAuth(), provider)

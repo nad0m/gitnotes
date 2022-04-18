@@ -7,10 +7,10 @@
  * @flow strict
  */
 
-import type {LexicalEditor} from 'lexical';
+import type { LexicalEditor } from 'lexical'
 
-import useMarkdownShortcuts from './shared/useMarkdownShortcuts';
+import useMarkdownShortcuts from './shared/useMarkdownShortcuts'
 
 export default function useLexicalAutoFormatter(editor: LexicalEditor): void {
-  useMarkdownShortcuts(editor);
+  useMarkdownShortcuts(editor)
 }

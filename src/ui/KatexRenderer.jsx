@@ -8,23 +8,23 @@
  */
 
 // $FlowFixMe
-import katex from 'katex';
-import * as React from 'react';
-import {useEffect, useRef} from 'react';
+import katex from 'katex'
+import * as React from 'react'
+import { useEffect, useRef } from 'react'
 
 export default function KatexRenderer({
   equation,
   inline,
-  onClick,
+  onClick
 }: $ReadOnly<{
   equation: string,
   inline: boolean,
-  onClick: () => void,
+  onClick: () => void
 }>): React$Node {
-  const katexElementRef = useRef(null);
+  const katexElementRef = useRef(null)
 
   useEffect(() => {
-    const katexElement = katexElementRef.current;
+    const katexElement = katexElementRef.current
 
     if (katexElement !== null) {
       katex.render(equation, katexElement, {
@@ -33,12 +33,12 @@ export default function KatexRenderer({
         output: 'html',
         strict: 'warn',
         throwOnError: false,
-        trust: false,
-      });
+        trust: false
+      })
     }
-  }, [equation, inline]);
+  }, [equation, inline])
 
   return (
     <span role="button" tabIndex={-1} onClick={onClick} ref={katexElementRef} />
-  );
+  )
 }

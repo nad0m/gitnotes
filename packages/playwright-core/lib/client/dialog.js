@@ -1,11 +1,11 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.Dialog = void 0;
+})
+exports.Dialog = void 0
 
-var _channelOwner = require("./channelOwner");
+var _channelOwner = require('./channelOwner')
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -24,39 +24,38 @@ var _channelOwner = require("./channelOwner");
  */
 class Dialog extends _channelOwner.ChannelOwner {
   static from(dialog) {
-    return dialog._object;
+    return dialog._object
   }
 
   constructor(parent, type, guid, initializer) {
-    super(parent, type, guid, initializer);
+    super(parent, type, guid, initializer)
   }
 
   type() {
-    return this._initializer.type;
+    return this._initializer.type
   }
 
   message() {
-    return this._initializer.message;
+    return this._initializer.message
   }
 
   defaultValue() {
-    return this._initializer.defaultValue;
+    return this._initializer.defaultValue
   }
 
   async accept(promptText) {
-    return this._wrapApiCall(async channel => {
+    return this._wrapApiCall(async (channel) => {
       await channel.accept({
         promptText
-      });
-    });
+      })
+    })
   }
 
   async dismiss() {
-    return this._wrapApiCall(async channel => {
-      await channel.dismiss();
-    });
+    return this._wrapApiCall(async (channel) => {
+      await channel.dismiss()
+    })
   }
-
 }
 
-exports.Dialog = Dialog;
+exports.Dialog = Dialog

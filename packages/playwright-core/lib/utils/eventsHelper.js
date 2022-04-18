@@ -1,9 +1,9 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.eventsHelper = void 0;
+})
+exports.eventsHelper = void 0
 
 /**
  * Copyright 2017 Google Inc. All rights reserved.
@@ -23,21 +23,21 @@ exports.eventsHelper = void 0;
  */
 class EventsHelper {
   static addEventListener(emitter, eventName, handler) {
-    emitter.on(eventName, handler);
+    emitter.on(eventName, handler)
     return {
       emitter,
       eventName,
       handler
-    };
+    }
   }
 
   static removeEventListeners(listeners) {
-    for (const listener of listeners) listener.emitter.removeListener(listener.eventName, listener.handler);
+    for (const listener of listeners)
+      listener.emitter.removeListener(listener.eventName, listener.handler)
 
-    listeners.splice(0, listeners.length);
+    listeners.splice(0, listeners.length)
   }
-
 }
 
-const eventsHelper = EventsHelper;
-exports.eventsHelper = eventsHelper;
+const eventsHelper = EventsHelper
+exports.eventsHelper = eventsHelper

@@ -7,11 +7,11 @@
  * @flow strict
  */
 
-'use strict';
+'use strict'
 
-declare var __DEV__: boolean;
+declare var __DEV__: boolean
 
-declare var queueMicrotask: (fn: () => void) => void;
+declare var queueMicrotask: (fn: () => void) => void
 
 declare class CompositionEvent extends UIEvent {
   +data: string | null;
@@ -36,8 +36,8 @@ declare class InputEvent extends UIEvent {
 declare type Segment = {
   +index: number,
   +isWordLike: boolean,
-  +segment: string,
-};
+  +segment: string
+}
 
 declare var Intl: {
   Collator: Class<Intl$Collator>,
@@ -48,11 +48,11 @@ declare var Intl: {
   Segmenter: (
     locale?: string,
     options?: {
-      granularity: 'word' | 'grapheme' | 'sentence',
-    },
+      granularity: 'word' | 'grapheme' | 'sentence'
+    }
   ) => {
     containing(index: number): void | Segment,
-    segment(string: string): Iterable<Segment>,
+    segment(string: string): Iterable<Segment>
   },
   ...
-};
+}

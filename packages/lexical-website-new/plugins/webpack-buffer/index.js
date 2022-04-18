@@ -6,20 +6,20 @@
  *
  *
  */
-'use strict';
+'use strict'
 
-const webpack = require('webpack');
+const webpack = require('webpack')
 
 module.exports = async function (context, options) {
   return {
     configureWebpack(config, isServer, utils) {
       return {
-        plugins: [new webpack.ProvidePlugin({Buffer: ['buffer', 'Buffer']})],
+        plugins: [new webpack.ProvidePlugin({ Buffer: ['buffer', 'Buffer'] })],
         resolve: {
-          fallback: {buffer: require.resolve('buffer/')},
-        },
-      };
+          fallback: { buffer: require.resolve('buffer/') }
+        }
+      }
     },
-    name: 'webpack-buffer',
-  };
-};
+    name: 'webpack-buffer'
+  }
+}

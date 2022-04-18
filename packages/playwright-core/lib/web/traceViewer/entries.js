@@ -1,9 +1,9 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.createEmptyContext = createEmptyContext;
+})
+exports.createEmptyContext = createEmptyContext
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -38,5 +38,5 @@ function createEmptyContext() {
     actions: [],
     events: [],
     objects: {}
-  };
+  }
 }

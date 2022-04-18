@@ -1,4 +1,12 @@
-import { FC, createContext, useState, useContext, Dispatch, SetStateAction, ReactNode } from 'react'
+import {
+  FC,
+  createContext,
+  useState,
+  useContext,
+  Dispatch,
+  SetStateAction,
+  ReactNode
+} from 'react'
 import { OAuthCredential, User } from '@firebase/auth'
 
 type AuthT = {
@@ -18,9 +26,9 @@ const initialContext: AuthContextT = {
     credential: null,
     token: '',
     user: null,
-    username: null,
+    username: null
   },
-  setAuth: () => { },
+  setAuth: () => {}
 }
 
 const AuthContext = createContext<AuthContextT>(initialContext)
@@ -30,7 +38,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
   const value = {
     auth,
-    setAuth,
+    setAuth
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

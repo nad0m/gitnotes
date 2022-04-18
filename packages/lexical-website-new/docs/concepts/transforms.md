@@ -13,9 +13,9 @@ We programmatically add an `@Mention` to the editor, the `@Mention` is immediate
 ```js
 const removeTransform = editor.registerNodeTransform(TextNode, (textNode) => {
   if (textNode.getTextContent() === 'blue') {
-    textNode.setTextContent('green');
+    textNode.setTextContent('green')
   }
-});
+})
 ```
 
 ## Syntax
@@ -40,8 +40,8 @@ Additionally, each cycle creates a brand new EditorState object which can interf
 editor.addUpdateListener(() => {
   editor.update(() => {
     // Don't do this
-  });
-});
+  })
+})
 ```
 
 ## Preconditions

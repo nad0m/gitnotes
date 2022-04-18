@@ -13,6 +13,6 @@
 export default function invariant(cond?: boolean, message?: string) {
   throw new Error(
     'Internal Lexical error: invariant() is meant to be replaced at compile ' +
-      'time. There is no runtime version.',
-  );
+      'time. There is no runtime version.'
+  )
 }

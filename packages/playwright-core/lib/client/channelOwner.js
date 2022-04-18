@@ -1,20 +1,20 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.renderCallWithParams = renderCallWithParams;
-exports.ChannelOwner = void 0;
+})
+exports.renderCallWithParams = renderCallWithParams
+exports.ChannelOwner = void 0
 
-var _events = require("events");
+var _events = require('events')
 
-var _validator = require("../protocol/validator");
+var _validator = require('../protocol/validator')
 
-var _debugLogger = require("../utils/debugLogger");
+var _debugLogger = require('../utils/debugLogger')
 
-var _stackTrace = require("../utils/stackTrace");
+var _stackTrace = require('../utils/stackTrace')
 
-var _utils = require("../utils/utils");
+var _utils = require('../utils/utils')
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -33,116 +33,137 @@ var _utils = require("../utils/utils");
  */
 class ChannelOwner extends _events.EventEmitter {
   constructor(parent, type, guid, initializer, instrumentation) {
-    var _this$_parent;
+    var _this$_parent
 
-    super();
-    this._connection = void 0;
-    this._parent = void 0;
-    this._objects = new Map();
-    this._type = void 0;
-    this._guid = void 0;
-    this._channel = void 0;
-    this._initializer = void 0;
-    this._logger = void 0;
-    this._instrumentation = void 0;
-    this.setMaxListeners(0);
-    this._connection = parent instanceof ChannelOwner ? parent._connection : parent;
-    this._type = type;
-    this._guid = guid;
-    this._parent = parent instanceof ChannelOwner ? parent : undefined;
-    this._instrumentation = instrumentation || ((_this$_parent = this._parent) === null || _this$_parent === void 0 ? void 0 : _this$_parent._instrumentation);
+    super()
+    this._connection = void 0
+    this._parent = void 0
+    this._objects = new Map()
+    this._type = void 0
+    this._guid = void 0
+    this._channel = void 0
+    this._initializer = void 0
+    this._logger = void 0
+    this._instrumentation = void 0
+    this.setMaxListeners(0)
+    this._connection =
+      parent instanceof ChannelOwner ? parent._connection : parent
+    this._type = type
+    this._guid = guid
+    this._parent = parent instanceof ChannelOwner ? parent : undefined
+    this._instrumentation =
+      instrumentation ||
+      ((_this$_parent = this._parent) === null || _this$_parent === void 0
+        ? void 0
+        : _this$_parent._instrumentation)
 
-    this._connection._objects.set(guid, this);
+    this._connection._objects.set(guid, this)
 
     if (this._parent) {
-      this._parent._objects.set(guid, this);
+      this._parent._objects.set(guid, this)
 
-      this._logger = this._parent._logger;
+      this._logger = this._parent._logger
     }
 
-    this._channel = this._createChannel(new _events.EventEmitter(), null);
-    this._initializer = initializer;
+    this._channel = this._createChannel(new _events.EventEmitter(), null)
+    this._initializer = initializer
   }
 
   _dispose() {
     // Clean up from parent and connection.
-    if (this._parent) this._parent._objects.delete(this._guid);
+    if (this._parent) this._parent._objects.delete(this._guid)
 
-    this._connection._objects.delete(this._guid); // Dispose all children.
+    this._connection._objects.delete(this._guid) // Dispose all children.
 
+    for (const object of [...this._objects.values()]) object._dispose()
 
-    for (const object of [...this._objects.values()]) object._dispose();
-
-    this._objects.clear();
+    this._objects.clear()
   }
 
   _debugScopeState() {
     return {
       _guid: this._guid,
-      objects: Array.from(this._objects.values()).map(o => o._debugScopeState())
-    };
+      objects: Array.from(this._objects.values()).map((o) =>
+        o._debugScopeState()
+      )
+    }
   }
 
   _createChannel(base, stackTrace, csi, callCookie) {
     const channel = new Proxy(base, {
       get: (obj, prop) => {
-        if (prop === 'debugScopeState') return params => this._connection.sendMessageToServer(this, prop, params, stackTrace);
+        if (prop === 'debugScopeState')
+          return (params) =>
+            this._connection.sendMessageToServer(this, prop, params, stackTrace)
 
         if (typeof prop === 'string') {
-          const validator = scheme[paramsName(this._type, prop)];
+          const validator = scheme[paramsName(this._type, prop)]
 
           if (validator) {
-            return params => {
+            return (params) => {
               if (callCookie && csi) {
-                csi.onApiCallBegin(renderCallWithParams(stackTrace.apiName, params), stackTrace, callCookie);
-                csi = undefined;
+                csi.onApiCallBegin(
+                  renderCallWithParams(stackTrace.apiName, params),
+                  stackTrace,
+                  callCookie
+                )
+                csi = undefined
               }
 
-              return this._connection.sendMessageToServer(this, prop, validator(params, ''), stackTrace);
-            };
+              return this._connection.sendMessageToServer(
+                this,
+                prop,
+                validator(params, ''),
+                stackTrace
+              )
+            }
           }
         }
 
-        return obj[prop];
+        return obj[prop]
       }
-    });
-    channel._object = this;
-    return channel;
+    })
+    channel._object = this
+    return channel
   }
 
   async _wrapApiCall(func, logger, isInternal) {
-    logger = logger || this._logger;
-    const stackTrace = (0, _stackTrace.captureStackTrace)();
-    const {
-      apiName,
-      frameTexts
-    } = stackTrace; // Do not report nested async calls to _wrapApiCall.
+    logger = logger || this._logger
+    const stackTrace = (0, _stackTrace.captureStackTrace)()
+    const { apiName, frameTexts } = stackTrace // Do not report nested async calls to _wrapApiCall.
 
-    isInternal = isInternal || stackTrace.allFrames.filter(f => {
-      var _f$function;
+    isInternal =
+      isInternal ||
+      stackTrace.allFrames.filter((f) => {
+        var _f$function
 
-      return (_f$function = f.function) === null || _f$function === void 0 ? void 0 : _f$function.includes('_wrapApiCall');
-    }).length > 1;
-    if (isInternal) delete stackTrace.apiName;
-    const csi = isInternal ? undefined : this._instrumentation;
-    const callCookie = {};
+        return (_f$function = f.function) === null || _f$function === void 0
+          ? void 0
+          : _f$function.includes('_wrapApiCall')
+      }).length > 1
+    if (isInternal) delete stackTrace.apiName
+    const csi = isInternal ? undefined : this._instrumentation
+    const callCookie = {}
 
     try {
-      logApiCall(logger, `=> ${apiName} started`, isInternal);
+      logApiCall(logger, `=> ${apiName} started`, isInternal)
 
-      const channel = this._createChannel({}, stackTrace, csi, callCookie);
+      const channel = this._createChannel({}, stackTrace, csi, callCookie)
 
-      const result = await func(channel, stackTrace);
-      csi === null || csi === void 0 ? void 0 : csi.onApiCallEnd(callCookie);
-      logApiCall(logger, `<= ${apiName} succeeded`, isInternal);
-      return result;
+      const result = await func(channel, stackTrace)
+      csi === null || csi === void 0 ? void 0 : csi.onApiCallEnd(callCookie)
+      logApiCall(logger, `<= ${apiName} succeeded`, isInternal)
+      return result
     } catch (e) {
-      const innerError = (process.env.PWDEBUGIMPL || (0, _utils.isUnderTest)()) && e.stack ? '\n<inner error>\n' + e.stack : '';
-      e.message = apiName + ': ' + e.message;
-      e.stack = e.message + '\n' + frameTexts.join('\n') + innerError;
-      csi === null || csi === void 0 ? void 0 : csi.onApiCallEnd(callCookie, e);
-      logApiCall(logger, `<= ${apiName} failed`, isInternal);
-      throw e;
+      const innerError =
+        (process.env.PWDEBUGIMPL || (0, _utils.isUnderTest)()) && e.stack
+          ? '\n<inner error>\n' + e.stack
+          : ''
+      e.message = apiName + ': ' + e.message
+      e.stack = e.message + '\n' + frameTexts.join('\n') + innerError
+      csi === null || csi === void 0 ? void 0 : csi.onApiCallEnd(callCookie, e)
+      logApiCall(logger, `<= ${apiName} failed`, isInternal)
+      throw e
     }
   }
 
@@ -154,48 +175,54 @@ class ChannelOwner extends _events.EventEmitter {
     return {
       _type: this._type,
       _guid: this._guid
-    };
+    }
   }
-
 }
 
-exports.ChannelOwner = ChannelOwner;
+exports.ChannelOwner = ChannelOwner
 
 function logApiCall(logger, message, isNested) {
-  if (isNested) return;
-  if (logger && logger.isEnabled('api', 'info')) logger.log('api', 'info', message, [], {
-    color: 'cyan'
-  });
+  if (isNested) return
+  if (logger && logger.isEnabled('api', 'info'))
+    logger.log('api', 'info', message, [], {
+      color: 'cyan'
+    })
 
-  _debugLogger.debugLogger.log('api', message);
+  _debugLogger.debugLogger.log('api', message)
 }
 
 function paramsName(type, method) {
-  return type + method[0].toUpperCase() + method.substring(1) + 'Params';
+  return type + method[0].toUpperCase() + method.substring(1) + 'Params'
 }
 
-const paramsToRender = ['url', 'selector', 'text', 'key'];
+const paramsToRender = ['url', 'selector', 'text', 'key']
 
 function renderCallWithParams(apiName, params) {
-  const paramsArray = [];
+  const paramsArray = []
 
   if (params) {
     for (const name of paramsToRender) {
-      if (params[name]) paramsArray.push(params[name]);
+      if (params[name]) paramsArray.push(params[name])
     }
   }
 
-  const paramsText = paramsArray.length ? '(' + paramsArray.join(', ') + ')' : '';
-  return apiName + paramsText;
+  const paramsText = paramsArray.length
+    ? '(' + paramsArray.join(', ') + ')'
+    : ''
+  return apiName + paramsText
 }
 
-const tChannel = name => {
+const tChannel = (name) => {
   return (arg, path) => {
-    if (arg._object instanceof ChannelOwner && (name === '*' || arg._object._type === name)) return {
-      guid: arg._object._guid
-    };
-    throw new _validator.ValidationError(`${path}: expected ${name}`);
-  };
-};
+    if (
+      arg._object instanceof ChannelOwner &&
+      (name === '*' || arg._object._type === name)
+    )
+      return {
+        guid: arg._object._guid
+      }
+    throw new _validator.ValidationError(`${path}: expected ${name}`)
+  }
+}
 
-const scheme = (0, _validator.createScheme)(tChannel);
+const scheme = (0, _validator.createScheme)(tChannel)

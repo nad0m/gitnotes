@@ -1,11 +1,11 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.DialogDispatcher = void 0;
+})
+exports.DialogDispatcher = void 0
 
-var _dispatcher = require("./dispatcher");
+var _dispatcher = require('./dispatcher')
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -28,17 +28,16 @@ class DialogDispatcher extends _dispatcher.Dispatcher {
       type: dialog.type(),
       message: dialog.message(),
       defaultValue: dialog.defaultValue()
-    });
+    })
   }
 
   async accept(params) {
-    await this._object.accept(params.promptText);
+    await this._object.accept(params.promptText)
   }
 
   async dismiss() {
-    await this._object.dismiss();
+    await this._object.dismiss()
   }
-
 }
 
-exports.DialogDispatcher = DialogDispatcher;
+exports.DialogDispatcher = DialogDispatcher

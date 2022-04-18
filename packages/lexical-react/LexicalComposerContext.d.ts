@@ -6,19 +6,19 @@
  *
  */
 
-import type {EditorThemeClasses, LexicalEditor} from 'lexical';
+import type { EditorThemeClasses, LexicalEditor } from 'lexical'
 export type LexicalComposerContextType = {
-  getTheme: () => EditorThemeClasses | null | undefined;
-};
+  getTheme: () => EditorThemeClasses | null | undefined
+}
 export type LexicalComposerContextWithEditor = [
   LexicalEditor,
-  LexicalComposerContextType,
-];
+  LexicalComposerContextType
+]
 export declare var LexicalComposerContext: React.Context<
   LexicalComposerContextWithEditor | null | undefined
->;
+>
 export function createLexicalComposerContext(
   parent: LexicalComposerContextWithEditor | null | undefined,
-  theme: EditorThemeClasses | null | undefined,
-): LexicalComposerContextType;
-export function useLexicalComposerContext(): LexicalComposerContextWithEditor;
+  theme: EditorThemeClasses | null | undefined
+): LexicalComposerContextType
+export function useLexicalComposerContext(): LexicalComposerContextWithEditor

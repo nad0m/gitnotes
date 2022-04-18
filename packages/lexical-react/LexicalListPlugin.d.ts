@@ -6,4 +6,4 @@
  *
  */
 
-export default function ListPlugin(): null;
+export default function ListPlugin(): null

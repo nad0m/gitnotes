@@ -1,10 +1,10 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.domainMatches = domainMatches;
-exports.CookieStore = void 0;
+})
+exports.domainMatches = domainMatches
+exports.CookieStore = void 0
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -23,122 +23,124 @@ exports.CookieStore = void 0;
  */
 class Cookie {
   constructor(data) {
-    this._raw = void 0;
-    this._raw = data;
+    this._raw = void 0
+    this._raw = data
   }
 
   name() {
-    return this._raw.name;
+    return this._raw.name
   } // https://datatracker.ietf.org/doc/html/rfc6265#section-5.4
 
-
   matches(url) {
-    if (this._raw.secure && url.protocol !== 'https:') return false;
-    if (!domainMatches(url.hostname, this._raw.domain)) return false;
-    if (!pathMatches(url.pathname, this._raw.path)) return false;
-    return true;
+    if (this._raw.secure && url.protocol !== 'https:') return false
+    if (!domainMatches(url.hostname, this._raw.domain)) return false
+    if (!pathMatches(url.pathname, this._raw.path)) return false
+    return true
   }
 
   equals(other) {
-    return this._raw.name === other._raw.name && this._raw.domain === other._raw.domain && this._raw.path === other._raw.path;
+    return (
+      this._raw.name === other._raw.name &&
+      this._raw.domain === other._raw.domain &&
+      this._raw.path === other._raw.path
+    )
   }
 
   networkCookie() {
-    return this._raw;
+    return this._raw
   }
 
   updateExpiresFrom(other) {
-    this._raw.expires = other._raw.expires;
+    this._raw.expires = other._raw.expires
   }
 
   expired() {
-    if (this._raw.expires === -1) return false;
-    return this._raw.expires * 1000 < Date.now();
+    if (this._raw.expires === -1) return false
+    return this._raw.expires * 1000 < Date.now()
   }
-
 }
 
 class CookieStore {
   constructor() {
-    this._nameToCookies = new Map();
+    this._nameToCookies = new Map()
   }
 
   addCookies(cookies) {
-    for (const cookie of cookies) this._addCookie(new Cookie(cookie));
+    for (const cookie of cookies) this._addCookie(new Cookie(cookie))
   }
 
   cookies(url) {
-    const result = [];
+    const result = []
 
     for (const cookie of this._cookiesIterator()) {
-      if (cookie.matches(url)) result.push(cookie.networkCookie());
+      if (cookie.matches(url)) result.push(cookie.networkCookie())
     }
 
-    return result;
+    return result
   }
 
   allCookies() {
-    const result = [];
+    const result = []
 
-    for (const cookie of this._cookiesIterator()) result.push(cookie.networkCookie());
+    for (const cookie of this._cookiesIterator())
+      result.push(cookie.networkCookie())
 
-    return result;
+    return result
   }
 
   _addCookie(cookie) {
-    if (cookie.expired()) return;
+    if (cookie.expired()) return
 
-    let set = this._nameToCookies.get(cookie.name());
+    let set = this._nameToCookies.get(cookie.name())
 
     if (!set) {
-      set = new Set();
+      set = new Set()
 
-      this._nameToCookies.set(cookie.name(), set);
+      this._nameToCookies.set(cookie.name(), set)
     }
 
-    CookieStore.pruneExpired(set); // https://datatracker.ietf.org/doc/html/rfc6265#section-5.3
+    CookieStore.pruneExpired(set) // https://datatracker.ietf.org/doc/html/rfc6265#section-5.3
 
     for (const other of set) {
       if (other.equals(cookie)) {
-        cookie.updateExpiresFrom(other);
-        set.delete(other);
+        cookie.updateExpiresFrom(other)
+        set.delete(other)
       }
     }
 
-    set.add(cookie);
+    set.add(cookie)
   }
 
   *_cookiesIterator() {
     for (const [name, cookies] of this._nameToCookies) {
-      CookieStore.pruneExpired(cookies);
+      CookieStore.pruneExpired(cookies)
 
-      for (const cookie of cookies) yield cookie;
+      for (const cookie of cookies) yield cookie
 
-      if (cookies.size === 0) this._nameToCookies.delete(name);
+      if (cookies.size === 0) this._nameToCookies.delete(name)
     }
   }
 
   static pruneExpired(cookies) {
     for (const cookie of cookies) {
-      if (cookie.expired()) cookies.delete(cookie);
+      if (cookie.expired()) cookies.delete(cookie)
     }
   }
-
 }
 
-exports.CookieStore = CookieStore;
+exports.CookieStore = CookieStore
 
 function domainMatches(value, domain) {
-  if (value === domain) return true; // Only strict match is allowed if domain doesn't start with '.' (host-only-flag is true in the spec)
+  if (value === domain) return true // Only strict match is allowed if domain doesn't start with '.' (host-only-flag is true in the spec)
 
-  if (!domain.startsWith('.')) return false;
-  value = '.' + value;
-  return value.endsWith(domain);
+  if (!domain.startsWith('.')) return false
+  value = '.' + value
+  return value.endsWith(domain)
 }
 
 function pathMatches(value, path) {
-  if (value === path) return true;
-  if (!value.endsWith('/')) value = value + '/';
-  if (!path.endsWith('/')) path = path + '/';
-  return value.startsWith(path);
+  if (value === path) return true
+  if (!value.endsWith('/')) value = value + '/'
+  if (!path.endsWith('/')) path = path + '/'
+  return value.startsWith(path)
 }

@@ -7,5 +7,5 @@
  */
 
 export default function LexicalCharacterLimitPlugin(props: {
-  charset: 'UTF-8' | 'UTF-16';
-}): JSX.Element | null;
+  charset: 'UTF-8' | 'UTF-16'
+}): JSX.Element | null

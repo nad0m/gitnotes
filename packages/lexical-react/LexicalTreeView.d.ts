@@ -6,12 +6,12 @@
  *
  */
 
-import type {LexicalEditor} from 'lexical';
+import type { LexicalEditor } from 'lexical'
 export default function TreeView(props: {
-  timeTravelPanelClassName: string;
-  timeTravelPanelSliderClassName: string;
-  timeTravelPanelButtonClassName: string;
-  timeTravelButtonClassName: string;
-  viewClassName: string;
-  editor: LexicalEditor;
-}): JSX.Element | null;
+  timeTravelPanelClassName: string
+  timeTravelPanelSliderClassName: string
+  timeTravelPanelButtonClassName: string
+  timeTravelButtonClassName: string
+  viewClassName: string
+  editor: LexicalEditor
+}): JSX.Element | null

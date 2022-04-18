@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-'use strict';
+'use strict'
 
 // Do not require this module directly! Use normal `invariant` calls with
 // template literal strings. The messages will be replaced with error codes
@@ -15,8 +15,8 @@ function formatProdErrorMessage(code) {
   throw Error(
     `Minified Lexical error #${code}; see codes.json for the full message or ` +
       'use the non-minified dev environment for full errors and additional ' +
-      'helpful warnings.',
-  );
+      'helpful warnings.'
+  )
 }
 
-module.exports = formatProdErrorMessage;
+module.exports = formatProdErrorMessage

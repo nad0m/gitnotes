@@ -7,11 +7,11 @@
  * @flow strict
  */
 
-import type {EventHandler, LexicalEditor} from 'lexical';
+import type { EventHandler, LexicalEditor } from 'lexical'
 
-import useLayoutEffect from 'shared/useLayoutEffect';
+import useLayoutEffect from 'shared/useLayoutEffect'
 
-export type InputEvents = Array<[string, EventHandler]>;
+export type InputEvents = Array<[string, EventHandler]>
 
 function getTarget(eventName: string, rootElement: HTMLElement): EventTarget {
   return eventName === 'selectionchange' ||
@@ -19,56 +19,56 @@ function getTarget(eventName: string, rootElement: HTMLElement): EventTarget {
     eventName === 'pointerup' ||
     eventName === 'pointercancel'
     ? rootElement.ownerDocument
-    : rootElement;
+    : rootElement
 }
 
 function isRootEditable(editor: LexicalEditor): boolean {
-  const rootElement = editor.getRootElement();
-  return rootElement !== null && rootElement.contentEditable === 'true';
+  const rootElement = editor.getRootElement()
+  return rootElement !== null && rootElement.contentEditable === 'true'
 }
 
 export default function useEditorEvents(
   events: InputEvents,
-  editor: LexicalEditor,
+  editor: LexicalEditor
 ): void {
   useLayoutEffect(() => {
-    const create = [];
-    const destroy = [];
+    const create = []
+    const destroy = []
 
     for (let i = 0; i < events.length; i++) {
-      const [eventName, handler] = events[i];
+      const [eventName, handler] = events[i]
 
       const handlerWrapper = (event: Event) => {
         if (isRootEditable(editor)) {
-          handler(event, editor);
+          handler(event, editor)
         }
-      };
+      }
       create.push((rootElement: HTMLElement) => {
         getTarget(eventName, rootElement).addEventListener(
           eventName,
-          handlerWrapper,
-        );
-      });
+          handlerWrapper
+        )
+      })
       destroy.push((rootElement: HTMLElement) => {
         getTarget(eventName, rootElement).removeEventListener(
           eventName,
-          handlerWrapper,
-        );
-      });
+          handlerWrapper
+        )
+      })
     }
 
     return editor.registerRootListener(
       (
         rootElement: null | HTMLElement,
-        prevRootElement: null | HTMLElement,
+        prevRootElement: null | HTMLElement
       ) => {
         if (prevRootElement !== null) {
-          destroy.forEach((fn) => fn(prevRootElement));
+          destroy.forEach((fn) => fn(prevRootElement))
         }
         if (rootElement !== null) {
-          create.forEach((fn) => fn(rootElement));
+          create.forEach((fn) => fn(rootElement))
         }
-      },
-    );
-  }, [editor, events]);
+      }
+    )
+  }, [editor, events])
 }

@@ -7,12 +7,12 @@
  * @flow strict
  */
 
-import type {LexicalEditor} from 'lexical';
+import type { LexicalEditor } from 'lexical'
 
-import useCanShowPlaceholder from './shared/useCanShowPlaceholder';
+import useCanShowPlaceholder from './shared/useCanShowPlaceholder'
 
 export default function useLexicalCanShowPlaceholder(
-  editor: LexicalEditor,
+  editor: LexicalEditor
 ): boolean {
-  return useCanShowPlaceholder(editor);
+  return useCanShowPlaceholder(editor)
 }

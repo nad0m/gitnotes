@@ -7,112 +7,112 @@
  * @flow strict
  */
 
-import type {LexicalNode, NodeKey} from 'lexical';
+import type { LexicalNode, NodeKey } from 'lexical'
 
-import {DecoratorNode} from 'lexical';
-import * as React from 'react';
-import {useCallback, useEffect, useRef, useState} from 'react';
+import { DecoratorNode } from 'lexical'
+import * as React from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
-const WIDGET_SCRIPT_URL = 'https://platform.twitter.com/widgets.js';
+const WIDGET_SCRIPT_URL = 'https://platform.twitter.com/widgets.js'
 
 const getHasScriptCached = () =>
-  document.querySelector(`script[src="${WIDGET_SCRIPT_URL}"]`);
+  document.querySelector(`script[src="${WIDGET_SCRIPT_URL}"]`)
 
 type TweetComponentProps = $ReadOnly<{
   loadingComponent?: React$Node,
   onError?: (error?: Error) => void,
   onLoad?: () => void,
-  tweetID: string,
-}>;
+  tweetID: string
+}>
 
 function TweetComponent({
   loadingComponent,
   onError,
   onLoad,
-  tweetID,
+  tweetID
 }: TweetComponentProps) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null)
 
-  const previousTweetIDRef = useRef(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const previousTweetIDRef = useRef(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   const createTweet = useCallback(async () => {
     try {
-      await window.twttr.widgets.createTweet(tweetID, containerRef.current);
+      await window.twttr.widgets.createTweet(tweetID, containerRef.current)
 
-      setIsLoading(false);
+      setIsLoading(false)
 
       if (onLoad) {
-        onLoad();
+        onLoad()
       }
     } catch (e) {
       if (onError) {
-        onError(e);
+        onError(e)
       }
     }
-  }, [onError, onLoad, tweetID]);
+  }, [onError, onLoad, tweetID])
 
   useEffect(() => {
     if (tweetID !== previousTweetIDRef.current) {
-      setIsLoading(true);
+      setIsLoading(true)
 
       if (!getHasScriptCached()) {
-        const script = document.createElement('script');
-        script.src = WIDGET_SCRIPT_URL;
-        script.async = true;
-        document.body.appendChild(script);
-        script.onload = createTweet;
-        script.onerror = onError;
+        const script = document.createElement('script')
+        script.src = WIDGET_SCRIPT_URL
+        script.async = true
+        document.body.appendChild(script)
+        script.onload = createTweet
+        script.onerror = onError
       } else {
-        createTweet();
+        createTweet()
       }
 
-      previousTweetIDRef.current = tweetID;
+      previousTweetIDRef.current = tweetID
     }
-  }, [createTweet, onError, tweetID]);
+  }, [createTweet, onError, tweetID])
 
   return (
     <>
       {isLoading ? loadingComponent : null}
       <div ref={containerRef} />
     </>
-  );
+  )
 }
 
 export class TweetNode extends DecoratorNode<React$Node> {
-  __id: string;
+  __id: string
 
   static getType(): string {
-    return 'tweet';
+    return 'tweet'
   }
 
   static clone(node: TweetNode): TweetNode {
-    return new TweetNode(node.__id, node.__key);
+    return new TweetNode(node.__id, node.__key)
   }
 
   constructor(id: string, key?: NodeKey) {
-    super(key);
+    super(key)
 
-    this.__id = id;
+    this.__id = id
   }
 
   createDOM(): HTMLElement {
-    return document.createElement('div');
+    return document.createElement('div')
   }
 
   updateDOM(): false {
-    return false;
+    return false
   }
 
   decorate(): React$Node {
-    return <TweetComponent loadingComponent="Loading..." tweetID={this.__id} />;
+    return <TweetComponent loadingComponent="Loading..." tweetID={this.__id} />
   }
 }
 
 export function $createTweetNode(tweetID: string): TweetNode {
-  return new TweetNode(tweetID);
+  return new TweetNode(tweetID)
 }
 
 export function $isTweetNode(node: ?LexicalNode): boolean %checks {
-  return node instanceof TweetNode;
+  return node instanceof TweetNode
 }

@@ -1,9 +1,9 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.VERSION = void 0;
+})
+exports.VERSION = void 0
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -20,5 +20,5 @@ exports.VERSION = void 0;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const VERSION = 3;
-exports.VERSION = VERSION;
+const VERSION = 3
+exports.VERSION = VERSION

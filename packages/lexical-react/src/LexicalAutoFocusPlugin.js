@@ -7,15 +7,15 @@
  * @flow strict
  */
 
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {useEffect} from 'react';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { useEffect } from 'react'
 
 export default function LexicalAutoFocusPlugin(): null {
-  const [editor] = useLexicalComposerContext();
+  const [editor] = useLexicalComposerContext()
 
   useEffect(() => {
-    editor.focus();
-  }, [editor]);
+    editor.focus()
+  }, [editor])
 
-  return null;
+  return null
 }

@@ -10,54 +10,54 @@
 import type {
   DOMConversionMap,
   DOMConversionOutput,
-  NodeKey,
-} from '../LexicalNode';
+  NodeKey
+} from '../LexicalNode'
 
-import {LexicalNode} from '../LexicalNode';
+import { LexicalNode } from '../LexicalNode'
 
 export class LineBreakNode extends LexicalNode {
   static getType(): string {
-    return 'linebreak';
+    return 'linebreak'
   }
 
   static clone(node: LineBreakNode): LineBreakNode {
-    return new LineBreakNode(node.__key);
+    return new LineBreakNode(node.__key)
   }
 
   constructor(key?: NodeKey): void {
-    super(key);
+    super(key)
   }
 
   getTextContent(): '\n' {
-    return '\n';
+    return '\n'
   }
 
   createDOM(): HTMLElement {
-    return document.createElement('br');
+    return document.createElement('br')
   }
 
   updateDOM(): false {
-    return false;
+    return false
   }
 
   static importDOM(): DOMConversionMap | null {
     return {
       br: (node: Node) => ({
         conversion: convertLineBreakElement,
-        priority: 0,
-      }),
-    };
+        priority: 0
+      })
+    }
   }
 }
 
 function convertLineBreakElement(node: Node): DOMConversionOutput {
-  return {node: $createLineBreakNode()};
+  return { node: $createLineBreakNode() }
 }
 
 export function $createLineBreakNode(): LineBreakNode {
-  return new LineBreakNode();
+  return new LineBreakNode()
 }
 
 export function $isLineBreakNode(node: ?LexicalNode): boolean %checks {
-  return node instanceof LineBreakNode;
+  return node instanceof LineBreakNode
 }

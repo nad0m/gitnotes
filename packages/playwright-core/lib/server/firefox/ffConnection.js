@@ -1,21 +1,26 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.FFSession = exports.FFSessionEvents = exports.FFConnection = exports.kBrowserCloseMessageId = exports.ConnectionEvents = void 0;
+})
+exports.FFSession =
+  exports.FFSessionEvents =
+  exports.FFConnection =
+  exports.kBrowserCloseMessageId =
+  exports.ConnectionEvents =
+    void 0
 
-var _events = require("events");
+var _events = require('events')
 
-var _utils = require("../../utils/utils");
+var _utils = require('../../utils/utils')
 
-var _stackTrace = require("../../utils/stackTrace");
+var _stackTrace = require('../../utils/stackTrace')
 
-var _debugLogger = require("../../utils/debugLogger");
+var _debugLogger = require('../../utils/debugLogger')
 
-var _helper = require("../helper");
+var _helper = require('../helper')
 
-var _protocolError = require("../common/protocolError");
+var _protocolError = require('../common/protocolError')
 
 /**
  * Copyright 2017 Google Inc. All rights reserved.
@@ -35,55 +40,55 @@ var _protocolError = require("../common/protocolError");
  */
 const ConnectionEvents = {
   Disconnected: Symbol('Disconnected')
-}; // FFPlaywright uses this special id to issue Browser.close command which we
+} // FFPlaywright uses this special id to issue Browser.close command which we
 // should ignore.
 
-exports.ConnectionEvents = ConnectionEvents;
-const kBrowserCloseMessageId = -9999;
-exports.kBrowserCloseMessageId = kBrowserCloseMessageId;
+exports.ConnectionEvents = ConnectionEvents
+const kBrowserCloseMessageId = -9999
+exports.kBrowserCloseMessageId = kBrowserCloseMessageId
 
 class FFConnection extends _events.EventEmitter {
   constructor(transport, protocolLogger, browserLogsCollector) {
-    super();
-    this._lastId = void 0;
-    this._callbacks = void 0;
-    this._transport = void 0;
-    this._protocolLogger = void 0;
-    this._browserLogsCollector = void 0;
-    this._sessions = void 0;
-    this._closed = void 0;
-    this.on = void 0;
-    this.addListener = void 0;
-    this.off = void 0;
-    this.removeListener = void 0;
-    this.once = void 0;
-    this.setMaxListeners(0);
-    this._transport = transport;
-    this._protocolLogger = protocolLogger;
-    this._browserLogsCollector = browserLogsCollector;
-    this._lastId = 0;
-    this._callbacks = new Map();
-    this._transport.onmessage = this._onMessage.bind(this);
-    this._transport.onclose = this._onClose.bind(this);
-    this._sessions = new Map();
-    this._closed = false;
-    this.on = super.on;
-    this.addListener = super.addListener;
-    this.off = super.removeListener;
-    this.removeListener = super.removeListener;
-    this.once = super.once;
+    super()
+    this._lastId = void 0
+    this._callbacks = void 0
+    this._transport = void 0
+    this._protocolLogger = void 0
+    this._browserLogsCollector = void 0
+    this._sessions = void 0
+    this._closed = void 0
+    this.on = void 0
+    this.addListener = void 0
+    this.off = void 0
+    this.removeListener = void 0
+    this.once = void 0
+    this.setMaxListeners(0)
+    this._transport = transport
+    this._protocolLogger = protocolLogger
+    this._browserLogsCollector = browserLogsCollector
+    this._lastId = 0
+    this._callbacks = new Map()
+    this._transport.onmessage = this._onMessage.bind(this)
+    this._transport.onclose = this._onClose.bind(this)
+    this._sessions = new Map()
+    this._closed = false
+    this.on = super.on
+    this.addListener = super.addListener
+    this.off = super.removeListener
+    this.removeListener = super.removeListener
+    this.once = super.once
   }
 
   async send(method, params) {
-    this._checkClosed(method);
+    this._checkClosed(method)
 
-    const id = this.nextMessageId();
+    const id = this.nextMessageId()
 
     this._rawSend({
       id,
       method,
       params
-    });
+    })
 
     return new Promise((resolve, reject) => {
       this._callbacks.set(id, {
@@ -91,135 +96,152 @@ class FFConnection extends _events.EventEmitter {
         reject,
         error: new _protocolError.ProtocolError(false),
         method
-      });
-    });
+      })
+    })
   }
 
   nextMessageId() {
-    return ++this._lastId;
+    return ++this._lastId
   }
 
   _checkClosed(method) {
-    if (this._closed) throw new _protocolError.ProtocolError(true, `${method}): Browser closed.` + _helper.helper.formatBrowserLogs(this._browserLogsCollector.recentLogs()));
+    if (this._closed)
+      throw new _protocolError.ProtocolError(
+        true,
+        `${method}): Browser closed.` +
+          _helper.helper.formatBrowserLogs(
+            this._browserLogsCollector.recentLogs()
+          )
+      )
   }
 
   _rawSend(message) {
-    this._protocolLogger('send', message);
+    this._protocolLogger('send', message)
 
-    this._transport.send(message);
+    this._transport.send(message)
   }
 
   async _onMessage(message) {
-    this._protocolLogger('receive', message);
+    this._protocolLogger('receive', message)
 
-    if (message.id === kBrowserCloseMessageId) return;
+    if (message.id === kBrowserCloseMessageId) return
 
     if (message.sessionId) {
-      const session = this._sessions.get(message.sessionId);
+      const session = this._sessions.get(message.sessionId)
 
-      if (session) session.dispatchMessage(message);
+      if (session) session.dispatchMessage(message)
     } else if (message.id) {
-      const callback = this._callbacks.get(message.id); // Callbacks could be all rejected if someone has called `.dispose()`.
-
+      const callback = this._callbacks.get(message.id) // Callbacks could be all rejected if someone has called `.dispose()`.
 
       if (callback) {
-        this._callbacks.delete(message.id);
+        this._callbacks.delete(message.id)
 
-        if (message.error) callback.reject(createProtocolError(callback.error, callback.method, message.error));else callback.resolve(message.result);
+        if (message.error)
+          callback.reject(
+            createProtocolError(callback.error, callback.method, message.error)
+          )
+        else callback.resolve(message.result)
       }
     } else {
-      Promise.resolve().then(() => this.emit(message.method, message.params));
+      Promise.resolve().then(() => this.emit(message.method, message.params))
     }
   }
 
   _onClose() {
-    this._closed = true;
-    this._transport.onmessage = undefined;
-    this._transport.onclose = undefined;
+    this._closed = true
+    this._transport.onmessage = undefined
+    this._transport.onclose = undefined
 
-    const formattedBrowserLogs = _helper.helper.formatBrowserLogs(this._browserLogsCollector.recentLogs());
+    const formattedBrowserLogs = _helper.helper.formatBrowserLogs(
+      this._browserLogsCollector.recentLogs()
+    )
 
-    for (const session of this._sessions.values()) session.dispose();
+    for (const session of this._sessions.values()) session.dispose()
 
-    this._sessions.clear();
+    this._sessions.clear()
 
     for (const callback of this._callbacks.values()) {
-      const error = (0, _stackTrace.rewriteErrorMessage)(callback.error, `Protocol error (${callback.method}): Browser closed.` + formattedBrowserLogs);
-      error.sessionClosed = true;
-      callback.reject(error);
+      const error = (0, _stackTrace.rewriteErrorMessage)(
+        callback.error,
+        `Protocol error (${callback.method}): Browser closed.` +
+          formattedBrowserLogs
+      )
+      error.sessionClosed = true
+      callback.reject(error)
     }
 
-    this._callbacks.clear();
+    this._callbacks.clear()
 
-    Promise.resolve().then(() => this.emit(ConnectionEvents.Disconnected));
+    Promise.resolve().then(() => this.emit(ConnectionEvents.Disconnected))
   }
 
   close() {
-    if (!this._closed) this._transport.close();
+    if (!this._closed) this._transport.close()
   }
 
   createSession(sessionId) {
-    const session = new FFSession(this, sessionId, message => this._rawSend({ ...message,
-      sessionId
-    }));
+    const session = new FFSession(this, sessionId, (message) =>
+      this._rawSend({ ...message, sessionId })
+    )
 
-    this._sessions.set(sessionId, session);
+    this._sessions.set(sessionId, session)
 
-    return session;
+    return session
   }
-
 }
 
-exports.FFConnection = FFConnection;
+exports.FFConnection = FFConnection
 const FFSessionEvents = {
   Disconnected: Symbol('Disconnected')
-};
-exports.FFSessionEvents = FFSessionEvents;
+}
+exports.FFSessionEvents = FFSessionEvents
 
 class FFSession extends _events.EventEmitter {
   constructor(connection, sessionId, rawSend) {
-    super();
-    this._connection = void 0;
-    this._disposed = false;
-    this._callbacks = void 0;
-    this._sessionId = void 0;
-    this._rawSend = void 0;
-    this._crashed = false;
-    this.on = void 0;
-    this.addListener = void 0;
-    this.off = void 0;
-    this.removeListener = void 0;
-    this.once = void 0;
-    this.setMaxListeners(0);
-    this._callbacks = new Map();
-    this._connection = connection;
-    this._sessionId = sessionId;
-    this._rawSend = rawSend;
-    this.on = super.on;
-    this.addListener = super.addListener;
-    this.off = super.removeListener;
-    this.removeListener = super.removeListener;
-    this.once = super.once;
+    super()
+    this._connection = void 0
+    this._disposed = false
+    this._callbacks = void 0
+    this._sessionId = void 0
+    this._rawSend = void 0
+    this._crashed = false
+    this.on = void 0
+    this.addListener = void 0
+    this.off = void 0
+    this.removeListener = void 0
+    this.once = void 0
+    this.setMaxListeners(0)
+    this._callbacks = new Map()
+    this._connection = connection
+    this._sessionId = sessionId
+    this._rawSend = rawSend
+    this.on = super.on
+    this.addListener = super.addListener
+    this.off = super.removeListener
+    this.removeListener = super.removeListener
+    this.once = super.once
   }
 
   markAsCrashed() {
-    this._crashed = true;
+    this._crashed = true
   }
 
   async send(method, params) {
-    if (this._crashed) throw new _protocolError.ProtocolError(true, 'Target crashed');
+    if (this._crashed)
+      throw new _protocolError.ProtocolError(true, 'Target crashed')
 
-    this._connection._checkClosed(method);
+    this._connection._checkClosed(method)
 
-    if (this._disposed) throw new _protocolError.ProtocolError(true, 'Target closed');
+    if (this._disposed)
+      throw new _protocolError.ProtocolError(true, 'Target closed')
 
-    const id = this._connection.nextMessageId();
+    const id = this._connection.nextMessageId()
 
     this._rawSend({
       method,
       params,
       id
-    });
+    })
 
     return new Promise((resolve, reject) => {
       this._callbacks.set(id, {
@@ -227,48 +249,55 @@ class FFSession extends _events.EventEmitter {
         reject,
         error: new _protocolError.ProtocolError(false),
         method
-      });
-    });
+      })
+    })
   }
 
   sendMayFail(method, params) {
-    return this.send(method, params).catch(error => _debugLogger.debugLogger.log('error', error));
+    return this.send(method, params).catch((error) =>
+      _debugLogger.debugLogger.log('error', error)
+    )
   }
 
   dispatchMessage(object) {
     if (object.id && this._callbacks.has(object.id)) {
-      const callback = this._callbacks.get(object.id);
+      const callback = this._callbacks.get(object.id)
 
-      this._callbacks.delete(object.id);
+      this._callbacks.delete(object.id)
 
-      if (object.error) callback.reject(createProtocolError(callback.error, callback.method, object.error));else callback.resolve(object.result);
+      if (object.error)
+        callback.reject(
+          createProtocolError(callback.error, callback.method, object.error)
+        )
+      else callback.resolve(object.result)
     } else {
-      (0, _utils.assert)(!object.id);
-      Promise.resolve().then(() => this.emit(object.method, object.params));
+      ;(0, _utils.assert)(!object.id)
+      Promise.resolve().then(() => this.emit(object.method, object.params))
     }
   }
 
   dispose() {
     for (const callback of this._callbacks.values()) {
-      callback.error.sessionClosed = true;
-      callback.reject((0, _stackTrace.rewriteErrorMessage)(callback.error, 'Target closed'));
+      callback.error.sessionClosed = true
+      callback.reject(
+        (0, _stackTrace.rewriteErrorMessage)(callback.error, 'Target closed')
+      )
     }
 
-    this._callbacks.clear();
+    this._callbacks.clear()
 
-    this._disposed = true;
+    this._disposed = true
 
-    this._connection._sessions.delete(this._sessionId);
+    this._connection._sessions.delete(this._sessionId)
 
-    Promise.resolve().then(() => this.emit(FFSessionEvents.Disconnected));
+    Promise.resolve().then(() => this.emit(FFSessionEvents.Disconnected))
   }
-
 }
 
-exports.FFSession = FFSession;
+exports.FFSession = FFSession
 
 function createProtocolError(error, method, protocolError) {
-  let message = `Protocol error (${method}): ${protocolError.message}`;
-  if ('data' in protocolError) message += ` ${protocolError.data}`;
-  return (0, _stackTrace.rewriteErrorMessage)(error, message);
+  let message = `Protocol error (${method}): ${protocolError.message}`
+  if ('data' in protocolError) message += ` ${protocolError.data}`
+  return (0, _stackTrace.rewriteErrorMessage)(error, message)
 }

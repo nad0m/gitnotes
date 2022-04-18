@@ -1,9 +1,9 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.macEditingCommands = void 0;
+})
+exports.macEditingCommands = void 0
 
 /**
  * Copyright 2017 Google Inc. All rights reserved.
@@ -22,20 +22,20 @@ exports.macEditingCommands = void 0;
  * limitations under the License.
  */
 const macEditingCommands = {
-  'Backspace': 'deleteBackward:',
-  'Enter': 'insertNewline:',
-  'NumpadEnter': 'insertNewline:',
-  'Escape': 'cancelOperation:',
-  'ArrowUp': 'moveUp:',
-  'ArrowDown': 'moveDown:',
-  'ArrowLeft': 'moveLeft:',
-  'ArrowRight': 'moveRight:',
-  'F5': 'complete:',
-  'Delete': 'deleteForward:',
-  'Home': 'scrollToBeginningOfDocument:',
-  'End': 'scrollToEndOfDocument:',
-  'PageUp': 'scrollPageUp:',
-  'PageDown': 'scrollPageDown:',
+  Backspace: 'deleteBackward:',
+  Enter: 'insertNewline:',
+  NumpadEnter: 'insertNewline:',
+  Escape: 'cancelOperation:',
+  ArrowUp: 'moveUp:',
+  ArrowDown: 'moveDown:',
+  ArrowLeft: 'moveLeft:',
+  ArrowRight: 'moveRight:',
+  F5: 'complete:',
+  Delete: 'deleteForward:',
+  Home: 'scrollToBeginningOfDocument:',
+  End: 'scrollToEndOfDocument:',
+  PageUp: 'scrollPageUp:',
+  PageDown: 'scrollPageDown:',
   'Shift+Backspace': 'deleteBackward:',
   'Shift+Enter': 'insertNewline:',
   'Shift+NumpadEnter': 'insertNewline:',
@@ -131,5 +131,5 @@ const macEditingCommands = {
   'Shift+Meta+ArrowLeft': 'moveToLeftEndOfLineAndModifySelection:',
   'Shift+Meta+ArrowRight': 'moveToRightEndOfLineAndModifySelection:',
   'Meta+KeyA': 'selectAll:'
-};
-exports.macEditingCommands = macEditingCommands;
+}
+exports.macEditingCommands = macEditingCommands

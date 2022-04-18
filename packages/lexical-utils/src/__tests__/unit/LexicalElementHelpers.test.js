@@ -9,57 +9,57 @@
 
 import {
   addClassNamesToElement,
-  removeClassNamesFromElement,
-} from '@lexical/utils';
+  removeClassNamesFromElement
+} from '@lexical/utils'
 
 // No idea why we suddenly need to do this, but it fixes the tests
 // with latest experimental React version.
-global.IS_REACT_ACT_ENVIRONMENT = true;
+global.IS_REACT_ACT_ENVIRONMENT = true
 
 describe('LexicalElementHelpers tests', () => {
   describe('addClassNamesToElement() and removeClassNamesFromElement()', () => {
     test('basic', async () => {
-      const element = document.createElement('div');
+      const element = document.createElement('div')
 
-      addClassNamesToElement(element, 'test-class');
+      addClassNamesToElement(element, 'test-class')
 
-      expect(element.className).toEqual('test-class');
+      expect(element.className).toEqual('test-class')
 
-      removeClassNamesFromElement(element, 'test-class');
+      removeClassNamesFromElement(element, 'test-class')
 
-      expect(element.className).toEqual('');
-    });
+      expect(element.className).toEqual('')
+    })
 
     test('empty', async () => {
-      const element = document.createElement('div');
+      const element = document.createElement('div')
 
-      addClassNamesToElement(element, null, undefined, false, true);
+      addClassNamesToElement(element, null, undefined, false, true)
 
-      expect(element.className).toEqual('');
-    });
+      expect(element.className).toEqual('')
+    })
 
     test('multiple', async () => {
-      const element = document.createElement('div');
+      const element = document.createElement('div')
 
-      addClassNamesToElement(element, 'a', 'b', 'c');
+      addClassNamesToElement(element, 'a', 'b', 'c')
 
-      expect(element.className).toEqual('a b c');
+      expect(element.className).toEqual('a b c')
 
-      removeClassNamesFromElement(element, 'a', 'b', 'c');
+      removeClassNamesFromElement(element, 'a', 'b', 'c')
 
-      expect(element.className).toEqual('');
-    });
+      expect(element.className).toEqual('')
+    })
 
     test('space separated', async () => {
-      const element = document.createElement('div');
+      const element = document.createElement('div')
 
-      addClassNamesToElement(element, 'a b c');
+      addClassNamesToElement(element, 'a b c')
 
-      expect(element.className).toEqual('a b c');
+      expect(element.className).toEqual('a b c')
 
-      removeClassNamesFromElement(element, 'a b c');
+      removeClassNamesFromElement(element, 'a b c')
 
-      expect(element.className).toEqual('');
-    });
-  });
-});
+      expect(element.className).toEqual('')
+    })
+  })
+})

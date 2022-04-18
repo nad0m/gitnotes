@@ -1,9 +1,9 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.Touchscreen = exports.Mouse = exports.Keyboard = void 0;
+})
+exports.Touchscreen = exports.Mouse = exports.Keyboard = void 0
 
 /**
  * Copyright 2017 Google Inc. All rights reserved.
@@ -23,140 +23,134 @@ exports.Touchscreen = exports.Mouse = exports.Keyboard = void 0;
  */
 class Keyboard {
   constructor(page) {
-    this._page = void 0;
-    this._page = page;
+    this._page = void 0
+    this._page = page
   }
 
   async down(key) {
-    await this._page._wrapApiCall(async channel => {
+    await this._page._wrapApiCall(async (channel) => {
       await channel.keyboardDown({
         key
-      });
-    });
+      })
+    })
   }
 
   async up(key) {
-    await this._page._wrapApiCall(async channel => {
+    await this._page._wrapApiCall(async (channel) => {
       await channel.keyboardUp({
         key
-      });
-    });
+      })
+    })
   }
 
   async insertText(text) {
-    await this._page._wrapApiCall(async channel => {
+    await this._page._wrapApiCall(async (channel) => {
       await channel.keyboardInsertText({
         text
-      });
-    });
+      })
+    })
   }
 
   async imeSetComposition(text, selectionStart, selectionEnd, options) {
-    await this._page._wrapApiCall(async channel => {
+    await this._page._wrapApiCall(async (channel) => {
       await channel.keyboardImeSetComposition({
         text,
         selectionStart,
         selectionEnd,
         ...options
-      });
-    });
+      })
+    })
   }
 
   async type(text, options = {}) {
-    await this._page._wrapApiCall(async channel => {
+    await this._page._wrapApiCall(async (channel) => {
       await channel.keyboardType({
         text,
         ...options
-      });
-    });
+      })
+    })
   }
 
   async press(key, options = {}) {
-    await this._page._wrapApiCall(async channel => {
+    await this._page._wrapApiCall(async (channel) => {
       await channel.keyboardPress({
         key,
         ...options
-      });
-    });
+      })
+    })
   }
-
 }
 
-exports.Keyboard = Keyboard;
+exports.Keyboard = Keyboard
 
 class Mouse {
   constructor(page) {
-    this._page = void 0;
-    this._page = page;
+    this._page = void 0
+    this._page = page
   }
 
   async move(x, y, options = {}) {
-    await this._page._wrapApiCall(async channel => {
+    await this._page._wrapApiCall(async (channel) => {
       await channel.mouseMove({
         x,
         y,
         ...options
-      });
-    });
+      })
+    })
   }
 
   async down(options = {}) {
-    await this._page._wrapApiCall(async channel => {
-      await channel.mouseDown({ ...options
-      });
-    });
+    await this._page._wrapApiCall(async (channel) => {
+      await channel.mouseDown({ ...options })
+    })
   }
 
   async up(options = {}) {
-    await this._page._wrapApiCall(async channel => {
-      await channel.mouseUp(options);
-    });
+    await this._page._wrapApiCall(async (channel) => {
+      await channel.mouseUp(options)
+    })
   }
 
   async click(x, y, options = {}) {
-    await this._page._wrapApiCall(async channel => {
+    await this._page._wrapApiCall(async (channel) => {
       await channel.mouseClick({
         x,
         y,
         ...options
-      });
-    });
+      })
+    })
   }
 
   async dblclick(x, y, options = {}) {
-    await this.click(x, y, { ...options,
-      clickCount: 2
-    });
+    await this.click(x, y, { ...options, clickCount: 2 })
   }
 
   async wheel(deltaX, deltaY) {
-    await this._page._wrapApiCall(async channel => {
+    await this._page._wrapApiCall(async (channel) => {
       await channel.mouseWheel({
         deltaX,
         deltaY
-      });
-    });
+      })
+    })
   }
-
 }
 
-exports.Mouse = Mouse;
+exports.Mouse = Mouse
 
 class Touchscreen {
   constructor(page) {
-    this._page = void 0;
-    this._page = page;
+    this._page = void 0
+    this._page = page
   }
 
   async tap(x, y) {
-    await this._page._wrapApiCall(async channel => {
+    await this._page._wrapApiCall(async (channel) => {
       await channel.touchscreenTap({
         x,
         y
-      });
-    });
+      })
+    })
   }
-
 }
 
-exports.Touchscreen = Touchscreen;
+exports.Touchscreen = Touchscreen

@@ -5,49 +5,49 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-import type {ElementNode, LexicalEditor, RootNode, TextNode} from 'lexical';
+import type { ElementNode, LexicalEditor, RootNode, TextNode } from 'lexical'
 export type TextNodeWithOffset = {
-  node: TextNode;
-  offset: number;
-};
+  node: TextNode
+  offset: number
+}
 export function $findTextIntersectionFromCharacters(
   root: RootNode,
-  targetCharacters: number,
+  targetCharacters: number
 ): null | {
-  node: TextNode;
-  offset: number;
-};
+  node: TextNode
+  offset: number
+}
 export function $joinTextNodesInElementNode(
   elementNode: ElementNode,
   separator: string,
-  stopAt: TextNodeWithOffset,
-): string;
+  stopAt: TextNodeWithOffset
+): string
 export function $findNodeWithOffsetFromJoinedText(
   offsetInJoinedText: number,
   joinedTextLength: number,
   separatorLength: number,
-  elementNode: ElementNode,
-): ?TextNodeWithOffset;
+  elementNode: ElementNode
+): ?TextNodeWithOffset
 export function $isRootTextContentEmpty(
   isEditorComposing: boolean,
-  trim?: boolean,
-): boolean;
+  trim?: boolean
+): boolean
 export function $isRootTextContentEmptyCurry(
   isEditorComposing: boolean,
-  trim?: boolean,
-): () => boolean;
-export function $rootTextContentCurry(): string;
-export function $canShowPlaceholder(isComposing: boolean): boolean;
+  trim?: boolean
+): () => boolean
+export function $rootTextContentCurry(): string
+export function $canShowPlaceholder(isComposing: boolean): boolean
 export function $canShowPlaceholderCurry(
-  isEditorComposing: boolean,
-): () => boolean;
+  isEditorComposing: boolean
+): () => boolean
 export type EntityMatch = {
-  end: number;
-  start: number;
-};
+  end: number
+  start: number
+}
 export function registerLexicalTextEntity<N extends TextNode>(
   editor: LexicalEditor,
   getMatch: (text: string) => null | EntityMatch,
   targetNode: Class<N>,
-  createNode: (textNode: TextNode) => N,
-): Array<() => void>;
+  createNode: (textNode: TextNode) => N
+): Array<() => void>

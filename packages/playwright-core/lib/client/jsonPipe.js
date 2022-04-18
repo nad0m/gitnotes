@@ -1,11 +1,11 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.JsonPipe = void 0;
+})
+exports.JsonPipe = void 0
 
-var _channelOwner = require("./channelOwner");
+var _channelOwner = require('./channelOwner')
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -24,17 +24,16 @@ var _channelOwner = require("./channelOwner");
  */
 class JsonPipe extends _channelOwner.ChannelOwner {
   static from(jsonPipe) {
-    return jsonPipe._object;
+    return jsonPipe._object
   }
 
   constructor(parent, type, guid, initializer) {
-    super(parent, type, guid, initializer);
+    super(parent, type, guid, initializer)
   }
 
   channel() {
-    return this._channel;
+    return this._channel
   }
-
 }
 
-exports.JsonPipe = JsonPipe;
+exports.JsonPipe = JsonPipe

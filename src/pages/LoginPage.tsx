@@ -1,9 +1,9 @@
-import { LOCAL_STORAGE_KEY_GITHUB_TOKEN } from "configs"
-import { getAuth } from "firebase/auth"
-import { useAuthState } from "react-firebase-hooks/auth"
-import { Navigate } from "react-router-dom"
-import { useLocalStorage } from "react-use"
-import { useSignInWithGithub } from "../hooks"
+import { LOCAL_STORAGE_KEY_GITHUB_TOKEN } from 'configs'
+import { getAuth } from 'firebase/auth'
+import { useAuthState } from 'react-firebase-hooks/auth'
+import { Navigate } from 'react-router-dom'
+import { useLocalStorage } from 'react-use'
+import { useSignInWithGithub } from '../hooks'
 
 export const LoginPage = () => {
   const { isLoading, isError, mutate } = useSignInWithGithub()
@@ -18,7 +18,5 @@ export const LoginPage = () => {
     return <Navigate to="/" />
   }
 
-  return (
-    <button onClick={() => mutate()}>Sign in</button>
-  )
+  return <button onClick={() => mutate()}>Sign in</button>
 }

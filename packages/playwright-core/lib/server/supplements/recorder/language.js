@@ -1,10 +1,10 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.sanitizeDeviceOptions = sanitizeDeviceOptions;
-exports.toSignalMap = toSignalMap;
+})
+exports.sanitizeDeviceOptions = sanitizeDeviceOptions
+exports.toSignalMap = toSignalMap
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -23,24 +23,31 @@ exports.toSignalMap = toSignalMap;
  */
 function sanitizeDeviceOptions(device, options) {
   // Filter out all the properties from the device descriptor.
-  const cleanedOptions = {};
+  const cleanedOptions = {}
 
   for (const property in options) {
-    if (JSON.stringify(device[property]) !== JSON.stringify(options[property])) cleanedOptions[property] = options[property];
+    if (JSON.stringify(device[property]) !== JSON.stringify(options[property]))
+      cleanedOptions[property] = options[property]
   }
 
-  return cleanedOptions;
+  return cleanedOptions
 }
 
 function toSignalMap(action) {
-  let waitForNavigation;
-  let assertNavigation;
-  let popup;
-  let download;
-  let dialog;
+  let waitForNavigation
+  let assertNavigation
+  let popup
+  let download
+  let dialog
 
   for (const signal of action.signals) {
-    if (signal.name === 'navigation' && signal.isAsync) waitForNavigation = signal;else if (signal.name === 'navigation' && !signal.isAsync) assertNavigation = signal;else if (signal.name === 'popup') popup = signal;else if (signal.name === 'download') download = signal;else if (signal.name === 'dialog') dialog = signal;
+    if (signal.name === 'navigation' && signal.isAsync)
+      waitForNavigation = signal
+    else if (signal.name === 'navigation' && !signal.isAsync)
+      assertNavigation = signal
+    else if (signal.name === 'popup') popup = signal
+    else if (signal.name === 'download') download = signal
+    else if (signal.name === 'dialog') dialog = signal
   }
 
   return {
@@ -49,5 +56,5 @@ function toSignalMap(action) {
     popup,
     download,
     dialog
-  };
+  }
 }

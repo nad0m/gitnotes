@@ -1,19 +1,21 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.Download = void 0;
+})
+exports.Download = void 0
 
-var _path = _interopRequireDefault(require("path"));
+var _path = _interopRequireDefault(require('path'))
 
-var _page = require("./page");
+var _page = require('./page')
 
-var _utils = require("../utils/utils");
+var _utils = require('../utils/utils')
 
-var _artifact = require("./artifact");
+var _artifact = require('./artifact')
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+  return obj && obj.__esModule ? obj : { default: obj }
+}
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -32,34 +34,42 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 class Download {
   constructor(page, downloadsPath, uuid, url, suggestedFilename) {
-    this.artifact = void 0;
-    this.url = void 0;
-    this._page = void 0;
-    this._suggestedFilename = void 0;
-    const unaccessibleErrorMessage = !page._browserContext._options.acceptDownloads ? 'Pass { acceptDownloads: true } when you are creating your browser context.' : undefined;
-    this.artifact = new _artifact.Artifact(page, _path.default.join(downloadsPath, uuid), unaccessibleErrorMessage, () => {
-      return this._page._browserContext._doCancelDownload(uuid);
-    });
-    this._page = page;
-    this.url = url;
-    this._suggestedFilename = suggestedFilename;
+    this.artifact = void 0
+    this.url = void 0
+    this._page = void 0
+    this._suggestedFilename = void 0
+    const unaccessibleErrorMessage = !page._browserContext._options
+      .acceptDownloads
+      ? 'Pass { acceptDownloads: true } when you are creating your browser context.'
+      : undefined
+    this.artifact = new _artifact.Artifact(
+      page,
+      _path.default.join(downloadsPath, uuid),
+      unaccessibleErrorMessage,
+      () => {
+        return this._page._browserContext._doCancelDownload(uuid)
+      }
+    )
+    this._page = page
+    this.url = url
+    this._suggestedFilename = suggestedFilename
 
-    page._browserContext._downloads.add(this);
+    page._browserContext._downloads.add(this)
 
-    if (suggestedFilename !== undefined) this._page.emit(_page.Page.Events.Download, this);
+    if (suggestedFilename !== undefined)
+      this._page.emit(_page.Page.Events.Download, this)
   }
 
   _filenameSuggested(suggestedFilename) {
-    (0, _utils.assert)(this._suggestedFilename === undefined);
-    this._suggestedFilename = suggestedFilename;
+    ;(0, _utils.assert)(this._suggestedFilename === undefined)
+    this._suggestedFilename = suggestedFilename
 
-    this._page.emit(_page.Page.Events.Download, this);
+    this._page.emit(_page.Page.Events.Download, this)
   }
 
   suggestedFilename() {
-    return this._suggestedFilename;
+    return this._suggestedFilename
   }
-
 }
 
-exports.Download = Download;
+exports.Download = Download

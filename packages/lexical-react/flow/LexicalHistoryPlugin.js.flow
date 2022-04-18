@@ -12,23 +12,23 @@ import type {
   GridSelection,
   LexicalEditor,
   NodeSelection,
-  RangeSelection,
-} from 'lexical';
+  RangeSelection
+} from 'lexical'
 
 export type HistoryStateEntry = {
   editor: LexicalEditor,
   editorState: EditorState,
-  undoSelection?: RangeSelection | NodeSelection | GridSelection | null,
-};
+  undoSelection?: RangeSelection | NodeSelection | GridSelection | null
+}
 
 export type HistoryState = {
   current: null | HistoryStateEntry,
   redoStack: Array<HistoryStateEntry>,
-  undoStack: Array<HistoryStateEntry>,
-};
+  undoStack: Array<HistoryStateEntry>
+}
 
 declare export function HistoryPlugin({
-  externalHistoryState?: HistoryState,
-}): React$Node;
+  externalHistoryState?: HistoryState
+}): React$Node
 
-declare export function createEmptyHistoryState(): HistoryState;
+declare export function createEmptyHistoryState(): HistoryState

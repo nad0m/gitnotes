@@ -1,10 +1,10 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.isSessionClosedError = isSessionClosedError;
-exports.ProtocolError = void 0;
+})
+exports.isSessionClosedError = isSessionClosedError
+exports.ProtocolError = void 0
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -23,15 +23,14 @@ exports.ProtocolError = void 0;
  */
 class ProtocolError extends Error {
   constructor(sessionClosed, message) {
-    super(message);
-    this.sessionClosed = void 0;
-    this.sessionClosed = sessionClosed || false;
+    super(message)
+    this.sessionClosed = void 0
+    this.sessionClosed = sessionClosed || false
   }
-
 }
 
-exports.ProtocolError = ProtocolError;
+exports.ProtocolError = ProtocolError
 
 function isSessionClosedError(e) {
-  return e instanceof ProtocolError && e.sessionClosed;
+  return e instanceof ProtocolError && e.sessionClosed
 }

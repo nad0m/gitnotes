@@ -7,14 +7,14 @@
  * @flow strict
  */
 
-import type {LexicalEditor} from 'lexical';
+import type { LexicalEditor } from 'lexical'
 
-import {registerMarkdownShortcuts} from '@lexical/markdown';
-import {$createHorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
-import {useEffect} from 'react';
+import { registerMarkdownShortcuts } from '@lexical/markdown'
+import { $createHorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
+import { useEffect } from 'react'
 
 export default function useMarkdownShortcuts(editor: LexicalEditor): void {
   useEffect(() => {
-    return registerMarkdownShortcuts(editor, $createHorizontalRuleNode);
-  }, [editor]);
+    return registerMarkdownShortcuts(editor, $createHorizontalRuleNode)
+  }, [editor])
 }

@@ -7,147 +7,147 @@
  * @flow strict
  */
 
-import type {Provider} from '.';
-import type {Binding} from './Bindings';
+import type { Provider } from '.'
+import type { Binding } from './Bindings'
 import type {
   GridSelection,
   NodeKey,
   NodeMap,
   NodeSelection,
   Point,
-  RangeSelection,
-} from 'lexical';
+  RangeSelection
+} from 'lexical'
 import type {
   AbsolutePosition,
   Map as YMap,
   RelativePosition,
-  XmlText,
-} from 'yjs';
+  XmlText
+} from 'yjs'
 
 import {
   $getNodeByKey,
   $getSelection,
   $isElementNode,
   $isRangeSelection,
-  $isTextNode,
-} from 'lexical';
+  $isTextNode
+} from 'lexical'
 import {
   compareRelativePositions,
   createAbsolutePositionFromRelativePosition,
-  createRelativePositionFromTypeIndex,
-} from 'yjs';
+  createRelativePositionFromTypeIndex
+} from 'yjs'
 
-import {CollabDecoratorNode} from './CollabDecoratorNode';
-import {CollabElementNode} from './CollabElementNode';
-import {CollabLineBreakNode} from './CollabLineBreakNode';
-import {CollabTextNode} from './CollabTextNode';
-import {getPositionFromElementAndOffset} from './Utils';
+import { CollabDecoratorNode } from './CollabDecoratorNode'
+import { CollabElementNode } from './CollabElementNode'
+import { CollabLineBreakNode } from './CollabLineBreakNode'
+import { CollabTextNode } from './CollabTextNode'
+import { getPositionFromElementAndOffset } from './Utils'
 
 export type CursorSelection = {
   anchor: {
     key: NodeKey,
-    offset: number,
+    offset: number
   },
   caret: HTMLElement,
   color: string,
   focus: {
     key: NodeKey,
-    offset: number,
+    offset: number
   },
   name: HTMLSpanElement,
   range: Range,
-  selections: Array<HTMLElement>,
-};
+  selections: Array<HTMLElement>
+}
 
 export type Cursor = {
   color: string,
   name: string,
-  selection: null | CursorSelection,
-};
+  selection: null | CursorSelection
+}
 
 function createRelativePosition(
   point: Point,
-  binding: Binding,
+  binding: Binding
 ): null | RelativePosition {
-  const collabNodeMap = binding.collabNodeMap;
-  const collabNode = collabNodeMap.get(point.key);
+  const collabNodeMap = binding.collabNodeMap
+  const collabNode = collabNodeMap.get(point.key)
   if (collabNode === undefined) {
-    return null;
+    return null
   }
-  let offset = point.offset;
-  let sharedType = collabNode.getSharedType();
+  let offset = point.offset
+  let sharedType = collabNode.getSharedType()
 
   if (collabNode instanceof CollabTextNode) {
-    sharedType = collabNode._parent._xmlText;
-    const currentOffset = collabNode.getOffset();
+    sharedType = collabNode._parent._xmlText
+    const currentOffset = collabNode.getOffset()
     if (currentOffset === -1) {
-      return null;
+      return null
     }
-    offset = currentOffset + 1 + offset;
+    offset = currentOffset + 1 + offset
   }
-  return createRelativePositionFromTypeIndex(sharedType, offset);
+  return createRelativePositionFromTypeIndex(sharedType, offset)
 }
 
 function createAbsolutePosition(
   relativePosition: RelativePosition,
-  binding: Binding,
+  binding: Binding
 ): AbsolutePosition {
   return createAbsolutePositionFromRelativePosition(
     relativePosition,
-    binding.doc,
-  );
+    binding.doc
+  )
 }
 
 function shouldUpdatePosition(
   currentPos: ?RelativePosition,
-  pos: ?RelativePosition,
+  pos: ?RelativePosition
 ): boolean {
   if (currentPos == null) {
     if (pos != null) {
-      return true;
+      return true
     }
   } else if (pos == null || !compareRelativePositions(currentPos, pos)) {
-    return true;
+    return true
   }
-  return false;
+  return false
 }
 
 function createCursor(name: string, color: string): Cursor {
   return {
     color: color,
     name: name,
-    selection: null,
-  };
+    selection: null
+  }
 }
 
 function destroySelection(binding: Binding, selection: CursorSelection) {
-  const cursorsContainer = binding.cursorsContainer;
+  const cursorsContainer = binding.cursorsContainer
   if (cursorsContainer !== null) {
-    const selections = selection.selections;
-    const selectionsLength = selections.length;
+    const selections = selection.selections
+    const selectionsLength = selections.length
     for (let i = 0; i < selectionsLength; i++) {
-      cursorsContainer.removeChild(selections[i]);
+      cursorsContainer.removeChild(selections[i])
     }
   }
 }
 
 function destroyCursor(binding: Binding, cursor: Cursor) {
-  const selection = cursor.selection;
+  const selection = cursor.selection
   if (selection !== null) {
-    destroySelection(binding, selection);
+    destroySelection(binding, selection)
   }
 }
 
 function getDOMTextNode(element: Node | null): Text | null {
-  let node = element;
+  let node = element
   while (node != null) {
     if (node.nodeType === 3) {
       // $FlowFixMe: this is a Text
-      return node;
+      return node
     }
-    node = node.firstChild;
+    node = node.firstChild
   }
-  return null;
+  return null
 }
 
 function createCursorSelection(
@@ -155,84 +155,84 @@ function createCursorSelection(
   anchorKey: NodeKey,
   anchorOffset: number,
   focusKey: NodeKey,
-  focusOffset: number,
+  focusOffset: number
 ): CursorSelection {
-  const color = cursor.color;
-  const caret = document.createElement('span');
-  caret.style.cssText = `position:absolute;top:0;bottom:0;right:-1px;width:1px;background-color:rgb(${color});z-index:10;`;
-  const name = document.createElement('span');
-  name.textContent = cursor.name;
-  name.style.cssText = `position:absolute;left:-2px;top:-16px;background-color:rgb(${color});color:#fff;line-height:12px;height:12px;font-size:12px;padding:2px;font-family:Arial;font-weight:bold;white-space:nowrap;`;
-  caret.appendChild(name);
+  const color = cursor.color
+  const caret = document.createElement('span')
+  caret.style.cssText = `position:absolute;top:0;bottom:0;right:-1px;width:1px;background-color:rgb(${color});z-index:10;`
+  const name = document.createElement('span')
+  name.textContent = cursor.name
+  name.style.cssText = `position:absolute;left:-2px;top:-16px;background-color:rgb(${color});color:#fff;line-height:12px;height:12px;font-size:12px;padding:2px;font-family:Arial;font-weight:bold;white-space:nowrap;`
+  caret.appendChild(name)
   return {
     anchor: {
       key: anchorKey,
-      offset: anchorOffset,
+      offset: anchorOffset
     },
     caret,
     color,
     focus: {
       key: focusKey,
-      offset: focusOffset,
+      offset: focusOffset
     },
     name,
     range: document.createRange(),
-    selections: [],
-  };
+    selections: []
+  }
 }
 
 function getDOMIndexWithinParent(node: Node): [Node, number] {
-  const parent = node.parentNode;
+  const parent = node.parentNode
   if (parent == null) {
-    throw new Error('Should never happen');
+    throw new Error('Should never happen')
   }
-  return [parent, Array.from(parent.childNodes).indexOf(node)];
+  return [parent, Array.from(parent.childNodes).indexOf(node)]
 }
 
 function updateCursor(
   binding: Binding,
   cursor: Cursor,
   nextSelection: null | CursorSelection,
-  nodeMap: NodeMap,
+  nodeMap: NodeMap
 ): void {
-  const editor = binding.editor;
-  const rootElement = editor.getRootElement();
-  const cursorsContainer = binding.cursorsContainer;
+  const editor = binding.editor
+  const rootElement = editor.getRootElement()
+  const cursorsContainer = binding.cursorsContainer
   if (cursorsContainer === null || rootElement === null) {
-    return;
+    return
   }
-  const prevSelection = cursor.selection;
+  const prevSelection = cursor.selection
   if (nextSelection === null) {
     if (prevSelection === null) {
-      return;
+      return
     } else {
-      cursor.selection = null;
-      destroySelection(binding, prevSelection);
-      return;
+      cursor.selection = null
+      destroySelection(binding, prevSelection)
+      return
     }
   } else {
-    cursor.selection = nextSelection;
+    cursor.selection = nextSelection
   }
-  const range = nextSelection.range;
-  const caret = nextSelection.caret;
-  const color = nextSelection.color;
-  const selections = nextSelection.selections;
-  const anchor = nextSelection.anchor;
-  const focus = nextSelection.focus;
-  const anchorKey = anchor.key;
-  const focusKey = focus.key;
-  const anchorNode = nodeMap.get(anchorKey);
-  const focusNode = nodeMap.get(focusKey);
-  let anchorDOM = editor.getElementByKey(anchorKey);
-  let focusDOM = editor.getElementByKey(focusKey);
-  let anchorOffset = anchor.offset;
-  let focusOffset = focus.offset;
+  const range = nextSelection.range
+  const caret = nextSelection.caret
+  const color = nextSelection.color
+  const selections = nextSelection.selections
+  const anchor = nextSelection.anchor
+  const focus = nextSelection.focus
+  const anchorKey = anchor.key
+  const focusKey = focus.key
+  const anchorNode = nodeMap.get(anchorKey)
+  const focusNode = nodeMap.get(focusKey)
+  let anchorDOM = editor.getElementByKey(anchorKey)
+  let focusDOM = editor.getElementByKey(focusKey)
+  let anchorOffset = anchor.offset
+  let focusOffset = focus.offset
 
   if ($isTextNode(anchorNode)) {
-    anchorDOM = getDOMTextNode(anchorDOM);
+    anchorDOM = getDOMTextNode(anchorDOM)
   }
   if ($isTextNode(focusNode)) {
-    focusDOM = getDOMTextNode(focusDOM);
+    focusDOM = getDOMTextNode(focusDOM)
   }
   if (
     anchorNode === undefined ||
@@ -240,15 +240,15 @@ function updateCursor(
     anchorDOM === null ||
     focusDOM === null
   ) {
-    return;
+    return
   }
   if (anchorDOM.nodeName === 'BR') {
-    [anchorDOM, anchorOffset] = getDOMIndexWithinParent(anchorDOM);
+    ;[anchorDOM, anchorOffset] = getDOMIndexWithinParent(anchorDOM)
   }
   if (focusDOM.nodeName === 'BR') {
-    [focusDOM, focusOffset] = getDOMIndexWithinParent(focusDOM);
+    ;[focusDOM, focusOffset] = getDOMIndexWithinParent(focusDOM)
   }
-  const firstChild = anchorDOM.firstChild;
+  const firstChild = anchorDOM.firstChild
   if (
     anchorDOM === focusDOM &&
     firstChild != null &&
@@ -256,13 +256,13 @@ function updateCursor(
     anchorOffset === 0 &&
     focusOffset === 0
   ) {
-    focusOffset = 1;
+    focusOffset = 1
   }
   try {
-    range.setStart(anchorDOM, anchorOffset);
-    range.setEnd(focusDOM, focusOffset);
+    range.setStart(anchorDOM, anchorOffset)
+    range.setEnd(focusDOM, focusOffset)
   } catch (e) {
-    return;
+    return
   }
 
   if (
@@ -270,99 +270,99 @@ function updateCursor(
     (anchorOffset !== focusOffset || anchorKey !== focusKey)
   ) {
     // Range is backwards, we need to reverse it
-    range.setStart(focusDOM, focusOffset);
-    range.setEnd(anchorDOM, anchorOffset);
+    range.setStart(focusDOM, focusOffset)
+    range.setEnd(anchorDOM, anchorOffset)
   }
   // We need to
-  const rootRect = rootElement.getBoundingClientRect();
-  const computedStyle = getComputedStyle(rootElement);
+  const rootRect = rootElement.getBoundingClientRect()
+  const computedStyle = getComputedStyle(rootElement)
   const rootPadding =
     parseFloat(computedStyle.paddingLeft) +
-    parseFloat(computedStyle.paddingRight);
-  const selectionRects = Array.from(range.getClientRects());
-  let selectionRectsLength = selectionRects.length;
-  const selectionsLength = selections.length;
+    parseFloat(computedStyle.paddingRight)
+  const selectionRects = Array.from(range.getClientRects())
+  let selectionRectsLength = selectionRects.length
+  const selectionsLength = selections.length
 
   for (let i = 0; i < selectionRectsLength; i++) {
-    const selectionRect = selectionRects[i];
+    const selectionRect = selectionRects[i]
     if (selectionRect.width + rootPadding === rootRect.width) {
       // Exclude selections that span the entire element
-      selectionRects.splice(i--, 1);
-      selectionRectsLength--;
-      continue;
+      selectionRects.splice(i--, 1)
+      selectionRectsLength--
+      continue
     }
-    let selection = selections[i];
+    let selection = selections[i]
     if (selection === undefined) {
-      selection = document.createElement('span');
-      selections[i] = selection;
-      cursorsContainer.appendChild(selection);
+      selection = document.createElement('span')
+      selections[i] = selection
+      cursorsContainer.appendChild(selection)
     }
-    const style = `position:absolute;top:${selectionRect.top}px;left:${selectionRect.left}px;height:${selectionRect.height}px;width:${selectionRect.width}px;background-color:rgba(${color}, 0.3);pointer-events:none;z-index:10;`;
-    selection.style.cssText = style;
+    const style = `position:absolute;top:${selectionRect.top}px;left:${selectionRect.left}px;height:${selectionRect.height}px;width:${selectionRect.width}px;background-color:rgba(${color}, 0.3);pointer-events:none;z-index:10;`
+    selection.style.cssText = style
     if (i === selectionRectsLength - 1) {
       if (caret.parentNode !== selection) {
-        selection.appendChild(caret);
+        selection.appendChild(caret)
       }
     }
   }
   for (let i = selectionsLength - 1; i >= selectionRectsLength; i--) {
-    const selection = selections[i];
-    cursorsContainer.removeChild(selection);
-    selections.pop();
+    const selection = selections[i]
+    cursorsContainer.removeChild(selection)
+    selections.pop()
   }
 }
 
 export function syncLocalCursorPosition(
   binding: Binding,
-  provider: Provider,
+  provider: Provider
 ): void {
-  const awareness = provider.awareness;
-  const localState = awareness.getLocalState();
+  const awareness = provider.awareness
+  const localState = awareness.getLocalState()
   if (localState === null) {
-    return;
+    return
   }
-  const anchorPos = localState.anchorPos;
-  const focusPos = localState.focusPos;
+  const anchorPos = localState.anchorPos
+  const focusPos = localState.focusPos
 
   if (anchorPos !== null && focusPos !== null) {
-    const anchorAbsPos = createAbsolutePosition(anchorPos, binding);
-    const focusAbsPos = createAbsolutePosition(focusPos, binding);
+    const anchorAbsPos = createAbsolutePosition(anchorPos, binding)
+    const focusAbsPos = createAbsolutePosition(focusPos, binding)
 
     if (anchorAbsPos !== null && focusAbsPos !== null) {
       const [anchorCollabNode, anchorOffset] = getCollabNodeAndOffset(
         anchorAbsPos.type,
-        anchorAbsPos.index,
-      );
+        anchorAbsPos.index
+      )
       const [focusCollabNode, focusOffset] = getCollabNodeAndOffset(
         focusAbsPos.type,
-        focusAbsPos.index,
-      );
+        focusAbsPos.index
+      )
       if (anchorCollabNode !== null && focusCollabNode !== null) {
-        const anchorKey = anchorCollabNode.getKey();
-        const focusKey = focusCollabNode.getKey();
+        const anchorKey = anchorCollabNode.getKey()
+        const focusKey = focusCollabNode.getKey()
 
-        const selection = $getSelection();
+        const selection = $getSelection()
         if (!$isRangeSelection(selection)) {
-          return;
+          return
         }
-        const anchor = selection.anchor;
-        const focus = selection.focus;
+        const anchor = selection.anchor
+        const focus = selection.focus
 
         if (anchor.key !== anchorKey || anchor.offset !== anchorOffset) {
-          const anchorNode = $getNodeByKey(anchorKey);
+          const anchorNode = $getNodeByKey(anchorKey)
           selection.anchor.set(
             anchorKey,
             anchorOffset,
-            $isElementNode(anchorNode) ? 'element' : 'text',
-          );
+            $isElementNode(anchorNode) ? 'element' : 'text'
+          )
         }
         if (focus.key !== focusKey || focus.offset !== focusOffset) {
-          const focusNode = $getNodeByKey(focusKey);
+          const focusNode = $getNodeByKey(focusKey)
           selection.focus.set(
             focusKey,
             focusOffset,
-            $isElementNode(focusNode) ? 'element' : 'text',
-          );
+            $isElementNode(focusNode) ? 'element' : 'text'
+          )
         }
       }
     }
@@ -371,7 +371,7 @@ export function syncLocalCursorPosition(
 
 function getCollabNodeAndOffset(
   sharedType: XmlText | YMap,
-  offset: number,
+  offset: number
 ): [
   (
     | null
@@ -380,70 +380,70 @@ function getCollabNodeAndOffset(
     | CollabTextNode
     | CollabLineBreakNode
   ),
-  number,
+  number
 ] {
   // $FlowFixMe: internal field
-  const collabNode = sharedType._collabNode;
+  const collabNode = sharedType._collabNode
   if (collabNode === undefined) {
-    return [null, 0];
+    return [null, 0]
   }
   if (collabNode instanceof CollabElementNode) {
-    const {node, offset: collabNodeOffset} = getPositionFromElementAndOffset(
+    const { node, offset: collabNodeOffset } = getPositionFromElementAndOffset(
       collabNode,
       offset,
-      true,
-    );
+      true
+    )
     if (node === null) {
-      return [collabNode, 0];
+      return [collabNode, 0]
     } else {
-      return [node, collabNodeOffset];
+      return [node, collabNodeOffset]
     }
   }
-  return [null, 0];
+  return [null, 0]
 }
 
 export function syncCursorPositions(
   binding: Binding,
-  provider: Provider,
+  provider: Provider
 ): void {
-  const awarenessStates = Array.from(provider.awareness.getStates());
-  const localClientID = binding.clientID;
-  const cursors = binding.cursors;
-  const editor = binding.editor;
-  const nodeMap = editor._editorState._nodeMap;
-  const visitedClientIDs = new Set();
+  const awarenessStates = Array.from(provider.awareness.getStates())
+  const localClientID = binding.clientID
+  const cursors = binding.cursors
+  const editor = binding.editor
+  const nodeMap = editor._editorState._nodeMap
+  const visitedClientIDs = new Set()
 
   for (let i = 0; i < awarenessStates.length; i++) {
-    const awarenessState = awarenessStates[i];
-    const [clientID, awareness] = awarenessState;
+    const awarenessState = awarenessStates[i]
+    const [clientID, awareness] = awarenessState
 
     if (clientID !== localClientID) {
-      visitedClientIDs.add(clientID);
-      const {anchorPos, focusPos, name, color, focusing} = awareness;
-      let selection = null;
+      visitedClientIDs.add(clientID)
+      const { anchorPos, focusPos, name, color, focusing } = awareness
+      let selection = null
 
-      let cursor = cursors.get(clientID);
+      let cursor = cursors.get(clientID)
       if (cursor === undefined) {
-        cursor = createCursor(name, color);
-        cursors.set(clientID, cursor);
+        cursor = createCursor(name, color)
+        cursors.set(clientID, cursor)
       }
       if (anchorPos !== null && focusPos !== null && focusing) {
-        const anchorAbsPos = createAbsolutePosition(anchorPos, binding);
-        const focusAbsPos = createAbsolutePosition(focusPos, binding);
+        const anchorAbsPos = createAbsolutePosition(anchorPos, binding)
+        const focusAbsPos = createAbsolutePosition(focusPos, binding)
 
         if (anchorAbsPos !== null && focusAbsPos !== null) {
           const [anchorCollabNode, anchorOffset] = getCollabNodeAndOffset(
             anchorAbsPos.type,
-            anchorAbsPos.index,
-          );
+            anchorAbsPos.index
+          )
           const [focusCollabNode, focusOffset] = getCollabNodeAndOffset(
             focusAbsPos.type,
-            focusAbsPos.index,
-          );
+            focusAbsPos.index
+          )
           if (anchorCollabNode !== null && focusCollabNode !== null) {
-            const anchorKey = anchorCollabNode.getKey();
-            const focusKey = focusCollabNode.getKey();
-            selection = cursor.selection;
+            const anchorKey = anchorCollabNode.getKey()
+            const focusKey = focusCollabNode.getKey()
+            selection = cursor.selection
 
             if (selection === null) {
               selection = createCursorSelection(
@@ -451,30 +451,30 @@ export function syncCursorPositions(
                 anchorKey,
                 anchorOffset,
                 focusKey,
-                focusOffset,
-              );
+                focusOffset
+              )
             } else {
-              const anchor = selection.anchor;
-              const focus = selection.focus;
-              anchor.key = anchorKey;
-              anchor.offset = anchorOffset;
-              focus.key = focusKey;
-              focus.offset = focusOffset;
+              const anchor = selection.anchor
+              const focus = selection.focus
+              anchor.key = anchorKey
+              anchor.offset = anchorOffset
+              focus.key = focusKey
+              focus.offset = focusOffset
             }
           }
         }
       }
-      updateCursor(binding, cursor, selection, nodeMap);
+      updateCursor(binding, cursor, selection, nodeMap)
     }
   }
-  const allClientIDs = Array.from(cursors.keys());
+  const allClientIDs = Array.from(cursors.keys())
   for (let i = 0; i < allClientIDs.length; i++) {
-    const clientID = allClientIDs[i];
+    const clientID = allClientIDs[i]
     if (!visitedClientIDs.has(clientID)) {
-      const cursor = cursors.get(clientID);
+      const cursor = cursors.get(clientID)
       if (cursor !== undefined) {
-        destroyCursor(binding, cursor);
-        cursors.delete(clientID);
+        destroyCursor(binding, cursor)
+        cursors.delete(clientID)
       }
     }
   }
@@ -484,41 +484,41 @@ export function syncLexicalSelectionToYjs(
   binding: Binding,
   provider: Provider,
   prevSelection: null | RangeSelection | NodeSelection | GridSelection,
-  nextSelection: null | RangeSelection | NodeSelection | GridSelection,
+  nextSelection: null | RangeSelection | NodeSelection | GridSelection
 ): void {
-  const awareness = provider.awareness;
-  const localState = awareness.getLocalState();
+  const awareness = provider.awareness
+  const localState = awareness.getLocalState()
   if (localState === null) {
-    return;
+    return
   }
   const {
     anchorPos: currentAnchorPos,
     focusPos: currentFocusPos,
     name,
     color,
-    focusing,
-  } = localState;
-  let anchorPos = null;
-  let focusPos = null;
+    focusing
+  } = localState
+  let anchorPos = null
+  let focusPos = null
 
   if (
     nextSelection === null ||
     (currentAnchorPos !== null && !nextSelection.is(prevSelection))
   ) {
     if (prevSelection === null) {
-      return;
+      return
     }
   }
 
   if ($isRangeSelection(nextSelection)) {
-    anchorPos = createRelativePosition(nextSelection.anchor, binding);
-    focusPos = createRelativePosition(nextSelection.focus, binding);
+    anchorPos = createRelativePosition(nextSelection.anchor, binding)
+    focusPos = createRelativePosition(nextSelection.focus, binding)
   }
 
   if (
     shouldUpdatePosition(currentAnchorPos, anchorPos) ||
     shouldUpdatePosition(currentFocusPos, focusPos)
   ) {
-    awareness.setLocalState({anchorPos, color, focusPos, focusing, name});
+    awareness.setLocalState({ anchorPos, color, focusPos, focusing, name })
   }
 }

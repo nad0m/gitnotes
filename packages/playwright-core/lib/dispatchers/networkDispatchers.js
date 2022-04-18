@@ -1,17 +1,22 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.FetchRequestDispatcher = exports.WebSocketDispatcher = exports.RouteDispatcher = exports.ResponseDispatcher = exports.RequestDispatcher = void 0;
+})
+exports.FetchRequestDispatcher =
+  exports.WebSocketDispatcher =
+  exports.RouteDispatcher =
+  exports.ResponseDispatcher =
+  exports.RequestDispatcher =
+    void 0
 
-var _fetch = require("../server/fetch");
+var _fetch = require('../server/fetch')
 
-var _network = require("../server/network");
+var _network = require('../server/network')
 
-var _dispatcher = require("./dispatcher");
+var _dispatcher = require('./dispatcher')
 
-var _frameDispatcher = require("./frameDispatcher");
+var _frameDispatcher = require('./frameDispatcher')
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -30,16 +35,16 @@ var _frameDispatcher = require("./frameDispatcher");
  */
 class RequestDispatcher extends _dispatcher.Dispatcher {
   static from(scope, request) {
-    const result = (0, _dispatcher.existingDispatcher)(request);
-    return result || new RequestDispatcher(scope, request);
+    const result = (0, _dispatcher.existingDispatcher)(request)
+    return result || new RequestDispatcher(scope, request)
   }
 
   static fromNullable(scope, request) {
-    return request ? RequestDispatcher.from(scope, request) : undefined;
+    return request ? RequestDispatcher.from(scope, request) : undefined
   }
 
   constructor(scope, request) {
-    const postData = request.postDataBuffer();
+    const postData = request.postDataBuffer()
     super(scope, request, 'Request', {
       frame: _frameDispatcher.FrameDispatcher.from(scope, request.frame()),
       url: request.url(),
@@ -48,34 +53,38 @@ class RequestDispatcher extends _dispatcher.Dispatcher {
       postData: postData === null ? undefined : postData.toString('base64'),
       headers: request.headers(),
       isNavigationRequest: request.isNavigationRequest(),
-      redirectedFrom: RequestDispatcher.fromNullable(scope, request.redirectedFrom())
-    });
+      redirectedFrom: RequestDispatcher.fromNullable(
+        scope,
+        request.redirectedFrom()
+      )
+    })
   }
 
   async rawRequestHeaders(params) {
     return {
       headers: await this._object.rawRequestHeaders()
-    };
+    }
   }
 
   async response() {
     return {
-      response: (0, _dispatcher.lookupNullableDispatcher)(await this._object.response())
-    };
+      response: (0, _dispatcher.lookupNullableDispatcher)(
+        await this._object.response()
+      )
+    }
   }
-
 }
 
-exports.RequestDispatcher = RequestDispatcher;
+exports.RequestDispatcher = RequestDispatcher
 
 class ResponseDispatcher extends _dispatcher.Dispatcher {
   static from(scope, response) {
-    const result = (0, _dispatcher.existingDispatcher)(response);
-    return result || new ResponseDispatcher(scope, response);
+    const result = (0, _dispatcher.existingDispatcher)(response)
+    return result || new ResponseDispatcher(scope, response)
   }
 
   static fromNullable(scope, response) {
-    return response ? ResponseDispatcher.from(scope, response) : undefined;
+    return response ? ResponseDispatcher.from(scope, response) : undefined
   }
 
   constructor(scope, response) {
@@ -87,54 +96,53 @@ class ResponseDispatcher extends _dispatcher.Dispatcher {
       statusText: response.statusText(),
       headers: response.headers(),
       timing: response.timing()
-    });
+    })
   }
 
   async body() {
     return {
       binary: (await this._object.body()).toString('base64')
-    };
+    }
   }
 
   async securityDetails() {
     return {
       value: (await this._object.securityDetails()) || undefined
-    };
+    }
   }
 
   async serverAddr() {
     return {
       value: (await this._object.serverAddr()) || undefined
-    };
+    }
   }
 
   async rawResponseHeaders(params) {
     return {
       headers: await this._object.rawResponseHeaders()
-    };
+    }
   }
 
   async sizes(params) {
     return {
       sizes: await this._object.sizes()
-    };
+    }
   }
-
 }
 
-exports.ResponseDispatcher = ResponseDispatcher;
+exports.ResponseDispatcher = ResponseDispatcher
 
 class RouteDispatcher extends _dispatcher.Dispatcher {
   static from(scope, route) {
-    const result = (0, _dispatcher.existingDispatcher)(route);
-    return result || new RouteDispatcher(scope, route);
+    const result = (0, _dispatcher.existingDispatcher)(route)
+    return result || new RouteDispatcher(scope, route)
   }
 
   constructor(scope, route) {
     super(scope, route, 'Route', {
       // Context route can point to a non-reported request.
       request: RequestDispatcher.from(scope, route.request())
-    });
+    })
   }
 
   async continue(params, metadata) {
@@ -142,70 +150,75 @@ class RouteDispatcher extends _dispatcher.Dispatcher {
       url: params.url,
       method: params.method,
       headers: params.headers,
-      postData: params.postData ? Buffer.from(params.postData, 'base64') : undefined
-    });
+      postData: params.postData
+        ? Buffer.from(params.postData, 'base64')
+        : undefined
+    })
   }
 
   async fulfill(params) {
-    await this._object.fulfill(params);
+    await this._object.fulfill(params)
   }
 
   async abort(params) {
-    await this._object.abort(params.errorCode || 'failed');
+    await this._object.abort(params.errorCode || 'failed')
   }
-
 }
 
-exports.RouteDispatcher = RouteDispatcher;
+exports.RouteDispatcher = RouteDispatcher
 
 class WebSocketDispatcher extends _dispatcher.Dispatcher {
   constructor(scope, webSocket) {
     super(scope, webSocket, 'WebSocket', {
       url: webSocket.url()
-    });
-    webSocket.on(_network.WebSocket.Events.FrameSent, event => this._dispatchEvent('frameSent', event));
-    webSocket.on(_network.WebSocket.Events.FrameReceived, event => this._dispatchEvent('frameReceived', event));
-    webSocket.on(_network.WebSocket.Events.SocketError, error => this._dispatchEvent('socketError', {
-      error
-    }));
-    webSocket.on(_network.WebSocket.Events.Close, () => this._dispatchEvent('close', {}));
+    })
+    webSocket.on(_network.WebSocket.Events.FrameSent, (event) =>
+      this._dispatchEvent('frameSent', event)
+    )
+    webSocket.on(_network.WebSocket.Events.FrameReceived, (event) =>
+      this._dispatchEvent('frameReceived', event)
+    )
+    webSocket.on(_network.WebSocket.Events.SocketError, (error) =>
+      this._dispatchEvent('socketError', {
+        error
+      })
+    )
+    webSocket.on(_network.WebSocket.Events.Close, () =>
+      this._dispatchEvent('close', {})
+    )
   }
-
 }
 
-exports.WebSocketDispatcher = WebSocketDispatcher;
+exports.WebSocketDispatcher = WebSocketDispatcher
 
 class FetchRequestDispatcher extends _dispatcher.Dispatcher {
   static from(scope, request) {
-    const result = (0, _dispatcher.existingDispatcher)(request);
-    return result || new FetchRequestDispatcher(scope, request);
+    const result = (0, _dispatcher.existingDispatcher)(request)
+    return result || new FetchRequestDispatcher(scope, request)
   }
 
   static fromNullable(scope, request) {
-    return request ? FetchRequestDispatcher.from(scope, request) : undefined;
+    return request ? FetchRequestDispatcher.from(scope, request) : undefined
   }
 
   constructor(scope, request) {
-    super(scope, request, 'FetchRequest', {}, true);
+    super(scope, request, 'FetchRequest', {}, true)
     request.once(_fetch.FetchRequest.Events.Dispose, () => {
-      if (!this._disposed) super._dispose();
-    });
+      if (!this._disposed) super._dispose()
+    })
   }
 
   async storageState(params) {
-    return this._object.storageState();
+    return this._object.storageState()
   }
 
   async dispose(params) {
-    this._object.dispose();
+    this._object.dispose()
   }
 
   async fetch(params, metadata) {
-    const {
-      fetchResponse,
-      error
-    } = await this._object.fetch(params);
-    let response;
+    const { fetchResponse, error } = await this._object.fetch(params)
+    let response
 
     if (fetchResponse) {
       response = {
@@ -214,27 +227,26 @@ class FetchRequestDispatcher extends _dispatcher.Dispatcher {
         statusText: fetchResponse.statusText,
         headers: fetchResponse.headers,
         fetchUid: fetchResponse.fetchUid
-      };
+      }
     }
 
     return {
       response,
       error
-    };
+    }
   }
 
   async fetchResponseBody(params, metadata) {
-    const buffer = this._object.fetchResponses.get(params.fetchUid);
+    const buffer = this._object.fetchResponses.get(params.fetchUid)
 
     return {
       binary: buffer ? buffer.toString('base64') : undefined
-    };
+    }
   }
 
   async disposeFetchResponse(params, metadata) {
-    this._object.fetchResponses.delete(params.fetchUid);
+    this._object.fetchResponses.delete(params.fetchUid)
   }
-
 }
 
-exports.FetchRequestDispatcher = FetchRequestDispatcher;
+exports.FetchRequestDispatcher = FetchRequestDispatcher

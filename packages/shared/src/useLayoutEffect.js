@@ -7,11 +7,11 @@
  * @flow strict
  */
 
-import {useEffect, useLayoutEffect} from 'react';
-import {CAN_USE_DOM} from 'shared/canUseDOM';
+import { useEffect, useLayoutEffect } from 'react'
+import { CAN_USE_DOM } from 'shared/canUseDOM'
 
 const useLayoutEffectImpl: typeof useLayoutEffect = CAN_USE_DOM
   ? useLayoutEffect
-  : useEffect;
+  : useEffect
 
-export default useLayoutEffectImpl;
+export default useLayoutEffectImpl

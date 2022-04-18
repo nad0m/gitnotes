@@ -10,112 +10,112 @@
 import type {
   EditorConfig,
   EditorThemeClasses,
-  LexicalEditor,
-} from '../LexicalEditor';
+  LexicalEditor
+} from '../LexicalEditor'
 import type {
   DOMConversionMap,
   DOMConversionOutput,
   DOMExportOutput,
-  LexicalNode,
-} from '../LexicalNode';
+  LexicalNode
+} from '../LexicalNode'
 
-import {getCachedClassNameArray} from '../LexicalUtils';
-import {ElementNode} from './LexicalElementNode';
-import {$isTextNode} from './LexicalTextNode';
+import { getCachedClassNameArray } from '../LexicalUtils'
+import { ElementNode } from './LexicalElementNode'
+import { $isTextNode } from './LexicalTextNode'
 
 export class ParagraphNode extends ElementNode {
   static getType(): string {
-    return 'paragraph';
+    return 'paragraph'
   }
 
   static clone(node: ParagraphNode): ParagraphNode {
-    return new ParagraphNode(node.__key);
+    return new ParagraphNode(node.__key)
   }
 
   // View
 
   createDOM<EditorContext>(config: EditorConfig<EditorContext>): HTMLElement {
-    const dom = document.createElement('p');
+    const dom = document.createElement('p')
     const classNames = getCachedClassNameArray<EditorThemeClasses>(
       config.theme,
-      'paragraph',
-    );
+      'paragraph'
+    )
     if (classNames !== undefined) {
-      const domClassList = dom.classList;
-      domClassList.add(...classNames);
+      const domClassList = dom.classList
+      domClassList.add(...classNames)
     }
-    return dom;
+    return dom
   }
   updateDOM(prevNode: ParagraphNode, dom: HTMLElement): boolean {
-    return false;
+    return false
   }
 
   static importDOM(): DOMConversionMap | null {
     return {
       p: (node: Node) => ({
         conversion: convertParagraphElement,
-        priority: 0,
-      }),
-    };
+        priority: 0
+      })
+    }
   }
 
   exportDOM(editor: LexicalEditor): DOMExportOutput {
-    const {element} = super.exportDOM(editor);
+    const { element } = super.exportDOM(editor)
 
     if (element) {
       if (this.getTextContentSize() === 0) {
-        element.append(document.createElement('br'));
+        element.append(document.createElement('br'))
       }
     }
 
     return {
-      element,
-    };
+      element
+    }
   }
 
   // Mutation
 
   insertNewAfter(): ParagraphNode {
-    const newElement = $createParagraphNode();
-    const direction = this.getDirection();
-    newElement.setDirection(direction);
-    this.insertAfter(newElement);
-    return newElement;
+    const newElement = $createParagraphNode()
+    const direction = this.getDirection()
+    newElement.setDirection(direction)
+    this.insertAfter(newElement)
+    return newElement
   }
 
   collapseAtStart(): boolean {
-    const children = this.getChildren();
+    const children = this.getChildren()
     // If we have an empty (trimmed) first paragraph and try and remove it,
     // delete the paragraph as long as we have another sibling to go to
     if (
       children.length === 0 ||
       ($isTextNode(children[0]) && children[0].getTextContent().trim() === '')
     ) {
-      const nextSibling = this.getNextSibling();
+      const nextSibling = this.getNextSibling()
       if (nextSibling !== null) {
-        this.selectNext();
-        this.remove();
-        return true;
+        this.selectNext()
+        this.remove()
+        return true
       }
-      const prevSibling = this.getPreviousSibling();
+      const prevSibling = this.getPreviousSibling()
       if (prevSibling !== null) {
-        this.selectPrevious();
-        this.remove();
-        return true;
+        this.selectPrevious()
+        this.remove()
+        return true
       }
     }
-    return false;
+    return false
   }
 }
 
 function convertParagraphElement(): DOMConversionOutput {
-  return {node: $createParagraphNode()};
+  return { node: $createParagraphNode() }
 }
 
 export function $createParagraphNode(): ParagraphNode {
-  return new ParagraphNode();
+  return new ParagraphNode()
 }
 
 export function $isParagraphNode(node: ?LexicalNode): boolean %checks {
-  return node instanceof ParagraphNode;
+  return node instanceof ParagraphNode
 }

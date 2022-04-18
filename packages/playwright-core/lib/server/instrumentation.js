@@ -1,23 +1,23 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.createInstrumentation = createInstrumentation;
-exports.internalCallMetadata = internalCallMetadata;
-Object.defineProperty(exports, "CallMetadata", {
+})
+exports.createInstrumentation = createInstrumentation
+exports.internalCallMetadata = internalCallMetadata
+Object.defineProperty(exports, 'CallMetadata', {
   enumerable: true,
   get: function () {
-    return _callMetadata.CallMetadata;
+    return _callMetadata.CallMetadata
   }
-});
-exports.SdkObject = void 0;
+})
+exports.SdkObject = void 0
 
-var _events = require("events");
+var _events = require('events')
 
-var _utils = require("../utils/utils");
+var _utils = require('../utils/utils')
 
-var _callMetadata = require("../protocol/callMetadata");
+var _callMetadata = require('../protocol/callMetadata')
 
 /**
  * Copyright (c) Microsoft Corporation. All rights reserved.
@@ -36,37 +36,43 @@ var _callMetadata = require("../protocol/callMetadata");
  */
 class SdkObject extends _events.EventEmitter {
   constructor(parent, guidPrefix, guid) {
-    super();
-    this.guid = void 0;
-    this.attribution = void 0;
-    this.instrumentation = void 0;
-    this.guid = guid || `${guidPrefix || ''}@${(0, _utils.createGuid)()}`;
-    this.setMaxListeners(0);
-    this.attribution = { ...parent.attribution
-    };
-    this.instrumentation = parent.instrumentation;
+    super()
+    this.guid = void 0
+    this.attribution = void 0
+    this.instrumentation = void 0
+    this.guid = guid || `${guidPrefix || ''}@${(0, _utils.createGuid)()}`
+    this.setMaxListeners(0)
+    this.attribution = { ...parent.attribution }
+    this.instrumentation = parent.instrumentation
   }
-
 }
 
-exports.SdkObject = SdkObject;
+exports.SdkObject = SdkObject
 
 function createInstrumentation() {
-  const listeners = [];
-  return new Proxy({}, {
-    get: (obj, prop) => {
-      if (prop === 'addListener') return listener => listeners.push(listener);
-      if (prop === 'removeListener') return listener => listeners.splice(listeners.indexOf(listener), 1);
-      if (!prop.startsWith('on')) return obj[prop];
-      return async (...params) => {
-        for (const listener of listeners) {
-          var _prop, _ref;
+  const listeners = []
+  return new Proxy(
+    {},
+    {
+      get: (obj, prop) => {
+        if (prop === 'addListener')
+          return (listener) => listeners.push(listener)
+        if (prop === 'removeListener')
+          return (listener) => listeners.splice(listeners.indexOf(listener), 1)
+        if (!prop.startsWith('on')) return obj[prop]
+        return async (...params) => {
+          for (const listener of listeners) {
+            var _prop, _ref
 
-          await ((_prop = (_ref = listener)[prop]) === null || _prop === void 0 ? void 0 : _prop.call(_ref, ...params));
+            await ((_prop = (_ref = listener)[prop]) === null ||
+            _prop === void 0
+              ? void 0
+              : _prop.call(_ref, ...params))
+          }
         }
-      };
+      }
     }
-  });
+  )
 }
 
 function internalCallMetadata() {
@@ -80,5 +86,5 @@ function internalCallMetadata() {
     params: {},
     log: [],
     snapshots: []
-  };
+  }
 }

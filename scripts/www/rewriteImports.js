@@ -5,12 +5,12 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-'use strict';
+'use strict'
 
-const glob = require('glob');
-const {readFile, writeFile} = require('fs');
+const glob = require('glob')
+const { readFile, writeFile } = require('fs')
 
-const options = {};
+const options = {}
 
 // This script attempts to find all Flow definition modules, and makes
 // them compatible with www. Specifically, it finds any imports that
@@ -21,12 +21,12 @@ const options = {};
 
 glob('packages/**/flow/*.flow', options, function (error1, files) {
   if (error1) {
-    throw error1;
+    throw error1
   }
   files.forEach((file) => {
     readFile(file, 'utf8', function (error2, data) {
       if (error2) {
-        throw error2;
+        throw error2
       }
       const result = data
         .replace(/ \* @flow strict/g, ' * @flow strict\n * @generated')
@@ -55,16 +55,16 @@ glob('packages/**/flow/*.flow', options, function (error1, files) {
         .replace(/from '@lexical\/yjs\'/g, "from 'LexicalYjs'")
         .replace(
           /from 'lexical\/CodeHighlightNode'/g,
-          "from 'LexicalCodeHighlightNode'",
-        );
+          "from 'LexicalCodeHighlightNode'"
+        )
 
-      const distDirectory = file.replace('/flow/', '/dist/');
+      const distDirectory = file.replace('/flow/', '/dist/')
 
       writeFile(distDirectory, result, 'utf8', function (error3) {
         if (error3) {
-          throw error3;
+          throw error3
         }
-      });
-    });
-  });
-});
+      })
+    })
+  })
+})

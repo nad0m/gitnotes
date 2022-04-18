@@ -7,107 +7,107 @@
  * @flow strict
  */
 
-import type {Binding} from '.';
-import type {CollabElementNode} from './CollabElementNode';
-import type {DecoratorNode, NodeKey, NodeMap} from 'lexical';
-import type {XmlElement} from 'yjs';
+import type { Binding } from '.'
+import type { CollabElementNode } from './CollabElementNode'
+import type { DecoratorNode, NodeKey, NodeMap } from 'lexical'
+import type { XmlElement } from 'yjs'
 
-import {$getNodeByKey, $isDecoratorNode} from 'lexical';
+import { $getNodeByKey, $isDecoratorNode } from 'lexical'
 
-import {syncPropertiesFromLexical, syncPropertiesFromYjs} from './Utils';
+import { syncPropertiesFromLexical, syncPropertiesFromYjs } from './Utils'
 
 export class CollabDecoratorNode {
-  _xmlElem: XmlElement;
-  _key: NodeKey;
-  _parent: CollabElementNode;
-  _type: string;
-  _unobservers: Set<() => void>;
+  _xmlElem: XmlElement
+  _key: NodeKey
+  _parent: CollabElementNode
+  _type: string
+  _unobservers: Set<() => void>
 
   constructor(xmlElem: XmlElement, parent: CollabElementNode, type: string) {
-    this._key = '';
-    this._xmlElem = xmlElem;
-    this._parent = parent;
-    this._type = type;
-    this._unobservers = new Set();
+    this._key = ''
+    this._xmlElem = xmlElem
+    this._parent = parent
+    this._type = type
+    this._unobservers = new Set()
   }
 
-  getPrevNode(nodeMap: null | NodeMap): null | DecoratorNode<{...}> {
+  getPrevNode(nodeMap: null | NodeMap): null | DecoratorNode<{ ... }> {
     if (nodeMap === null) {
-      return null;
+      return null
     }
-    const node = nodeMap.get(this._key);
-    return $isDecoratorNode(node) ? node : null;
+    const node = nodeMap.get(this._key)
+    return $isDecoratorNode(node) ? node : null
   }
 
-  getNode(): null | DecoratorNode<{...}> {
-    const node = $getNodeByKey(this._key);
-    return $isDecoratorNode(node) ? node : null;
+  getNode(): null | DecoratorNode<{ ... }> {
+    const node = $getNodeByKey(this._key)
+    return $isDecoratorNode(node) ? node : null
   }
 
   getSharedType(): XmlElement {
-    return this._xmlElem;
+    return this._xmlElem
   }
 
   getType(): string {
-    return this._type;
+    return this._type
   }
 
   getKey(): NodeKey {
-    return this._key;
+    return this._key
   }
 
   getSize(): number {
-    return 1;
+    return 1
   }
 
   getOffset(): number {
-    const collabElementNode = this._parent;
-    return collabElementNode.getChildOffset(this);
+    const collabElementNode = this._parent
+    return collabElementNode.getChildOffset(this)
   }
 
   syncPropertiesFromLexical(
     binding: Binding,
-    nextLexicalNode: DecoratorNode<{...}>,
-    prevNodeMap: null | NodeMap,
+    nextLexicalNode: DecoratorNode<{ ... }>,
+    prevNodeMap: null | NodeMap
   ): void {
-    const prevLexicalNode = this.getPrevNode(prevNodeMap);
-    const xmlElem = this._xmlElem;
+    const prevLexicalNode = this.getPrevNode(prevNodeMap)
+    const xmlElem = this._xmlElem
 
     syncPropertiesFromLexical(
       binding,
       xmlElem,
       prevLexicalNode,
-      nextLexicalNode,
-    );
+      nextLexicalNode
+    )
   }
 
   syncPropertiesFromYjs(
     binding: Binding,
-    keysChanged: null | Set<string>,
+    keysChanged: null | Set<string>
   ): void {
-    const lexicalNode = this.getNode();
+    const lexicalNode = this.getNode()
     if (lexicalNode === null) {
-      throw new Error('Should never happen');
+      throw new Error('Should never happen')
     }
-    const xmlElem = this._xmlElem;
-    syncPropertiesFromYjs(binding, xmlElem, lexicalNode, keysChanged);
+    const xmlElem = this._xmlElem
+    syncPropertiesFromYjs(binding, xmlElem, lexicalNode, keysChanged)
   }
 
   destroy(binding: Binding): void {
-    const collabNodeMap = binding.collabNodeMap;
-    collabNodeMap.delete(this._key);
-    this._unobservers.forEach((unobserver) => unobserver());
-    this._unobservers.clear();
+    const collabNodeMap = binding.collabNodeMap
+    collabNodeMap.delete(this._key)
+    this._unobservers.forEach((unobserver) => unobserver())
+    this._unobservers.clear()
   }
 }
 
 export function $createCollabDecoratorNode(
   xmlElem: XmlElement,
   parent: CollabElementNode,
-  type: string,
+  type: string
 ): CollabDecoratorNode {
-  const collabNode = new CollabDecoratorNode(xmlElem, parent, type);
+  const collabNode = new CollabDecoratorNode(xmlElem, parent, type)
   // $FlowFixMe: internal field
-  xmlElem._collabNode = collabNode;
-  return collabNode;
+  xmlElem._collabNode = collabNode
+  return collabNode
 }

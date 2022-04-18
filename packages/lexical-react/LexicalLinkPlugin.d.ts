@@ -6,4 +6,4 @@
  *
  */
 
-export default function LexicalLinkPlugin(): null;
+export default function LexicalLinkPlugin(): null

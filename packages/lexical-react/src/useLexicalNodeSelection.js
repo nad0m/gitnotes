@@ -7,68 +7,68 @@
  * @flow strict
  */
 
-import type {LexicalEditor, NodeKey} from 'lexical';
+import type { LexicalEditor, NodeKey } from 'lexical'
 
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import {
   $createNodeSelection,
   $getNodeByKey,
   $getSelection,
   $isNodeSelection,
-  $setSelection,
-} from 'lexical';
-import {useCallback, useEffect, useState} from 'react';
+  $setSelection
+} from 'lexical'
+import { useCallback, useEffect, useState } from 'react'
 
 function isNodeSelected(editor: LexicalEditor, key: NodeKey): boolean {
   return editor.getEditorState().read(() => {
-    const node = $getNodeByKey(key);
+    const node = $getNodeByKey(key)
     if (node === null) {
-      return false;
+      return false
     }
-    return node.isSelected();
-  });
+    return node.isSelected()
+  })
 }
 
 export default function useLexicalNodeSelection(
-  key: NodeKey,
+  key: NodeKey
 ): [boolean, (boolean) => void, () => void] {
-  const [editor] = useLexicalComposerContext();
+  const [editor] = useLexicalComposerContext()
   const [isSelected, setIsSelected] = useState(() =>
-    isNodeSelected(editor, key),
-  );
+    isNodeSelected(editor, key)
+  )
 
   useEffect(() => {
     return editor.registerUpdateListener(() => {
-      setIsSelected(isNodeSelected(editor, key));
-    });
-  }, [editor, key]);
+      setIsSelected(isNodeSelected(editor, key))
+    })
+  }, [editor, key])
 
   const setSelected = useCallback(
     (selected: boolean) => {
       editor.update(() => {
-        let selection = $getSelection();
+        let selection = $getSelection()
         if (!$isNodeSelection(selection)) {
-          selection = $createNodeSelection();
-          $setSelection(selection);
+          selection = $createNodeSelection()
+          $setSelection(selection)
         }
         if (selected) {
-          selection.add(key);
+          selection.add(key)
         } else {
-          selection.delete(key);
+          selection.delete(key)
         }
-      });
+      })
     },
-    [editor, key],
-  );
+    [editor, key]
+  )
 
   const clearSelected = useCallback(() => {
     editor.update(() => {
-      const selection = $getSelection();
+      const selection = $getSelection()
       if ($isNodeSelection(selection)) {
-        selection.clear();
+        selection.clear()
       }
-    });
-  }, [editor]);
+    })
+  }, [editor])
 
-  return [isSelected, setSelected, clearSelected];
+  return [isSelected, setSelected, clearSelected]
 }

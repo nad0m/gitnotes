@@ -7,60 +7,60 @@
  * @flow strict
  */
 
-import {useEffect, useRef, useState} from 'react';
-import * as React from 'react';
+import { useEffect, useRef, useState } from 'react'
+import * as React from 'react'
 // $FlowFixMe
-import {createPortal} from 'react-dom';
+import { createPortal } from 'react-dom'
 
 export default function DropDown({
   buttonLabel,
   buttonAriaLabel,
   buttonClassName,
   buttonIconClassName,
-  children,
+  children
 }: {
   buttonAriaLabel?: string,
   buttonClassName: string,
   buttonIconClassName?: string,
   buttonLabel?: string,
-  children: React.Node,
+  children: React.Node
 }): React$Node {
-  const dropDownRef = useRef<HTMLElement | null>(null);
-  const buttonRef = useRef<HTMLElement | null>(null);
-  const [showDropDown, setShowDropDown] = useState(false);
+  const dropDownRef = useRef<HTMLElement | null>(null)
+  const buttonRef = useRef<HTMLElement | null>(null)
+  const [showDropDown, setShowDropDown] = useState(false)
 
   useEffect(() => {
-    const button = buttonRef.current;
-    const dropDown = dropDownRef.current;
+    const button = buttonRef.current
+    const dropDown = dropDownRef.current
 
     if (showDropDown && button !== null && dropDown !== null) {
-      const {top, left} = button.getBoundingClientRect();
-      dropDown.style.top = `${top + 40}px`;
+      const { top, left } = button.getBoundingClientRect()
+      dropDown.style.top = `${top + 40}px`
       dropDown.style.left = `${Math.min(
         left,
-        window.innerWidth - dropDown.offsetWidth - 20,
-      )}px`;
+        window.innerWidth - dropDown.offsetWidth - 20
+      )}px`
     }
-  }, [dropDownRef, buttonRef, showDropDown]);
+  }, [dropDownRef, buttonRef, showDropDown])
 
   useEffect(() => {
-    const button = buttonRef.current;
+    const button = buttonRef.current
 
     if (button !== null && showDropDown) {
       const handle = (event: MouseEvent) => {
         // $FlowFixMe: no idea why flow is complaining
-        const target: HTMLElement = event.target;
+        const target: HTMLElement = event.target
         if (!button.contains(target)) {
-          setShowDropDown(false);
+          setShowDropDown(false)
         }
-      };
-      document.addEventListener('click', handle);
+      }
+      document.addEventListener('click', handle)
 
       return () => {
-        document.removeEventListener('click', handle);
-      };
+        document.removeEventListener('click', handle)
+      }
     }
-  }, [dropDownRef, buttonRef, showDropDown]);
+  }, [dropDownRef, buttonRef, showDropDown])
 
   return (
     <>
@@ -68,8 +68,7 @@ export default function DropDown({
         aria-label={buttonAriaLabel || buttonLabel}
         className={buttonClassName}
         onClick={() => setShowDropDown(!showDropDown)}
-        ref={buttonRef}
-      >
+        ref={buttonRef}>
         {buttonIconClassName && <span className={buttonIconClassName} />}
         {buttonLabel && (
           <span className="text dropdown-button-text">{buttonLabel}</span>
@@ -82,8 +81,8 @@ export default function DropDown({
           <div className="dropdown" ref={dropDownRef}>
             {children}
           </div>,
-          document.body,
+          document.body
         )}
     </>
-  );
+  )
 }

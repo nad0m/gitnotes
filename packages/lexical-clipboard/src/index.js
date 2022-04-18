@@ -11,12 +11,12 @@ import {
   $getLexicalContent,
   $insertDataTransferForPlainText,
   $insertDataTransferForRichText,
-  getHtmlContent,
-} from './clipboard';
+  getHtmlContent
+} from './clipboard'
 
 export {
   $getLexicalContent,
   $insertDataTransferForPlainText,
   $insertDataTransferForRichText,
-  getHtmlContent,
-};
+  getHtmlContent
+}

@@ -8,11 +8,11 @@
  */
 
 // $FlowFixMe: node modules are ignored by flow
-import {exportToSvg} from '@excalidraw/excalidraw';
-import * as React from 'react';
-import {useEffect, useState} from 'react';
+import { exportToSvg } from '@excalidraw/excalidraw'
+import * as React from 'react'
+import { useEffect, useState } from 'react'
 
-type ImageType = 'svg' | 'canvas';
+type ImageType = 'svg' | 'canvas'
 
 type Props = {
   /**
@@ -26,7 +26,7 @@ type Props = {
   /**
    * The Excalidraw elements to be rendered as an image
    */
-  elements: $ReadOnlyArray<{...}>,
+  elements: $ReadOnlyArray<{ ... }>,
   /**
    * The height of the image to be rendered
    */
@@ -42,17 +42,17 @@ type Props = {
   /**
    * The width of the image to be rendered
    */
-  width?: number | null,
-};
+  width?: number | null
+}
 
 // exportToSvg has fonts from excalidraw.com
 // We don't want them to be used in open source
 const removeStyleFromSvg_HACK = (svg) => {
-  const styleTag = svg?.firstElementChild?.firstElementChild;
+  const styleTag = svg?.firstElementChild?.firstElementChild
   if (styleTag && styleTag.tagName === 'style') {
-    styleTag.remove();
+    styleTag.remove()
   }
-};
+}
 
 /**
  * @explorer-desc
@@ -64,26 +64,26 @@ export default function ExcalidrawImage({
   height = null,
   width = null,
   appState = null,
-  rootClassName = null,
+  rootClassName = null
 }: Props): React.MixedElement {
-  const [Svg, setSvg] = useState<Element | null>(null);
+  const [Svg, setSvg] = useState<Element | null>(null)
 
   useEffect(() => {
     const setContent = async () => {
       const svg: Element = await exportToSvg({
         appState,
-        elements,
-      });
-      removeStyleFromSvg_HACK(svg);
-      setSvg(svg);
-    };
-    setContent();
-  }, [elements, appState]);
+        elements
+      })
+      removeStyleFromSvg_HACK(svg)
+      setSvg(svg)
+    }
+    setContent()
+  }, [elements, appState])
 
   return (
     <div
       className={rootClassName}
-      dangerouslySetInnerHTML={{__html: Svg?.outerHTML}}
+      dangerouslySetInnerHTML={{ __html: Svg?.outerHTML }}
     />
-  );
+  )
 }

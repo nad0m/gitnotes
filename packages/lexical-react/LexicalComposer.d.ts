@@ -6,17 +6,17 @@
  *
  */
 
-import {Class} from 'utility-types';
-import type {EditorThemeClasses, LexicalEditor, LexicalNode} from 'lexical';
+import { Class } from 'utility-types'
+import type { EditorThemeClasses, LexicalEditor, LexicalNode } from 'lexical'
 type Props = {
   initialConfig: {
-    editor__DEPRECATED?: LexicalEditor | null;
-    readOnly?: boolean;
-    namespace?: string;
-    nodes?: Array<Class<LexicalNode>>;
-    theme?: EditorThemeClasses;
-    onError: (error: Error, editor: LexicalEditor) => void;
-  };
-  children: JSX.Element | JSX.Element[] | null;
-};
-export default function LexicalComposer(arg0: Props): JSX.Element | null;
+    editor__DEPRECATED?: LexicalEditor | null
+    readOnly?: boolean
+    namespace?: string
+    nodes?: Array<Class<LexicalNode>>
+    theme?: EditorThemeClasses
+    onError: (error: Error, editor: LexicalEditor) => void
+  }
+  children: JSX.Element | JSX.Element[] | null
+}
+export default function LexicalComposer(arg0: Props): JSX.Element | null

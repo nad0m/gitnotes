@@ -7,50 +7,50 @@
  * @flow strict
  */
 
-import type {LexicalCommand} from 'lexical';
+import type { LexicalCommand } from 'lexical'
 
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import {
   $getSelection,
   $isRangeSelection,
   $isRootNode,
   COMMAND_PRIORITY_EDITOR,
-  createCommand,
-} from 'lexical';
-import {useEffect} from 'react';
+  createCommand
+} from 'lexical'
+import { useEffect } from 'react'
 
-import yellowFlowerImage from '../images/yellow-flower.jpg';
-import {$createImageNode, ImageNode} from '../nodes/ImageNode';
+import yellowFlowerImage from '../images/yellow-flower.jpg'
+import { $createImageNode, ImageNode } from '../nodes/ImageNode'
 
-export const INSERT_IMAGE_COMMAND: LexicalCommand<void> = createCommand();
+export const INSERT_IMAGE_COMMAND: LexicalCommand<void> = createCommand()
 
 export default function ImagesPlugin(): React$Node {
-  const [editor] = useLexicalComposerContext();
+  const [editor] = useLexicalComposerContext()
 
   useEffect(() => {
     if (!editor.hasNodes([ImageNode])) {
-      throw new Error('ImagesPlugin: ImageNode not registered on editor');
+      throw new Error('ImagesPlugin: ImageNode not registered on editor')
     }
 
     return editor.registerCommand(
       INSERT_IMAGE_COMMAND,
       () => {
-        const selection = $getSelection();
+        const selection = $getSelection()
         if ($isRangeSelection(selection)) {
           if ($isRootNode(selection.anchor.getNode())) {
-            selection.insertParagraph();
+            selection.insertParagraph()
           }
           const imageNode = $createImageNode(
             yellowFlowerImage,
             'Yellow flower in tilt shift lens',
-            500,
-          );
-          selection.insertNodes([imageNode]);
+            500
+          )
+          selection.insertNodes([imageNode])
         }
-        return true;
+        return true
       },
-      COMMAND_PRIORITY_EDITOR,
-    );
-  }, [editor]);
-  return null;
+      COMMAND_PRIORITY_EDITOR
+    )
+  }, [editor])
+  return null
 }

@@ -7,35 +7,35 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React from 'react'
 // $FlowFixMe: Flow doesn't understand react-dom
-import {createRoot} from 'react-dom/client';
+import { createRoot } from 'react-dom/client'
 
-import App from './App';
-import { initFirebase } from './firebase';
+import App from './App'
+import { initFirebase } from './firebase'
 
 initFirebase()
 
 // Handle runtime errors
 const showErrorOverlay = (err) => {
-  const ErrorOverlay = customElements.get('vite-error-overlay');
+  const ErrorOverlay = customElements.get('vite-error-overlay')
   if (!ErrorOverlay) {
-    return;
+    return
   }
-  const overlay = new ErrorOverlay(err);
-  const body = document.body;
+  const overlay = new ErrorOverlay(err)
+  const body = document.body
   if (body !== null) {
-    body.appendChild(overlay);
+    body.appendChild(overlay)
   }
-};
+}
 
-window.addEventListener('error', showErrorOverlay);
-window.addEventListener('unhandledrejection', ({reason}) =>
-  showErrorOverlay(reason),
-);
+window.addEventListener('error', showErrorOverlay)
+window.addEventListener('unhandledrejection', ({ reason }) =>
+  showErrorOverlay(reason)
+)
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>,
-);
+  </React.StrictMode>
+)

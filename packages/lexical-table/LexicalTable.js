@@ -7,6 +7,6 @@
  *
  */
 
-'use strict';
+'use strict'
 
-module.exports = require('./dist/LexicalTable.js');
+module.exports = require('./dist/LexicalTable.js')

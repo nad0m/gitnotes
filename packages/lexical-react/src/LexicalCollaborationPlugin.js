@@ -7,24 +7,24 @@
  * @flow strict
  */
 
-import type {Provider} from '@lexical/yjs';
-import type {Doc} from 'yjs';
+import type { Provider } from '@lexical/yjs'
+import type { Doc } from 'yjs'
 
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {createContext, useContext, useMemo} from 'react';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { createContext, useContext, useMemo } from 'react'
 
 import {
   useYjsCollaboration,
   useYjsFocusTracking,
-  useYjsHistory,
-} from './shared/useYjsCollaboration';
+  useYjsHistory
+} from './shared/useYjsCollaboration'
 
 type CollaborationContextType = {
   clientID: number,
   color: string,
   name: string,
-  yjsDocMap: Map<string, Doc>,
-};
+  yjsDocMap: Map<string, Doc>
+}
 
 const entries = [
   ['Cat', '255,165,0'],
@@ -42,29 +42,29 @@ const entries = [
   ['Wolf', '0,102,255'],
   ['Owl', '147,0,255'],
   ['Gull', '255,0,153'],
-  ['Squid', '0,220,255'],
-];
+  ['Squid', '0,220,255']
+]
 
-const randomEntry = entries[Math.floor(Math.random() * entries.length)];
+const randomEntry = entries[Math.floor(Math.random() * entries.length)]
 
 export function CollaborationPlugin({
   id,
   providerFactory,
   shouldBootstrap,
-  username,
+  username
 }: {
   id: string,
   providerFactory: (id: string, yjsDocMap: Map<string, Doc>) => Provider,
   shouldBootstrap: boolean,
-  username?: string,
+  username?: string
 }): React$Node {
-  const collabContext = useCollaborationContext(username);
-  const {yjsDocMap, name, color} = collabContext;
-  const [editor] = useLexicalComposerContext();
+  const collabContext = useCollaborationContext(username)
+  const { yjsDocMap, name, color } = collabContext
+  const [editor] = useLexicalComposerContext()
   const provider = useMemo(
     () => providerFactory(id, yjsDocMap),
-    [id, providerFactory, yjsDocMap],
-  );
+    [id, providerFactory, yjsDocMap]
+  )
   const [cursors, binding] = useYjsCollaboration(
     editor,
     id,
@@ -72,13 +72,13 @@ export function CollaborationPlugin({
     yjsDocMap,
     name,
     color,
-    shouldBootstrap,
-  );
-  collabContext.clientID = binding.clientID;
-  useYjsHistory(editor, binding);
-  useYjsFocusTracking(editor, provider, name, color);
+    shouldBootstrap
+  )
+  collabContext.clientID = binding.clientID
+  useYjsHistory(editor, binding)
+  useYjsFocusTracking(editor, provider, name, color)
 
-  return cursors;
+  return cursors
 }
 
 export const CollaborationContext: React$Context<CollaborationContextType> =
@@ -86,15 +86,15 @@ export const CollaborationContext: React$Context<CollaborationContextType> =
     clientID: 0,
     color: randomEntry[1],
     name: randomEntry[0],
-    yjsDocMap: new Map(),
-  });
+    yjsDocMap: new Map()
+  })
 
 export function useCollaborationContext(
-  username?: string,
+  username?: string
 ): CollaborationContextType {
-  const collabContext = useContext(CollaborationContext);
+  const collabContext = useContext(CollaborationContext)
   if (username != null) {
-    collabContext.name = username;
+    collabContext.name = username
   }
-  return collabContext;
+  return collabContext
 }

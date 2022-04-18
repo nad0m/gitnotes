@@ -11,19 +11,19 @@ import type {
   GridSelection,
   LexicalEditor,
   NodeSelection,
-  RangeSelection,
-} from 'lexical';
+  RangeSelection
+} from 'lexical'
 export type HistoryStateEntry = {
-  editor: LexicalEditor;
-  editorState: EditorState;
-  undoSelection?: RangeSelection | NodeSelection | GridSelection | null;
-};
+  editor: LexicalEditor
+  editorState: EditorState
+  undoSelection?: RangeSelection | NodeSelection | GridSelection | null
+}
 export type HistoryState = {
-  current: null | HistoryStateEntry;
-  redoStack: Array<HistoryStateEntry>;
-  undoStack: Array<HistoryStateEntry>;
-};
+  current: null | HistoryStateEntry
+  redoStack: Array<HistoryStateEntry>
+  undoStack: Array<HistoryStateEntry>
+}
 export function HistoryPlugin(arg0: {
-  externalHistoryState?: HistoryState;
-}): JSX.Element | null;
-export function createEmptyHistoryState(): HistoryState;
+  externalHistoryState?: HistoryState
+}): JSX.Element | null
+export function createEmptyHistoryState(): HistoryState

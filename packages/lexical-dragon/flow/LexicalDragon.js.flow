@@ -6,8 +6,6 @@
  *
  * @flow strict
  */
-import type {LexicalEditor} from 'lexical';
-import {$getSelection, $isRangeSelection, $isTextNode} from 'lexical';
-declare export function registerDragonSupport(
-  editor: LexicalEditor,
-): () => void;
+import type { LexicalEditor } from 'lexical'
+import { $getSelection, $isRangeSelection, $isTextNode } from 'lexical'
+declare export function registerDragonSupport(editor: LexicalEditor): () => void

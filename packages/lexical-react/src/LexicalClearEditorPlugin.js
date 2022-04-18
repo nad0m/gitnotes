@@ -7,45 +7,47 @@
  * @flow strict
  */
 
-import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import {
   $createParagraphNode,
   $getRoot,
   $getSelection,
   CLEAR_EDITOR_COMMAND,
-  COMMAND_PRIORITY_EDITOR,
-} from 'lexical';
-import useLayoutEffect from 'shared/useLayoutEffect';
+  COMMAND_PRIORITY_EDITOR
+} from 'lexical'
+import useLayoutEffect from 'shared/useLayoutEffect'
 
 type Props = $ReadOnly<{
-  onClear?: () => void,
-}>;
+  onClear?: () => void
+}>
 
-export default function LexicalClearEditorPlugin({onClear}: Props): React$Node {
-  const [editor] = useLexicalComposerContext();
+export default function LexicalClearEditorPlugin({
+  onClear
+}: Props): React$Node {
+  const [editor] = useLexicalComposerContext()
   useLayoutEffect(() => {
     return editor.registerCommand(
       CLEAR_EDITOR_COMMAND,
       (payload) => {
         editor.update(() => {
           if (onClear == null) {
-            const root = $getRoot();
-            const selection = $getSelection();
-            const paragraph = $createParagraphNode();
-            root.clear();
-            root.append(paragraph);
+            const root = $getRoot()
+            const selection = $getSelection()
+            const paragraph = $createParagraphNode()
+            root.clear()
+            root.append(paragraph)
             if (selection !== null) {
-              paragraph.select();
+              paragraph.select()
             }
           } else {
-            onClear();
+            onClear()
           }
-        });
-        return true;
+        })
+        return true
       },
-      COMMAND_PRIORITY_EDITOR,
-    );
-  }, [editor, onClear]);
+      COMMAND_PRIORITY_EDITOR
+    )
+  }, [editor, onClear])
 
-  return null;
+  return null
 }

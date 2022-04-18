@@ -7,61 +7,61 @@
  * @flow strict
  */
 
-import type {ElementNode, LexicalEditor, LexicalNode, RootNode} from 'lexical';
+import type { ElementNode, LexicalEditor, LexicalNode, RootNode } from 'lexical'
 
 import {
   $createTextNode,
   $getRoot,
   $isElementNode,
   $isTextNode,
-  TextNode,
-} from 'lexical';
-import invariant from 'shared/invariant';
+  TextNode
+} from 'lexical'
+import invariant from 'shared/invariant'
 
 export type TextNodeWithOffset = {
   node: TextNode,
-  offset: number,
-};
+  offset: number
+}
 
 export function $findTextIntersectionFromCharacters(
   root: RootNode,
-  targetCharacters: number,
-): null | {node: TextNode, offset: number} {
-  let node = root.getFirstChild();
-  let currentCharacters = 0;
+  targetCharacters: number
+): null | { node: TextNode, offset: number } {
+  let node = root.getFirstChild()
+  let currentCharacters = 0
 
   mainLoop: while (node !== null) {
     if ($isElementNode(node)) {
-      const child = node.getFirstChild();
+      const child = node.getFirstChild()
       if (child !== null) {
-        node = child;
-        continue;
+        node = child
+        continue
       }
     } else if ($isTextNode(node)) {
-      const characters = node.getTextContentSize();
+      const characters = node.getTextContentSize()
 
       if (currentCharacters + characters > targetCharacters) {
-        return {node, offset: targetCharacters - currentCharacters};
+        return { node, offset: targetCharacters - currentCharacters }
       }
-      currentCharacters += characters;
+      currentCharacters += characters
     }
-    const sibling = node.getNextSibling();
+    const sibling = node.getNextSibling()
     if (sibling !== null) {
-      node = sibling;
-      continue;
+      node = sibling
+      continue
     }
-    let parent = node.getParent();
+    let parent = node.getParent()
     while (parent !== null) {
-      const parentSibling = parent.getNextSibling();
+      const parentSibling = parent.getNextSibling()
       if (parentSibling !== null) {
-        node = parentSibling;
-        continue mainLoop;
+        node = parentSibling
+        continue mainLoop
       }
-      parent = parent.getParent();
+      parent = parent.getParent()
     }
-    break;
+    break
   }
-  return null;
+  return null
 }
 
 // Return text content for child text nodes.  Each non-text node is separated by input string.
@@ -71,34 +71,34 @@ export function $findTextIntersectionFromCharacters(
 export function $joinTextNodesInElementNode(
   elementNode: ElementNode,
   separator: string,
-  stopAt: TextNodeWithOffset,
+  stopAt: TextNodeWithOffset
 ): string {
-  let textContent = '';
-  const children = elementNode.getChildren();
-  const length = children.length;
+  let textContent = ''
+  const children = elementNode.getChildren()
+  const length = children.length
   for (let i = 0; i < length; ++i) {
-    const child = children[i];
+    const child = children[i]
     if ($isTextNode(child)) {
-      const childTextContent = child.getTextContent();
+      const childTextContent = child.getTextContent()
 
       if (child.is(stopAt.node)) {
         if (stopAt.offset > childTextContent.length) {
           invariant(
             false,
             'Node %s and selection point do not match.',
-            child.__key,
-          );
+            child.__key
+          )
         }
-        textContent += child.getTextContent().substr(0, stopAt.offset);
-        break;
+        textContent += child.getTextContent().substr(0, stopAt.offset)
+        break
       } else {
-        textContent += childTextContent;
+        textContent += childTextContent
       }
     } else {
-      textContent += separator;
+      textContent += separator
     }
   }
-  return textContent;
+  return textContent
 }
 
 // This function converts the offsetInJoinedText to
@@ -119,12 +119,12 @@ export function $findNodeWithOffsetFromJoinedText(
   offsetInJoinedText: number,
   joinedTextLength: number,
   separatorLength: number,
-  elementNode: ElementNode,
+  elementNode: ElementNode
 ): ?TextNodeWithOffset {
-  const children = elementNode.getChildren();
-  const childrenLength = children.length;
-  let runningLength = 0;
-  let isPriorNodeTextNode = false;
+  const children = elementNode.getChildren()
+  const childrenLength = children.length
+  let runningLength = 0
+  let isPriorNodeTextNode = false
   for (let i = 0; i < childrenLength; ++i) {
     // We must examine the offsetInJoinedText that is located
     // at the length of the string.
@@ -132,252 +132,251 @@ export function $findNodeWithOffsetFromJoinedText(
     // the caller still wants the node + offset at the
     // right edge of the "o".
     if (runningLength > joinedTextLength) {
-      break;
+      break
     }
 
-    const child = children[i];
-    const isChildNodeTestNode = $isTextNode(child);
+    const child = children[i]
+    const isChildNodeTestNode = $isTextNode(child)
     const childContentLength = isChildNodeTestNode
       ? child.getTextContent().length
-      : separatorLength;
+      : separatorLength
 
-    const newRunningLength = runningLength + childContentLength;
+    const newRunningLength = runningLength + childContentLength
 
     const isJoinedOffsetWithinNode =
       (isPriorNodeTextNode === false && runningLength === offsetInJoinedText) ||
       (runningLength === 0 && runningLength === offsetInJoinedText) ||
       (runningLength < offsetInJoinedText &&
-        offsetInJoinedText <= newRunningLength);
+        offsetInJoinedText <= newRunningLength)
 
     if (isJoinedOffsetWithinNode && $isTextNode(child)) {
       // Check isTextNode again for flow.
       return {
         node: child,
-        offset: offsetInJoinedText - runningLength,
-      };
+        offset: offsetInJoinedText - runningLength
+      }
     }
-    runningLength = newRunningLength;
-    isPriorNodeTextNode = isChildNodeTestNode;
+    runningLength = newRunningLength
+    isPriorNodeTextNode = isChildNodeTestNode
   }
-  return null;
+  return null
 }
 
 export function $isRootTextContentEmpty(
   isEditorComposing: boolean,
-  trim?: boolean = true,
+  trim?: boolean = true
 ): boolean {
   if (isEditorComposing) {
-    return false;
+    return false
   }
-  let text = $rootTextContentCurry();
+  let text = $rootTextContentCurry()
   if (trim) {
-    text = text.trim();
+    text = text.trim()
   }
-  return text === '';
+  return text === ''
 }
 
 export function $isRootTextContentEmptyCurry(
   isEditorComposing: boolean,
-  trim?: boolean,
+  trim?: boolean
 ): () => boolean {
-  return () => $isRootTextContentEmpty(isEditorComposing, trim);
+  return () => $isRootTextContentEmpty(isEditorComposing, trim)
 }
 
 export function $rootTextContentCurry(): string {
-  const root = $getRoot();
-  return root.getTextContent();
+  const root = $getRoot()
+  return root.getTextContent()
 }
 
 export function $canShowPlaceholder(isComposing: boolean): boolean {
   if (!$isRootTextContentEmpty(isComposing, false)) {
-    return false;
+    return false
   }
-  const root = $getRoot();
-  const children = root.getChildren();
-  const childrenLength = children.length;
+  const root = $getRoot()
+  const children = root.getChildren()
+  const childrenLength = children.length
   if (childrenLength > 1) {
-    return false;
+    return false
   }
   for (let i = 0; i < childrenLength; i++) {
-    const topBlock = children[i];
+    const topBlock = children[i]
 
     if ($isElementNode(topBlock)) {
       if (topBlock.__type !== 'paragraph') {
-        return false;
+        return false
       }
       if (topBlock.__indent !== 0) {
-        return false;
+        return false
       }
-      const topBlockChildren = topBlock.getChildren();
-      const topBlockChildrenLength = topBlockChildren.length;
+      const topBlockChildren = topBlock.getChildren()
+      const topBlockChildrenLength = topBlockChildren.length
       for (let s = 0; s < topBlockChildrenLength; s++) {
-        const child = topBlockChildren[i];
+        const child = topBlockChildren[i]
         if (!$isTextNode(child)) {
-          return false;
+          return false
         }
       }
     }
   }
-  return true;
+  return true
 }
 
 export function $canShowPlaceholderCurry(
-  isEditorComposing: boolean,
+  isEditorComposing: boolean
 ): () => boolean {
-  return () => $canShowPlaceholder(isEditorComposing);
+  return () => $canShowPlaceholder(isEditorComposing)
 }
 
-export type EntityMatch = {end: number, start: number};
+export type EntityMatch = { end: number, start: number }
 
 export function registerLexicalTextEntity<N: TextNode>(
   editor: LexicalEditor,
   getMatch: (text: string) => null | EntityMatch,
   targetNode: Class<N>,
-  createNode: (textNode: TextNode) => N,
+  createNode: (textNode: TextNode) => N
 ): Array<() => void> {
   const isTargetNode = (node: ?LexicalNode): boolean %checks => {
-    return node instanceof targetNode;
-  };
+    return node instanceof targetNode
+  }
 
   const replaceWithSimpleText = (node: TextNode): void => {
-    const textNode = $createTextNode(node.getTextContent());
-    textNode.setFormat(node.getFormat());
-    node.replace(textNode);
-  };
+    const textNode = $createTextNode(node.getTextContent())
+    textNode.setFormat(node.getFormat())
+    node.replace(textNode)
+  }
 
   const getMode = (node: TextNode): number => {
-    return node.getLatest().__mode;
-  };
+    return node.getLatest().__mode
+  }
 
   const textNodeTransform = (node: TextNode) => {
     if (!node.isSimpleText()) {
-      return;
+      return
     }
-    const prevSibling = node.getPreviousSibling();
-    let text = node.getTextContent();
-    let currentNode = node;
-    let match;
+    const prevSibling = node.getPreviousSibling()
+    let text = node.getTextContent()
+    let currentNode = node
+    let match
 
     if ($isTextNode(prevSibling)) {
-      const previousText = prevSibling.getTextContent();
-      const combinedText = previousText + text;
-      const prevMatch = getMatch(combinedText);
+      const previousText = prevSibling.getTextContent()
+      const combinedText = previousText + text
+      const prevMatch = getMatch(combinedText)
 
       if (isTargetNode(prevSibling)) {
         if (prevMatch === null || getMode(prevSibling) !== 0) {
-          replaceWithSimpleText(prevSibling);
-          return;
+          replaceWithSimpleText(prevSibling)
+          return
         } else {
-          const diff = prevMatch.end - previousText.length;
+          const diff = prevMatch.end - previousText.length
           if (diff > 0) {
-            const concatText = text.slice(0, diff);
-            const newTextContent = previousText + concatText;
-            prevSibling.select();
-            prevSibling.setTextContent(newTextContent);
+            const concatText = text.slice(0, diff)
+            const newTextContent = previousText + concatText
+            prevSibling.select()
+            prevSibling.setTextContent(newTextContent)
             if (diff === text.length) {
-              node.remove();
+              node.remove()
             } else {
-              const remainingText = text.slice(diff);
-              node.setTextContent(remainingText);
+              const remainingText = text.slice(diff)
+              node.setTextContent(remainingText)
             }
-            return;
+            return
           }
         }
       } else if (prevMatch === null || prevMatch.start < previousText.length) {
-        return;
+        return
       }
     }
 
     while (true) {
-      match = getMatch(text);
-      let nextText = match === null ? '' : text.slice(match.end);
-      text = nextText;
+      match = getMatch(text)
+      let nextText = match === null ? '' : text.slice(match.end)
+      text = nextText
       if (nextText === '') {
-        const nextSibling = currentNode.getNextSibling();
+        const nextSibling = currentNode.getNextSibling()
         if ($isTextNode(nextSibling)) {
-          nextText =
-            currentNode.getTextContent() + nextSibling.getTextContent();
-          const nextMatch = getMatch(nextText);
+          nextText = currentNode.getTextContent() + nextSibling.getTextContent()
+          const nextMatch = getMatch(nextText)
           if (nextMatch === null) {
             if (isTargetNode(nextSibling)) {
-              replaceWithSimpleText(nextSibling);
+              replaceWithSimpleText(nextSibling)
             } else {
-              nextSibling.markDirty();
+              nextSibling.markDirty()
             }
-            return;
+            return
           } else if (nextMatch.start !== 0) {
-            return;
+            return
           }
         }
       } else {
-        const nextMatch = getMatch(nextText);
+        const nextMatch = getMatch(nextText)
         if (nextMatch !== null && nextMatch.start === 0) {
-          return;
+          return
         }
       }
       if (match === null) {
-        return;
+        return
       }
       if (
         match.start === 0 &&
         $isTextNode(prevSibling) &&
         prevSibling.isTextEntity()
       ) {
-        continue;
+        continue
       }
-      let nodeToReplace;
+      let nodeToReplace
 
       if (match.start === 0) {
-        [nodeToReplace, currentNode] = currentNode.splitText(match.end);
+        ;[nodeToReplace, currentNode] = currentNode.splitText(match.end)
       } else {
-        [, nodeToReplace, currentNode] = currentNode.splitText(
+        ;[, nodeToReplace, currentNode] = currentNode.splitText(
           match.start,
-          match.end,
-        );
+          match.end
+        )
       }
-      const replacementNode = createNode(nodeToReplace);
-      nodeToReplace.replace(replacementNode);
+      const replacementNode = createNode(nodeToReplace)
+      nodeToReplace.replace(replacementNode)
       if (currentNode == null) {
-        return;
+        return
       }
     }
-  };
+  }
 
   const reverseNodeTransform = (node: N) => {
-    const text = node.getTextContent();
-    const match = getMatch(text);
+    const text = node.getTextContent()
+    const match = getMatch(text)
     if (match === null || match.start !== 0) {
-      replaceWithSimpleText(node);
-      return;
+      replaceWithSimpleText(node)
+      return
     }
     if (text.length > match.end) {
       // This will split out the rest of the text as simple text
-      node.splitText(match.end);
-      return;
+      node.splitText(match.end)
+      return
     }
-    const prevSibling = node.getPreviousSibling();
+    const prevSibling = node.getPreviousSibling()
     if ($isTextNode(prevSibling) && prevSibling.isTextEntity()) {
-      replaceWithSimpleText(prevSibling);
-      replaceWithSimpleText(node);
+      replaceWithSimpleText(prevSibling)
+      replaceWithSimpleText(node)
     }
-    const nextSibling = node.getNextSibling();
+    const nextSibling = node.getNextSibling()
     if ($isTextNode(nextSibling) && nextSibling.isTextEntity()) {
-      replaceWithSimpleText(nextSibling);
+      replaceWithSimpleText(nextSibling)
       // This may have already been converted in the previous block
       if (isTargetNode(node)) {
-        replaceWithSimpleText(node);
+        replaceWithSimpleText(node)
       }
     }
-  };
+  }
 
   const removePlainTextTransform = editor.registerNodeTransform(
     TextNode,
-    textNodeTransform,
-  );
+    textNodeTransform
+  )
   const removeReverseNodeTransform = editor.registerNodeTransform<N>(
     targetNode,
-    reverseNodeTransform,
-  );
+    reverseNodeTransform
+  )
 
-  return [removePlainTextTransform, removeReverseNodeTransform];
+  return [removePlainTextTransform, removeReverseNodeTransform]
 }

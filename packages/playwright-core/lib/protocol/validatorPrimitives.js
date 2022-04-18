@@ -1,11 +1,22 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.tEnum = exports.tObject = exports.tArray = exports.tOptional = exports.tAny = exports.tUndefined = exports.tBinary = exports.tString = exports.tBoolean = exports.tNumber = exports.ValidationError = void 0;
+})
+exports.tEnum =
+  exports.tObject =
+  exports.tArray =
+  exports.tOptional =
+  exports.tAny =
+  exports.tUndefined =
+  exports.tBinary =
+  exports.tString =
+  exports.tBoolean =
+  exports.tNumber =
+  exports.ValidationError =
+    void 0
 
-var _utils = require("../utils/utils");
+var _utils = require('../utils/utils')
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -24,99 +35,105 @@ var _utils = require("../utils/utils");
  */
 class ValidationError extends Error {}
 
-exports.ValidationError = ValidationError;
+exports.ValidationError = ValidationError
 
 const tNumber = (arg, path) => {
-  if (arg instanceof Number) return arg.valueOf();
-  if (typeof arg === 'number') return arg;
-  throw new ValidationError(`${path}: expected number, got ${typeof arg}`);
-};
+  if (arg instanceof Number) return arg.valueOf()
+  if (typeof arg === 'number') return arg
+  throw new ValidationError(`${path}: expected number, got ${typeof arg}`)
+}
 
-exports.tNumber = tNumber;
+exports.tNumber = tNumber
 
 const tBoolean = (arg, path) => {
-  if (arg instanceof Boolean) return arg.valueOf();
-  if (typeof arg === 'boolean') return arg;
-  throw new ValidationError(`${path}: expected boolean, got ${typeof arg}`);
-};
+  if (arg instanceof Boolean) return arg.valueOf()
+  if (typeof arg === 'boolean') return arg
+  throw new ValidationError(`${path}: expected boolean, got ${typeof arg}`)
+}
 
-exports.tBoolean = tBoolean;
+exports.tBoolean = tBoolean
 
 const tString = (arg, path) => {
-  if (arg instanceof String) return arg.valueOf();
-  if (typeof arg === 'string') return arg;
-  throw new ValidationError(`${path}: expected string, got ${typeof arg}`);
-};
+  if (arg instanceof String) return arg.valueOf()
+  if (typeof arg === 'string') return arg
+  throw new ValidationError(`${path}: expected string, got ${typeof arg}`)
+}
 
-exports.tString = tString;
+exports.tString = tString
 
 const tBinary = (arg, path) => {
-  if (arg instanceof String) return arg.valueOf();
-  if (typeof arg === 'string') return arg;
-  throw new ValidationError(`${path}: expected base64-encoded buffer, got ${typeof arg}`);
-};
+  if (arg instanceof String) return arg.valueOf()
+  if (typeof arg === 'string') return arg
+  throw new ValidationError(
+    `${path}: expected base64-encoded buffer, got ${typeof arg}`
+  )
+}
 
-exports.tBinary = tBinary;
+exports.tBinary = tBinary
 
 const tUndefined = (arg, path) => {
-  if (Object.is(arg, undefined)) return arg;
-  throw new ValidationError(`${path}: expected undefined, got ${typeof arg}`);
-};
+  if (Object.is(arg, undefined)) return arg
+  throw new ValidationError(`${path}: expected undefined, got ${typeof arg}`)
+}
 
-exports.tUndefined = tUndefined;
+exports.tUndefined = tUndefined
 
 const tAny = (arg, path) => {
-  return arg;
-};
+  return arg
+}
 
-exports.tAny = tAny;
+exports.tAny = tAny
 
-const tOptional = v => {
+const tOptional = (v) => {
   return (arg, path) => {
-    if (Object.is(arg, undefined)) return arg;
-    return v(arg, path);
-  };
-};
+    if (Object.is(arg, undefined)) return arg
+    return v(arg, path)
+  }
+}
 
-exports.tOptional = tOptional;
+exports.tOptional = tOptional
 
-const tArray = v => {
+const tArray = (v) => {
   return (arg, path) => {
-    if (!Array.isArray(arg)) throw new ValidationError(`${path}: expected array, got ${typeof arg}`);
-    return arg.map((x, index) => v(x, path + '[' + index + ']'));
-  };
-};
+    if (!Array.isArray(arg))
+      throw new ValidationError(`${path}: expected array, got ${typeof arg}`)
+    return arg.map((x, index) => v(x, path + '[' + index + ']'))
+  }
+}
 
-exports.tArray = tArray;
+exports.tArray = tArray
 
-const tObject = s => {
+const tObject = (s) => {
   return (arg, path) => {
-    if (Object.is(arg, null)) throw new ValidationError(`${path}: expected object, got null`);
-    if (typeof arg !== 'object') throw new ValidationError(`${path}: expected object, got ${typeof arg}`);
-    const result = {};
+    if (Object.is(arg, null))
+      throw new ValidationError(`${path}: expected object, got null`)
+    if (typeof arg !== 'object')
+      throw new ValidationError(`${path}: expected object, got ${typeof arg}`)
+    const result = {}
 
     for (const [key, v] of Object.entries(s)) {
-      const value = v(arg[key], path ? path + '.' + key : key);
-      if (!Object.is(value, undefined)) result[key] = value;
+      const value = v(arg[key], path ? path + '.' + key : key)
+      if (!Object.is(value, undefined)) result[key] = value
     }
 
     if ((0, _utils.isUnderTest)()) {
       for (const [key, value] of Object.entries(arg)) {
-        if (key.startsWith('__testHook')) result[key] = value;
+        if (key.startsWith('__testHook')) result[key] = value
       }
     }
 
-    return result;
-  };
-};
+    return result
+  }
+}
 
-exports.tObject = tObject;
+exports.tObject = tObject
 
-const tEnum = e => {
+const tEnum = (e) => {
   return (arg, path) => {
-    if (!e.includes(arg)) throw new ValidationError(`${path}: expected one of (${e.join('|')})`);
-    return arg;
-  };
-};
+    if (!e.includes(arg))
+      throw new ValidationError(`${path}: expected one of (${e.join('|')})`)
+    return arg
+  }
+}
 
-exports.tEnum = tEnum;
+exports.tEnum = tEnum

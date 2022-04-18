@@ -6,4 +6,4 @@
  *
  */
 
-export default function LexicalAutoFocusPlugin(): null;
+export default function LexicalAutoFocusPlugin(): null

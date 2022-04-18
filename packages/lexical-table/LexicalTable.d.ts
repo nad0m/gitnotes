@@ -14,15 +14,15 @@ import type {
   ParagraphNode,
   RangeSelection,
   ElementNode,
-  LexicalEditor,
-} from 'lexical';
-import {TableSelection} from './src/TableSelection';
+  LexicalEditor
+} from 'lexical'
+import { TableSelection } from './src/TableSelection'
 
 export enum TableCellHeaderState {
   NO_STATUS = 0,
   ROW = 1,
   COLUMN = 2,
-  BOTH = 3,
+  BOTH = 3
 }
 
 /**
@@ -33,122 +33,120 @@ export const TableCellHeaderStates = {
   NO_STATUS: 0,
   ROW: 1,
   COLUMN: 2,
-  BOTH: 3,
-};
+  BOTH: 3
+}
 
-export type TableCellHeaderState = $Values<typeof TableCellHeaderStates>;
+export type TableCellHeaderState = $Values<typeof TableCellHeaderStates>
 
 export declare class TableCellNode extends ElementNode {
-  static getType(): string;
-  static clone(node: TableCellNode): TableCellNode;
+  static getType(): string
+  static clone(node: TableCellNode): TableCellNode
   constructor(
     headerState?: TableCellHeaderState,
     colSpan?: number,
     width?: ?number,
-    key?: NodeKey,
-  );
-  createDOM<EditorContext>(config: EditorConfig<EditorContext>): HTMLElement;
-  updateDOM(prevNode: TableCellNode, dom: HTMLElement): boolean;
+    key?: NodeKey
+  )
+  createDOM<EditorContext>(config: EditorConfig<EditorContext>): HTMLElement
+  updateDOM(prevNode: TableCellNode, dom: HTMLElement): boolean
   insertNewAfter(
-    selection: RangeSelection,
-  ): null | ParagraphNode | TableCellNode;
-  canInsertTab(): true;
-  collapseAtStart(): true;
-  getTag(): string;
-  setHeaderState(headerState: TableCellHeaderState): TableCellHeaderState;
-  getHeaderState(): TableCellHeaderState;
-  toggleHeaderState(headerState: TableCellHeaderState): TableCellNode;
-  hasHeader(): boolean;
-  setWidth(width: number): ?number;
-  getWidth(): ?number;
-  updateDOM(prevNode: TableCellNode): boolean;
-  collapseAtStart(): true;
-  canBeEmpty(): false;
+    selection: RangeSelection
+  ): null | ParagraphNode | TableCellNode
+  canInsertTab(): true
+  collapseAtStart(): true
+  getTag(): string
+  setHeaderState(headerState: TableCellHeaderState): TableCellHeaderState
+  getHeaderState(): TableCellHeaderState
+  toggleHeaderState(headerState: TableCellHeaderState): TableCellNode
+  hasHeader(): boolean
+  setWidth(width: number): ?number
+  getWidth(): ?number
+  updateDOM(prevNode: TableCellNode): boolean
+  collapseAtStart(): true
+  canBeEmpty(): false
 }
-export declare function $createTableCellNode(): TableCellNode;
-export declare function $isTableCellNode(node?: LexicalNode): boolean;
+export declare function $createTableCellNode(): TableCellNode
+export declare function $isTableCellNode(node?: LexicalNode): boolean
 
 /**
  * LexicalTableNode
  */
 
 export declare class TableNode extends ElementNode {
-  static getType(): string;
-  static clone(node: TableNode): TableNode;
-  constructor(grid?: Grid, key?: NodeKey);
-  createDOM<EditorContext>(config: EditorConfig<EditorContext>): HTMLElement;
-  updateDOM(prevNode: TableNode, dom: HTMLElement): boolean;
-  insertNewAfter(selection: RangeSelection): null | ParagraphNode | TableNode;
-  canInsertTab(): true;
-  collapseAtStart(): true;
-  getCordsFromCellNode(tableCellNode: TableCellNode): {x: number; y: number};
-  getCellFromCords(x: number, y: number, grid: Grid): ?Cell;
-  getCellFromCordsOrThrow(x: number, y: number, grid: Grid): Cell;
-  getCellNodeFromCords(x: number, y: number): TableCellNode | null;
-  getCellNodeFromCordsOrThrow(x: number, y: number): TableCellNode;
-  setGrid(grid?: Grid): TableNode;
-  getGrid(): Grid | null;
-  canSelectBefore(): true;
+  static getType(): string
+  static clone(node: TableNode): TableNode
+  constructor(grid?: Grid, key?: NodeKey)
+  createDOM<EditorContext>(config: EditorConfig<EditorContext>): HTMLElement
+  updateDOM(prevNode: TableNode, dom: HTMLElement): boolean
+  insertNewAfter(selection: RangeSelection): null | ParagraphNode | TableNode
+  canInsertTab(): true
+  collapseAtStart(): true
+  getCordsFromCellNode(tableCellNode: TableCellNode): { x: number; y: number }
+  getCellFromCords(x: number, y: number, grid: Grid): ?Cell
+  getCellFromCordsOrThrow(x: number, y: number, grid: Grid): Cell
+  getCellNodeFromCords(x: number, y: number): TableCellNode | null
+  getCellNodeFromCordsOrThrow(x: number, y: number): TableCellNode
+  setGrid(grid?: Grid): TableNode
+  getGrid(): Grid | null
+  canSelectBefore(): true
 }
-declare function $createTableNode(): TableNode;
-declare function $isTableNode(node?: LexicalNode): boolean;
+declare function $createTableNode(): TableNode
+declare function $isTableNode(node?: LexicalNode): boolean
 
 /**
  * LexicalTableRowNode
  */
 
 declare class TableRowNode extends ElementNode {
-  static getType(): string;
-  static clone(node: TableRowNode): TableRowNode;
-  constructor(key?: NodeKey, height?: ?number);
-  createDOM<EditorContext>(config: EditorConfig<EditorContext>): HTMLElement;
-  updateDOM(prevNode: TableRowNode, dom: HTMLElement): boolean;
-  insertNewAfter(
-    selection: RangeSelection,
-  ): null | ParagraphNode | TableRowNode;
-  setHeight(height: number): ?number;
-  getHeight(): ?number;
-  canInsertTab(): true;
-  collapseAtStart(): true;
+  static getType(): string
+  static clone(node: TableRowNode): TableRowNode
+  constructor(key?: NodeKey, height?: ?number)
+  createDOM<EditorContext>(config: EditorConfig<EditorContext>): HTMLElement
+  updateDOM(prevNode: TableRowNode, dom: HTMLElement): boolean
+  insertNewAfter(selection: RangeSelection): null | ParagraphNode | TableRowNode
+  setHeight(height: number): ?number
+  getHeight(): ?number
+  canInsertTab(): true
+  collapseAtStart(): true
 }
-declare function $createTableRowNode(): TableRowNode;
-declare function $isTableRowNode(node?: LexicalNode): boolean;
+declare function $createTableRowNode(): TableRowNode
+declare function $isTableRowNode(node?: LexicalNode): boolean
 
 /**
  * LexicalTableSelectionHelpers
  */
 
 export type Cell = {
-  elem: HTMLElement;
-  highlighted: boolean;
-  x: number;
-  y: number;
-};
+  elem: HTMLElement
+  highlighted: boolean
+  x: number
+  y: number
+}
 
-export type Cells = Array<Array<Cell>>;
+export type Cells = Array<Array<Cell>>
 
 export type Grid = {
-  cells: Cells;
-  columns: number;
-  rows: number;
-};
+  cells: Cells
+  columns: number
+  rows: number
+}
 
 declare function applyTableHandlers(
   tableNode: TableNode,
   tableElement: HTMLElement,
-  editor: LexicalEditor,
-): TableSelection;
+  editor: LexicalEditor
+): TableSelection
 
 declare function $getElementGridForTableNode(
   editor: LexicalEditor,
-  tableNode: TableNode,
-): Grid;
+  tableNode: TableNode
+): Grid
 
 declare function getTableSelectionFromTableElement(
-  tableElement: HTMLElement,
-): TableSelection;
+  tableElement: HTMLElement
+): TableSelection
 
-declare function getCellFromTarget(node: Node): Cell | null;
+declare function getCellFromTarget(node: Node): Cell | null
 
 /**
  * LexicalTableUtils
@@ -157,81 +155,81 @@ declare function getCellFromTarget(node: Node): Cell | null;
 declare function $createTableNodeWithDimensions(
   rowCount: number,
   columnCount: number,
-  includeHeaders?: boolean,
-): TableNode;
+  includeHeaders?: boolean
+): TableNode
 
 declare function $getTableCellNodeFromLexicalNode(
-  startingNode: LexicalNode,
-): TableCellNode | null;
+  startingNode: LexicalNode
+): TableCellNode | null
 
 declare function $getTableRowNodeFromTableCellNodeOrThrow(
-  startingNode: LexicalNode,
-): TableRowNode;
+  startingNode: LexicalNode
+): TableRowNode
 
 declare function $getTableNodeFromLexicalNodeOrThrow(
-  startingNode: LexicalNode,
-): TableNode;
+  startingNode: LexicalNode
+): TableNode
 
 declare function $getTableRowIndexFromTableCellNode(
-  tableCellNode: TableCellNode,
-): number;
+  tableCellNode: TableCellNode
+): number
 
 declare function $getTableColumnIndexFromTableCellNode(
-  tableCellNode: TableCellNode,
-): number;
+  tableCellNode: TableCellNode
+): number
 
 declare function $removeTableRowAtIndex(
   tableNode: TableNode,
-  indexToDelete: number,
-): TableNode;
+  indexToDelete: number
+): TableNode
 
 declare function $insertTableRow(
   tableNode: TableNode,
   targetIndex: number,
   shouldInsertAfter: boolean,
   rowCount: number,
-  grid: Grid,
-): TableNode;
+  grid: Grid
+): TableNode
 
 declare function $insertTableColumn(
   tableNode: TableNode,
   targetIndex: number,
   shouldInsertAfter: boolean,
-  columnCount: number,
-): TableNode;
+  columnCount: number
+): TableNode
 
 declare function $deleteTableColumn(
   tableNode: TableNode,
-  targetIndex: number,
-): TableNode;
+  targetIndex: number
+): TableNode
 
 /**
  * LexicalTableSelection.js
  */
 declare class TableSelection {
-  currentX: number;
-  currentY: number;
-  listenersToRemove: Set<() => void>;
-  domListeners: Set<() => void>;
-  grid: Grid;
-  isHighlightingCells: boolean;
-  isMouseDown: boolean;
-  startX: number;
-  startY: number;
-  nodeKey: string;
-  editor: LexicalEditor;
-  constructor(editor: LexicalEditor, nodeKey: string): void;
-  getGrid(): Grid;
-  removeListeners(): void;
-  trackTableGrid(): void;
-  clearHighlight(): void;
-  adjustFocusCellForSelection(cell: Cell): void;
-  setAnchorCellForSelection(cell: Cell): void;
-  formatCells(type: TextFormatType): void;
-  clearText(): void;
+  currentX: number
+  currentY: number
+  listenersToRemove: Set<() => void>
+  domListeners: Set<() => void>
+  grid: Grid
+  isHighlightingCells: boolean
+  isMouseDown: boolean
+  startX: number
+  startY: number
+  nodeKey: string
+  editor: LexicalEditor
+  constructor(editor: LexicalEditor, nodeKey: string): void
+  getGrid(): Grid
+  removeListeners(): void
+  trackTableGrid(): void
+  clearHighlight(): void
+  adjustFocusCellForSelection(cell: Cell): void
+  setAnchorCellForSelection(cell: Cell): void
+  formatCells(type: TextFormatType): void
+  clearText(): void
 }
 
 export var INSERT_TABLE_COMMAND: LexicalCommand<{
-  rows: string;
-  columns: string;
-}>;
+  rows: string
+  columns: string
+}>

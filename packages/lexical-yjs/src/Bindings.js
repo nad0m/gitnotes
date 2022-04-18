@@ -7,20 +7,20 @@
  * @flow strict
  */
 
-import type {Provider} from '.';
-import type {CollabDecoratorNode} from './CollabDecoratorNode';
-import type {CollabElementNode} from './CollabElementNode';
-import type {CollabLineBreakNode} from './CollabLineBreakNode';
-import type {CollabTextNode} from './CollabTextNode';
-import type {Cursor} from './SyncCursors';
-import type {LexicalEditor, NodeKey} from 'lexical';
-import type {Doc} from 'yjs';
+import type { Provider } from '.'
+import type { CollabDecoratorNode } from './CollabDecoratorNode'
+import type { CollabElementNode } from './CollabElementNode'
+import type { CollabLineBreakNode } from './CollabLineBreakNode'
+import type { CollabTextNode } from './CollabTextNode'
+import type { Cursor } from './SyncCursors'
+import type { LexicalEditor, NodeKey } from 'lexical'
+import type { Doc } from 'yjs'
 
-import {XmlText} from 'yjs';
+import { XmlText } from 'yjs'
 
-import {$createCollabElementNode} from './CollabElementNode';
+import { $createCollabElementNode } from './CollabElementNode'
 
-export type ClientID = number;
+export type ClientID = number
 
 export type Binding = {
   clientID: number,
@@ -29,7 +29,7 @@ export type Binding = {
     | CollabElementNode
     | CollabTextNode
     | CollabDecoratorNode
-    | CollabLineBreakNode,
+    | CollabLineBreakNode
   >,
   cursors: Map<ClientID, Cursor>,
   cursorsContainer: null | HTMLElement,
@@ -38,28 +38,28 @@ export type Binding = {
   editor: LexicalEditor,
   id: string,
   nodeProperties: Map<string, Array<string>>,
-  root: CollabElementNode,
-};
+  root: CollabElementNode
+}
 
 export function createBinding(
   editor: LexicalEditor,
   provider: Provider,
   id: string,
   doc: ?Doc,
-  docMap: Map<string, Doc>,
+  docMap: Map<string, Doc>
 ): Binding {
   if (doc === undefined || doc === null) {
-    throw new Error('Should never happen');
+    throw new Error('Should never happen')
   }
 
   // $FlowFixMe: this will work
-  const rootXmlText: XmlText = doc.get('root', XmlText);
+  const rootXmlText: XmlText = doc.get('root', XmlText)
   const root: CollabElementNode = $createCollabElementNode(
     rootXmlText,
     null,
-    'root',
-  );
-  root._key = 'root';
+    'root'
+  )
+  root._key = 'root'
 
   // $FlowFixMe: our Flow bindings need fixing
   return {
@@ -72,6 +72,6 @@ export function createBinding(
     editor,
     id,
     nodeProperties: new Map(),
-    root,
-  };
+    root
+  }
 }

@@ -7,43 +7,43 @@
  * @flow strict
  */
 
-import type {EditorConfig, LexicalNode} from 'lexical';
+import type { EditorConfig, LexicalNode } from 'lexical'
 
-import {TextNode} from 'lexical';
+import { TextNode } from 'lexical'
 
 export class KeywordNode extends TextNode {
   static getType(): string {
-    return 'keyword';
+    return 'keyword'
   }
 
   static clone(node: KeywordNode): KeywordNode {
-    return new KeywordNode(node.__text, node.__key);
+    return new KeywordNode(node.__text, node.__key)
   }
 
   createDOM<EditorContext>(config: EditorConfig<EditorContext>): HTMLElement {
-    const dom = super.createDOM(config);
-    dom.style.cursor = 'default';
-    dom.className = 'keyword';
-    return dom;
+    const dom = super.createDOM(config)
+    dom.style.cursor = 'default'
+    dom.className = 'keyword'
+    return dom
   }
 
   canInsertTextBefore(): boolean {
-    return false;
+    return false
   }
 
   canInsertTextAfter(): boolean {
-    return false;
+    return false
   }
 
   isTextEntity(): true {
-    return true;
+    return true
   }
 }
 
 export function $createKeywordNode(keyword: string): KeywordNode {
-  return new KeywordNode(keyword);
+  return new KeywordNode(keyword)
 }
 
 export function $isKeywordNode(node: ?LexicalNode): boolean %checks {
-  return node instanceof KeywordNode;
+  return node instanceof KeywordNode
 }

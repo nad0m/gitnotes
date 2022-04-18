@@ -1,15 +1,15 @@
-"use strict";
+'use strict'
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
-});
-exports.Worker = void 0;
+})
+exports.Worker = void 0
 
-var _events = require("./events");
+var _events = require('./events')
 
-var _channelOwner = require("./channelOwner");
+var _channelOwner = require('./channelOwner')
 
-var _jsHandle = require("./jsHandle");
+var _jsHandle = require('./jsHandle')
 
 /**
  * Copyright (c) Microsoft Corporation.
@@ -30,49 +30,48 @@ class Worker extends _channelOwner.ChannelOwner {
   // Set for web workers.
   // Set for service workers.
   static from(worker) {
-    return worker._object;
+    return worker._object
   }
 
   constructor(parent, type, guid, initializer) {
-    super(parent, type, guid, initializer);
-    this._page = void 0;
-    this._context = void 0;
+    super(parent, type, guid, initializer)
+    this._page = void 0
+    this._context = void 0
 
     this._channel.on('close', () => {
-      if (this._page) this._page._workers.delete(this);
-      if (this._context) this._context._serviceWorkers.delete(this);
-      this.emit(_events.Events.Worker.Close, this);
-    });
+      if (this._page) this._page._workers.delete(this)
+      if (this._context) this._context._serviceWorkers.delete(this)
+      this.emit(_events.Events.Worker.Close, this)
+    })
   }
 
   url() {
-    return this._initializer.url;
+    return this._initializer.url
   }
 
   async evaluate(pageFunction, arg) {
-    (0, _jsHandle.assertMaxArguments)(arguments.length, 2);
-    return this._wrapApiCall(async channel => {
+    ;(0, _jsHandle.assertMaxArguments)(arguments.length, 2)
+    return this._wrapApiCall(async (channel) => {
       const result = await channel.evaluateExpression({
         expression: String(pageFunction),
         isFunction: typeof pageFunction === 'function',
         arg: (0, _jsHandle.serializeArgument)(arg)
-      });
-      return (0, _jsHandle.parseResult)(result.value);
-    });
+      })
+      return (0, _jsHandle.parseResult)(result.value)
+    })
   }
 
   async evaluateHandle(pageFunction, arg) {
-    (0, _jsHandle.assertMaxArguments)(arguments.length, 2);
-    return this._wrapApiCall(async channel => {
+    ;(0, _jsHandle.assertMaxArguments)(arguments.length, 2)
+    return this._wrapApiCall(async (channel) => {
       const result = await channel.evaluateExpressionHandle({
         expression: String(pageFunction),
         isFunction: typeof pageFunction === 'function',
         arg: (0, _jsHandle.serializeArgument)(arg)
-      });
-      return _jsHandle.JSHandle.from(result.handle);
-    });
+      })
+      return _jsHandle.JSHandle.from(result.handle)
+    })
   }
-
 }
 
-exports.Worker = Worker;
+exports.Worker = Worker

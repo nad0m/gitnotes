@@ -7,30 +7,30 @@
  * @flow strict
  */
 
-import type {LexicalEditor} from './LexicalEditor';
-import type {LexicalNode, NodeKey} from './LexicalNode';
+import type { LexicalEditor } from './LexicalEditor'
+import type { LexicalNode, NodeKey } from './LexicalNode'
 
-import invariant from 'shared/invariant';
+import invariant from 'shared/invariant'
 
-import {$isElementNode, $isRootNode, $isTextNode, createEditor} from '.';
+import { $isElementNode, $isRootNode, $isTextNode, createEditor } from '.'
 import {
   errorOnReadOnly,
   getActiveEditor,
   getActiveEditorState,
-  parseEditorState,
-} from './LexicalUpdates';
+  parseEditorState
+} from './LexicalUpdates'
 
 export type NodeParserState = {
   originalSelection: null | ParsedSelection,
-  remappedSelection?: ParsedSelection,
-};
+  remappedSelection?: ParsedSelection
+}
 
 export type ParsedNode = {
   __key: NodeKey,
   __parent: null | NodeKey,
   __type: string,
   ...
-};
+}
 
 export type ParsedElementNode = {
   ...ParsedNode,
@@ -39,55 +39,55 @@ export type ParsedElementNode = {
   __format: number,
   __indent: number,
   ...
-};
+}
 
 export type ParsedTextNode = {
   ...ParsedNode,
   __format: number,
   __mode: number,
-  __text: string,
-};
+  __text: string
+}
 
-export type ParsedNodeMap = Map<NodeKey, ParsedNode>;
+export type ParsedNodeMap = Map<NodeKey, ParsedNode>
 
 export type ParsedRangeSelection = {
   anchor: {
     key: string,
     offset: number,
-    type: 'text' | 'element',
+    type: 'text' | 'element'
   },
   focus: {
     key: string,
     offset: number,
-    type: 'text' | 'element',
+    type: 'text' | 'element'
   },
-  type: 'range',
-};
+  type: 'range'
+}
 
 export type ParsedNodeSelection = {
   nodes: Array<NodeKey>,
-  type: 'node',
-};
+  type: 'node'
+}
 
 export type ParsedGridSelection = {
   anchorCellKey: NodeKey,
   focusCellKey: NodeKey,
   gridKey: NodeKey,
-  type: 'grid',
-};
+  type: 'grid'
+}
 
 export type ParsedSelection =
   | ParsedRangeSelection
   | ParsedNodeSelection
-  | ParsedGridSelection;
+  | ParsedGridSelection
 
 export function $createNodeFromParse(
   parsedNode: ParsedNode,
-  parsedNodeMap: ParsedNodeMap,
+  parsedNodeMap: ParsedNodeMap
 ): LexicalNode {
-  errorOnReadOnly();
-  const editor = getActiveEditor();
-  return internalCreateNodeFromParse(parsedNode, parsedNodeMap, editor, null);
+  errorOnReadOnly()
+  const editor = getActiveEditor()
+  return internalCreateNodeFromParse(parsedNode, parsedNodeMap, editor, null)
 }
 
 export function internalCreateNodeFromParse(
@@ -95,80 +95,80 @@ export function internalCreateNodeFromParse(
   parsedNodeMap: ParsedNodeMap,
   editor: LexicalEditor,
   parentKey: null | NodeKey,
-  state: NodeParserState = {originalSelection: null},
+  state: NodeParserState = { originalSelection: null }
 ): LexicalNode {
-  const nodeType = parsedNode.__type;
-  const registeredNode = editor._nodes.get(nodeType);
+  const nodeType = parsedNode.__type
+  const registeredNode = editor._nodes.get(nodeType)
   if (registeredNode === undefined) {
-    invariant(false, 'createNodeFromParse: type "%s" + not found', nodeType);
+    invariant(false, 'createNodeFromParse: type "%s" + not found', nodeType)
   }
   // Check for properties that are editors
   for (const property in parsedNode) {
-    const value = parsedNode[property];
+    const value = parsedNode[property]
     if (value != null && typeof value === 'object') {
-      const parsedEditorState = value.editorState;
+      const parsedEditorState = value.editorState
       if (parsedEditorState != null) {
-        const nestedEditor = createEditor();
-        nestedEditor._nodes = editor._nodes;
-        nestedEditor._parentEditor = editor._parentEditor;
+        const nestedEditor = createEditor()
+        nestedEditor._nodes = editor._nodes
+        nestedEditor._parentEditor = editor._parentEditor
         nestedEditor._pendingEditorState = parseEditorState(
           parsedEditorState,
-          nestedEditor,
-        );
-        parsedNode[property] = nestedEditor;
+          nestedEditor
+        )
+        parsedNode[property] = nestedEditor
       }
     }
   }
-  const NodeKlass = registeredNode.klass;
-  const parsedKey = parsedNode.__key;
+  const NodeKlass = registeredNode.klass
+  const parsedKey = parsedNode.__key
   // We set the parsedKey to undefined before calling clone() so that
   // we get a new random key assigned.
-  parsedNode.__key = undefined;
-  const node = NodeKlass.clone(parsedNode);
-  parsedNode.__key = parsedKey;
-  const key = node.__key;
+  parsedNode.__key = undefined
+  const node = NodeKlass.clone(parsedNode)
+  parsedNode.__key = parsedKey
+  const key = node.__key
   if ($isRootNode(node)) {
-    const editorState = getActiveEditorState();
-    editorState._nodeMap.set('root', node);
+    const editorState = getActiveEditorState()
+    editorState._nodeMap.set('root', node)
   }
-  node.__parent = parentKey;
+  node.__parent = parentKey
   // We will need to recursively handle the children in the case
   // of a ElementNode.
   if ($isElementNode(node)) {
-    const children = parsedNode.__children;
+    const children = parsedNode.__children
     for (let i = 0; i < children.length; i++) {
-      const childKey = children[i];
-      const parsedChild = parsedNodeMap.get(childKey);
+      const childKey = children[i]
+      const parsedChild = parsedNodeMap.get(childKey)
       if (parsedChild !== undefined) {
         const child = internalCreateNodeFromParse(
           parsedChild,
           parsedNodeMap,
           editor,
           key,
-          state,
-        );
-        const newChildKey = child.__key;
-        node.__children.push(newChildKey);
+          state
+        )
+        const newChildKey = child.__key
+        node.__children.push(newChildKey)
       }
     }
-    node.__indent = parsedNode.__indent;
-    node.__format = parsedNode.__format;
-    node.__dir = parsedNode.__dir;
+    node.__indent = parsedNode.__indent
+    node.__format = parsedNode.__format
+    node.__dir = parsedNode.__dir
   } else if ($isTextNode(node)) {
-    node.__format = parsedNode.__format;
-    node.__style = parsedNode.__style;
-    node.__mode = parsedNode.__mode;
-    node.__detail = parsedNode.__detail;
+    node.__format = parsedNode.__format
+    node.__style = parsedNode.__style
+    node.__mode = parsedNode.__mode
+    node.__detail = parsedNode.__detail
   }
   // The selection might refer to an old node whose key has changed. Produce a
   // new selection record with the old keys mapped to the new ones.
-  const originalSelection = state != null ? state.originalSelection : undefined;
+  const originalSelection = state != null ? state.originalSelection : undefined
   if (originalSelection != null) {
-    let remappedSelection = state.remappedSelection;
+    let remappedSelection = state.remappedSelection
 
     if (originalSelection.type === 'range') {
-      const anchor = originalSelection.anchor;
-      const focus = originalSelection.focus;
+      const anchor = originalSelection.anchor
+      const focus = originalSelection.focus
 
       if (
         remappedSelection == null &&
@@ -176,40 +176,40 @@ export function internalCreateNodeFromParse(
       ) {
         state.remappedSelection = remappedSelection = {
           anchor: {
-            ...anchor,
+            ...anchor
           },
           focus: {
-            ...focus,
+            ...focus
           },
-          type: 'range',
-        };
+          type: 'range'
+        }
       }
       if (remappedSelection != null && remappedSelection.type === 'range') {
         if (parsedKey === anchor.key) {
-          remappedSelection.anchor.key = key;
+          remappedSelection.anchor.key = key
         }
         if (parsedKey === focus.key) {
-          remappedSelection.focus.key = key;
+          remappedSelection.focus.key = key
         }
       }
     } else if (originalSelection.type === 'node') {
-      const nodes = originalSelection.nodes;
-      const indexOf = nodes.indexOf(parsedKey);
+      const nodes = originalSelection.nodes
+      const indexOf = nodes.indexOf(parsedKey)
       if (indexOf !== -1) {
         if (remappedSelection == null) {
           state.remappedSelection = remappedSelection = {
             nodes: [...nodes],
-            type: 'node',
-          };
+            type: 'node'
+          }
         }
         if (remappedSelection.type === 'node') {
-          remappedSelection.nodes.splice(indexOf, 1, key);
+          remappedSelection.nodes.splice(indexOf, 1, key)
         }
       }
     } else if (originalSelection.type === 'grid') {
-      const gridKey = originalSelection.gridKey;
-      const anchorCellKey = originalSelection.anchorCellKey;
-      const focusCellKey = originalSelection.focusCellKey;
+      const gridKey = originalSelection.gridKey
+      const anchorCellKey = originalSelection.anchorCellKey
+      const focusCellKey = originalSelection.focusCellKey
       if (
         remappedSelection == null &&
         (gridKey === parsedKey ||
@@ -218,21 +218,21 @@ export function internalCreateNodeFromParse(
       ) {
         state.remappedSelection = remappedSelection = {
           ...originalSelection,
-          type: 'grid',
-        };
+          type: 'grid'
+        }
       }
       if (remappedSelection != null && remappedSelection.type === 'grid') {
         if (gridKey === parsedKey) {
-          remappedSelection.gridKey = key;
+          remappedSelection.gridKey = key
         }
         if (anchorCellKey === parsedKey) {
-          remappedSelection.anchorCellKey = key;
+          remappedSelection.anchorCellKey = key
         }
         if (focusCellKey === parsedKey) {
-          remappedSelection.focusCellKey = key;
+          remappedSelection.focusCellKey = key
         }
       }
     }
   }
-  return node;
+  return node
 }

@@ -7,21 +7,21 @@
  * @flow strict
  */
 
-import type {LexicalEditor} from 'lexical';
+import type { LexicalEditor } from 'lexical'
 
-import useLexicalCanShowPlaceholder from '@lexical/react/DEPRECATED_useLexicalCanShowPlaceholder';
-import {useCallback} from 'react';
+import useLexicalCanShowPlaceholder from '@lexical/react/DEPRECATED_useLexicalCanShowPlaceholder'
+import { useCallback } from 'react'
 
 export default function useLexicalEditor(
-  editor: LexicalEditor,
+  editor: LexicalEditor
 ): [(null | HTMLElement) => void, boolean] {
-  const showPlaceholder = useLexicalCanShowPlaceholder(editor);
+  const showPlaceholder = useLexicalCanShowPlaceholder(editor)
   const rootElementRef = useCallback(
     (rootElement: null | HTMLElement) => {
-      editor.setRootElement(rootElement);
+      editor.setRootElement(rootElement)
     },
-    [editor],
-  );
+    [editor]
+  )
 
-  return [rootElementRef, showPlaceholder];
+  return [rootElementRef, showPlaceholder]
 }

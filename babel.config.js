@@ -1,22 +1,22 @@
-'use strict';
+'use strict'
 
 module.exports = {
   plugins: [
     [
       require('./scripts/error-codes/transform-error-messages'),
-      { noMinify: true },
-    ],
+      { noMinify: true }
+    ]
   ],
   presets: [
     [
       '@babel/preset-env',
       {
         targets: {
-          node: 'current',
-        },
-      },
+          node: 'current'
+        }
+      }
     ],
     '@babel/preset-react',
-    '@babel/preset-flow',
-  ],
-};
+    '@babel/preset-flow'
+  ]
+}

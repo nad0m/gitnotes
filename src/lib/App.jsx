@@ -7,34 +7,34 @@
  * @flow strict
  */
 
-import LexicalComposer from '@lexical/react/LexicalComposer';
-import * as React from 'react';
+import LexicalComposer from '@lexical/react/LexicalComposer'
+import { FC } from 'react'
 
-import {isDevPlayground} from './appSettings';
-import {SettingsContext, useSettings} from '../context/SettingsContext';
-import {SharedHistoryContext} from '../context/SharedHistoryContext';
-import Editor from './Editor';
-import logo from '../images/logo.svg';
-import PlaygroundNodes from '../nodes/PlaygroundNodes';
-import TestRecorderPlugin from '../plugins/TestRecorderPlugin';
-import TypingPerfPlugin from '../plugins/TypingPerfPlugin';
-import Settings from './Settings';
-import PlaygroundEditorTheme from '../themes/PlaygroundEditorTheme';
-import './setupEnv';
-import './index.css';
+import { isDevPlayground } from './appSettings'
+import { SettingsContext, useSettings } from '../context/SettingsContext'
+import { SharedHistoryContext } from '../context/SharedHistoryContext'
+import Editor from './Editor'
+import logo from '../images/logo.svg'
+import PlaygroundNodes from '../nodes/PlaygroundNodes'
+import TestRecorderPlugin from '../plugins/TestRecorderPlugin'
+import TypingPerfPlugin from '../plugins/TypingPerfPlugin'
+import Settings from './Settings'
+import PlaygroundEditorTheme from '../themes/PlaygroundEditorTheme'
+import './setupEnv'
+import './index.css'
 
-function App(): React$Node {
-  const {settings} = useSettings();
-  const {measureTypingPerf} = settings;
+const App: FC = () => {
+  const { settings } = useSettings()
+  const { measureTypingPerf } = settings
 
   const initialConfig = {
     namespace: 'PlaygroundEditor',
     nodes: [...PlaygroundNodes],
     onError: (error) => {
-      throw error;
+      throw error
     },
-    theme: PlaygroundEditorTheme,
-  };
+    theme: PlaygroundEditorTheme
+  }
 
   return (
     <LexicalComposer initialConfig={initialConfig}>
@@ -52,14 +52,14 @@ function App(): React$Node {
         {measureTypingPerf && <TypingPerfPlugin />}
       </SharedHistoryContext>
     </LexicalComposer>
-  );
+  )
 }
 
-export default function PlaygroundApp(): React$Node {
+export const Playground: FC = () => {
   return (
     <SettingsContext>
       <h1>ci deploy test</h1>
       <App />
     </SettingsContext>
-  );
+  )
 }
