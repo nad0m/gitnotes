@@ -30,7 +30,6 @@ jobs:
       - uses: borales/actions-yarn@v2.3.0
         with: 
           cmd: build
-      - uses: actions/checkout@v3
       - run: |
           cd dist
           git init
