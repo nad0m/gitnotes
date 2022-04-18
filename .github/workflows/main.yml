@@ -31,5 +31,6 @@ jobs:
       - uses: borales/actions-yarn@v2.3.0
         with:
           cmd: install # will run `yarn install` command
-      - run: sh deploy.sh
-
+      - uses: borales/actions-yarn@v2.3.0
+        with:
+          runs: sh deploy.sh
