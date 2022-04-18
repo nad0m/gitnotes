@@ -15,8 +15,8 @@ cd dist
 git init
 git checkout -b production
 
-git config --global user.email "adamdnguyen10@gmail.com"
-git config --global user.name "nad0m"
+git config --global user.email adamdnguyen10@gmail.com
+git config --global user.name nad0m
 
 git add -A
 git commit -m 'deploy'
