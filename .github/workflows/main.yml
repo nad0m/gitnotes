@@ -22,7 +22,6 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       - uses: borales/actions-yarn@v2.3.0
         with: 
@@ -30,13 +29,8 @@ jobs:
       - uses: borales/actions-yarn@v2.3.0
         with: 
           cmd: build
-      - name: Push build to repository
-        working-directory: ./dist
-        run: |
-          git init
-          git checkout -b production  
-          git config user.name nad0m
-          git config user.email adamdnguyen10@gmail.com
-          git add .
-          git commit -m "deploy"
-          git push -f git@github.com:nad0m/gitnotes.git production:gh-pages
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+          publish_dir: ./dist
