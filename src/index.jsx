@@ -11,7 +11,10 @@ import React from 'react';
 // $FlowFixMe: Flow doesn't understand react-dom
 import {createRoot} from 'react-dom/client';
 
-import App from './lib/App';
+import App from './App';
+import { initFirebase } from './firebase';
+
+initFirebase()
 
 // Handle runtime errors
 const showErrorOverlay = (err) => {

@@ -94,6 +94,7 @@ const moduleResolution = [
     replacement: path.resolve('./index.js'),
   },
   { find: 'shared', replacement: path.resolve('./shared') },
+  { find: 'configs', replacement: path.resolve('./src/configs') },
 ];
 
 // Lexical React
@@ -140,10 +141,14 @@ const moduleResolution = [
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/gitnotes/',
   optimizeDeps: {
     esbuildOptions: {
       plugins: [esbuildFlowPlugin()],
+    },
+  },
+  resolve: {
+    alias: {
+      'src': path.resolve(__dirname, './src'),
     },
   },
   plugins: [
