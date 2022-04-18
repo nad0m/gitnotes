@@ -13,18 +13,16 @@ const App = () => {
       <BrowserRouter basename='/gitnotes/'>
         <AuthProvider>
           <Routes>
-            {routes.map((route, index) => (
+            {routes.map((route, index,) => (
               <Route
                 key={index}
                 path={route.path}
                 element={
                   route.protected ? (
                     <AuthChecker>
-                      <route.component />
+                      {route.component}
                     </AuthChecker>
-                  ) : (
-                    <route.component />
-                  )
+                  ) : route.component
                 }
               />
             ))}
