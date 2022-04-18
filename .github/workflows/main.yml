@@ -29,8 +29,6 @@ jobs:
           name: id_rsa
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
       - uses: actions/checkout@v3
-        with:
-          persist-credentials: false
       - uses: borales/actions-yarn@v2.3.0
         with: 
           cmd: install
