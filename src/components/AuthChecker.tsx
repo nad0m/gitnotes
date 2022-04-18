@@ -1,5 +1,5 @@
-import React, { ReactNode } from 'react'
 import { getAuth } from 'firebase/auth'
+import { ReactNode } from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { Navigate } from 'react-router-dom'
 import { useLocalStorage } from 'react-use'
@@ -19,7 +19,7 @@ export const AuthChecker = ({ children }: Props) => {
   }
 
   if (!user || !token) {
-    return <Navigate to="/login" />
+    return <Navigate to="login" />
   }
 
   return <>{children}</>

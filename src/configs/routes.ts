@@ -14,7 +14,7 @@ export const routes: RouteType[] = [
     protected: true,
   },
   {
-    path: '/login',
+    path: 'login',
     component: LoginPage,
     name: 'Login Screen',
     protected: false,

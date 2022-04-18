@@ -10,7 +10,7 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
+      <BrowserRouter basename='/gitnotes/'>
         <AuthProvider>
           <Routes>
             {routes.map((route, index) => (
