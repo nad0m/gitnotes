@@ -54,6 +54,10 @@ import YouTubePlugin from '../plugins/YouTubePlugin'
 import ContentEditable from '../ui/ContentEditable'
 import Placeholder from '../ui/Placeholder'
 import { editorState } from '../mock/editorState'
+import {
+  useCreateRepositoryMutation,
+  useGetRepositoryQuery
+} from '../generated/graphql'
 
 function prepopulatedRichText() {
   const root = $getRoot()

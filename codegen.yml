@@ -2,10 +2,13 @@ overwrite: true
 documents:
   - ./src/**/*.graphql
   - ./src/**/**/*.graphql.ts
+schema: ./src/graphql/schema.docs.graphql
 generates:
   src/generated/graphql.tsx:
     plugins:
-      - 'typescript'
+      - typescript
+      - typescript-operations
+      - typescript-react-apollo
     config:
       preResolveTypes: true
       maybeValue: 'T'
