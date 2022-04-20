@@ -154,8 +154,7 @@ export default function Editor(): React$Node {
   const placeholder = <Placeholder>{text}</Placeholder>
   const scrollRef = useRef(null)
 
-  const state = editor.parseEditorState(JSON.stringify(editorState))
-  console.log(editor.setEditorState(state))
+  console.log(editor.getEditorState())
 
   return (
     <>

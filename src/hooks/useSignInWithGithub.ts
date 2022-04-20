@@ -1,16 +1,14 @@
 import { useNavigate } from 'react-router-dom'
-import { useLocalStorage } from 'react-use'
 import { useMutation } from 'react-query'
 import { signInWithGithub } from '../firebase'
-import { LOCAL_STORAGE_KEY_GITHUB_TOKEN } from '../configs'
+import { useAuthStateContext } from '../providers'
 
 export const useSignInWithGithub = () => {
   const navigate = useNavigate()
-  const [, setLocalStorageToken] = useLocalStorage<string>(
-    LOCAL_STORAGE_KEY_GITHUB_TOKEN
-  )
+  const setToken = useAuthStateContext()?.setToken
+
   const onSuccess = (token: string) => {
-    setLocalStorageToken(token)
+    setToken?.(token)
     navigate('/')
   }
   const { isLoading, isError, mutate } = useMutation('sign-in-github', () =>

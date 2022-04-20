@@ -1,24 +1,30 @@
 import { FC } from 'react'
-import { useAuthState } from 'react-firebase-hooks/auth'
 import { getAuth, signOut } from 'firebase/auth'
 import { Playground } from '../lib'
-import { useGetRepositoryQuery } from '../generated/graphql'
+import { useLocalStorage } from 'react-use'
+import { LOCAL_STORAGE_KEY_GITHUB_TOKEN } from '../configs'
+import { initialNotes } from '../utils/data/initialNotes'
+import { initialCategories } from '../utils/data/initialCategories'
+import { useSyncData } from '../hooks'
 
 export const HomePage: FC = () => {
   const auth = getAuth()
+  const [, , remove] = useLocalStorage(LOCAL_STORAGE_KEY_GITHUB_TOKEN)
+  const { syncData, isLoading, isError, isSuccess } = useSyncData()
 
-  const { data, loading, error } = useGetRepositoryQuery({
-    variables: {
-      owner: 'nad0m',
-      name: 'gitnotes-database'
-    }
-  })
+  console.log({ isLoading, isError, isSuccess })
 
-  console.log({ data, loading, error })
+  const onClick = () => {
+    syncData({
+      noteItems: initialNotes,
+      categoryItems: initialCategories
+    })
+  }
 
   return (
     <>
-      <button onClick={() => signOut(auth)}>Sign out</button>
+      <button onClick={onClick}>add commit</button>
+      <button onClick={() => signOut(auth).then(remove)}>Sign out</button>
       <Playground />
     </>
   )

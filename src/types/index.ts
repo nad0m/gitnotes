@@ -1,3 +1,5 @@
+import { OAuthCredential, User } from 'firebase/auth'
+import { EditorState } from 'lexical'
 import React from 'react'
 
 import { Folder, NotesSortKey } from './enums'
@@ -8,6 +10,7 @@ import { Folder, NotesSortKey } from './enums'
 
 export interface NoteItem {
   id: string
+  title: string
   editorState: string
   created: string
   lastUpdated: string
@@ -21,7 +24,7 @@ export interface NoteItem {
 export interface CategoryItem {
   id: string
   name: string
-  draggedOver: boolean
+  favorite?: boolean
 }
 
 //==============================================================================
@@ -78,8 +81,12 @@ export interface RootState {
 //==============================================================================
 
 export interface SyncPayload {
-  categories: CategoryItem[]
-  notes: NoteItem[]
+  categoryItems: CategoryItem[]
+  noteItems: NoteItem[]
+}
+
+export interface IAuthState extends Partial<User> {
+  token: string
 }
 
 //==============================================================================

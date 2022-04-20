@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { AuthProvider } from './providers'
+import { AuthStateProvider } from './providers'
 import { routes } from './configs'
 import { AuthChecker } from './components'
 import { ApolloClientProvider } from './providers/ApolloClientProvider'
@@ -12,7 +12,7 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <ApolloClientProvider>
         <BrowserRouter basename="/gitnotes/">
-          <AuthProvider>
+          <AuthStateProvider>
             <Routes>
               {routes.map((route, index) => (
                 <Route
@@ -28,7 +28,7 @@ const App = () => {
                 />
               ))}
             </Routes>
-          </AuthProvider>
+          </AuthStateProvider>
         </BrowserRouter>
       </ApolloClientProvider>
     </QueryClientProvider>
