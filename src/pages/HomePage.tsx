@@ -12,8 +12,6 @@ export const HomePage: FC = () => {
   const [, , remove] = useLocalStorage(LOCAL_STORAGE_KEY_GITHUB_TOKEN)
   const { syncData, isLoading, isError, isSuccess } = useSyncData()
 
-  console.log({ isLoading, isError, isSuccess })
-
   const onClick = () => {
     syncData({
       noteItems: initialNotes,
