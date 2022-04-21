@@ -10,7 +10,8 @@ import { LexicalEditor } from 'lexical'
 import { RouterBreadcrumbs } from '../components/RouterBreadcrumbs'
 import { initialCategories } from '../utils/data/initialCategories'
 import { initialNotes } from '../utils/data/initialNotes'
-import { useGetNotes } from '../hooks'
+import { useGetCategories, useGetNotes } from '../hooks'
+import { useDataSyncContext } from './DataSyncProvider'
 
 type CurrentEditorContextT = {
   editor: LexicalEditor | null
@@ -29,13 +30,15 @@ export const CurrentEditorProvider: FC<{ children: ReactNode }> = ({
   children
 }) => {
   const [editor, setEditor] = useState<LexicalEditor | null>(null)
-  const { noteItems } = useGetNotes()
+  const { state, dispatch } = useDataSyncContext()
+
+  console.log({ state })
 
   return (
     <CurrentEditorContext.Provider value={{ editor, setEditor }}>
       <RouterBreadcrumbs
-        categoryItems={initialCategories}
-        noteItems={noteItems ?? []}
+        categoryItems={state.categoryItems ?? []}
+        noteItems={state.noteItems ?? []}
       />
       {children}
     </CurrentEditorContext.Provider>

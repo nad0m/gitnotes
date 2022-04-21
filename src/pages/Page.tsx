@@ -1,8 +1,11 @@
 import { useLocation } from 'react-router-dom'
 import { Playground } from '../lib'
+import { CurrentEditorProvider } from '../providers/CurrentEditorProvider'
 
 export const Page = () => {
-  const location = useLocation()
-
-  return <Playground />
+  return (
+    <CurrentEditorProvider>
+      <Playground />
+    </CurrentEditorProvider>
+  )
 }

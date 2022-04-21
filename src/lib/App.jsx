@@ -39,11 +39,6 @@ const App: FC = () => {
   return (
     <LexicalComposer initialConfig={initialConfig}>
       <SharedHistoryContext>
-        <header>
-          <a href="https://lexical.dev" target="_blank" rel="noopener">
-            <img src={logo} alt="Lexical Logo" />
-          </a>
-        </header>
         <div className="editor-shell">
           <Editor />
         </div>
@@ -58,7 +53,6 @@ const App: FC = () => {
 export const Playground: FC = () => {
   return (
     <SettingsContext>
-      <h1>ci deploy test</h1>
       <App />
     </SettingsContext>
   )

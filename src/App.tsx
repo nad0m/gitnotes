@@ -5,6 +5,7 @@ import { routes } from './configs'
 import { AuthChecker } from './components'
 import { ApolloClientProvider } from './providers/ApolloClientProvider'
 import { CurrentEditorProvider } from './providers/CurrentEditorProvider'
+import { DataSyncProvider } from './providers/DataSyncProvider'
 
 const queryClient = new QueryClient()
 
@@ -14,7 +15,7 @@ const App = () => {
       <ApolloClientProvider>
         <BrowserRouter basename="/gitnotes/">
           <AuthStateProvider>
-            <CurrentEditorProvider>
+            <DataSyncProvider>
               <Routes>
                 {routes.map((route, index) => (
                   <Route
@@ -30,7 +31,7 @@ const App = () => {
                   />
                 ))}
               </Routes>
-            </CurrentEditorProvider>
+            </DataSyncProvider>
           </AuthStateProvider>
         </BrowserRouter>
       </ApolloClientProvider>

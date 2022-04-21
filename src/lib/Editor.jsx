@@ -54,6 +54,7 @@ import TreeViewPlugin from '../plugins/TreeViewPlugin'
 import TwitterPlugin from '../plugins/TwitterPlugin'
 import YouTubePlugin from '../plugins/YouTubePlugin'
 import { useCurrentEditorContext } from '../providers/CurrentEditorProvider'
+import { useDataSyncContext } from '../providers/DataSyncProvider'
 import ContentEditable from '../ui/ContentEditable'
 import Placeholder from '../ui/Placeholder'
 import { initialNotes } from '../utils/data/initialNotes'
@@ -133,7 +134,7 @@ function prepopulatedRichText() {
 
 export default function Editor(): React$Node {
   const { noteId } = useParams()
-  const { noteItems } = useGetNotes()
+  const { state } = useDataSyncContext()
   const { historyState } = useSharedHistoryContext()
   const [editor] = useLexicalComposerContext()
   const { setEditor } = useCurrentEditorContext()
@@ -158,12 +159,12 @@ export default function Editor(): React$Node {
 
   useEffect(() => {
     setEditor(editor)
-    const currentNote = noteItems?.find(({ id }) => id === noteId)
+    const currentNote = state?.noteItems?.find(({ id }) => id === noteId)
     if (currentNote) {
       const parsedEditorState = editor.parseEditorState(currentNote.editorState)
       editor.setEditorState(parsedEditorState)
     }
-  }, [editor, noteItems])
+  }, [editor, state?.noteItems, noteId])
 
   return (
     <>

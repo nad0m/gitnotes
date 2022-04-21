@@ -40,13 +40,13 @@ export const getGitHubtUsername = async (
 
 export const Queries = {
   getCategories: async (
-    username: string,
     accessToken: string
   ): Promise<CategoryItem[] | undefined> => {
+    const username = await getGitHubtUsername(accessToken)
     try {
       const { data } = await SDK(
         Method.GET,
-        `/repos/${username}/${REPO_NAME}/contents/categories.json`,
+        `/repos/${username}/${REPO_NAME}/contents/categoryItems.json`,
         accessToken
       )
 
@@ -62,7 +62,6 @@ export const Queries = {
       console.error(error)
     }
   },
-
   getNotes: async (accessToken: string): Promise<NoteItem[] | undefined> => {
     const username = await getGitHubtUsername(accessToken)
     try {
