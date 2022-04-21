@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import { Navigate } from 'react-router-dom'
-import { HomePage, LoginPage } from '../pages'
+import { HomePage, LoginPage, Page } from '../pages'
 interface RouteType {
   path: string
   component: ReactNode
@@ -21,6 +21,11 @@ export const routes: RouteType[] = [
     component: <LoginPage />,
     name: 'Login Screen',
     protected: false
+  },
+  {
+    path: '/noteItems/:noteId',
+    component: <Page />,
+    protected: true
   },
   {
     path: '*',

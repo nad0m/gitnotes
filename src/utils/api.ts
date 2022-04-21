@@ -20,23 +20,25 @@ export const SDK = (
     url: `${apiHost}${path}`,
     data,
     headers: {
-      Authorization: `token ${accessToken}`
+      Authorization: `Bearer ${accessToken}`
     }
   })
 }
 
-export const Queries = {
-  getGitHubtUsername: async (accessToken: string): Promise<string | null> => {
-    try {
-      const user = await SDK(Method.GET, `/user`, accessToken)
-      console.log({ user })
-      return user.data?.login ?? null
-    } catch (error) {
-      console.error(error)
-      return null
-    }
-  },
+export const getGitHubtUsername = async (
+  accessToken: string
+): Promise<string | null> => {
+  try {
+    const user = await SDK(Method.GET, `/user`, accessToken)
+    console.log({ user })
+    return user.data?.login ?? null
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}
 
+export const Queries = {
   getCategories: async (
     username: string,
     accessToken: string
@@ -61,14 +63,12 @@ export const Queries = {
     }
   },
 
-  getNotes: async (
-    username: string,
-    accessToken: string
-  ): Promise<NoteItem[] | undefined> => {
+  getNotes: async (accessToken: string): Promise<NoteItem[] | undefined> => {
+    const username = await getGitHubtUsername(accessToken)
     try {
       const { data } = await SDK(
         Method.GET,
-        `/repos/${username}/${REPO_NAME}/contents/notes.json`,
+        `/repos/${username}/${REPO_NAME}/contents/noteItems.json`,
         accessToken
       )
 
@@ -146,7 +146,7 @@ export const Mutations = {
     const noteItems = data.noteItems
     const categoryItems = data.categoryItems
     const accessToken = authState.token
-    const username = await Queries.getGitHubtUsername(accessToken)
+    const username = await getGitHubtUsername(accessToken)
 
     try {
       // Get a reference

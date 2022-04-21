@@ -7,6 +7,7 @@ import { initialNotes } from '../utils/data/initialNotes'
 import { initialCategories } from '../utils/data/initialCategories'
 import { useSyncData } from '../hooks'
 import { useCurrentEditorContext } from '../providers/CurrentEditorProvider'
+import { editorState } from '../mock/editorState'
 
 export const HomePage: FC = () => {
   const auth = getAuth()
@@ -15,7 +16,12 @@ export const HomePage: FC = () => {
   const { editor } = useCurrentEditorContext()
 
   const onClick = () => {
-    console.log(editor?.getEditorState())
+    syncData({
+      noteItems: [
+        { ...initialNotes[0], editorState: JSON.stringify(editorState) }
+      ],
+      categoryItems: initialCategories
+    })
   }
 
   return (

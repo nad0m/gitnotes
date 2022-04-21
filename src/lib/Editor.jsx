@@ -26,9 +26,11 @@ import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text'
 import { $createParagraphNode, $createTextNode, $getRoot } from 'lexical'
 import * as React from 'react'
 import { useRef, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
 
 import { useSettings } from '../context/SettingsContext'
 import { useSharedHistoryContext } from '../context/SharedHistoryContext'
+import { useGetNotes } from '../hooks'
 import ActionsPlugin from '../plugins/ActionsPlugin'
 import AutocompletePlugin from '../plugins/AutocompletePlugin'
 import AutoLinkPlugin from '../plugins/AutoLinkPlugin'
@@ -54,6 +56,7 @@ import YouTubePlugin from '../plugins/YouTubePlugin'
 import { useCurrentEditorContext } from '../providers/CurrentEditorProvider'
 import ContentEditable from '../ui/ContentEditable'
 import Placeholder from '../ui/Placeholder'
+import { initialNotes } from '../utils/data/initialNotes'
 
 function prepopulatedRichText() {
   const root = $getRoot()
@@ -129,6 +132,8 @@ function prepopulatedRichText() {
 }
 
 export default function Editor(): React$Node {
+  const { noteId } = useParams()
+  const { noteItems } = useGetNotes()
   const { historyState } = useSharedHistoryContext()
   const [editor] = useLexicalComposerContext()
   const { setEditor } = useCurrentEditorContext()
@@ -153,7 +158,12 @@ export default function Editor(): React$Node {
 
   useEffect(() => {
     setEditor(editor)
-  }, [editor])
+    const currentNote = noteItems?.find(({ id }) => id === noteId)
+    if (currentNote) {
+      const parsedEditorState = editor.parseEditorState(currentNote.editorState)
+      editor.setEditorState(parsedEditorState)
+    }
+  }, [editor, noteItems])
 
   return (
     <>
