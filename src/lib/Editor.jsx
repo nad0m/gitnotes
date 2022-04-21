@@ -25,7 +25,7 @@ import TablesPlugin from '@lexical/react/LexicalTablePlugin'
 import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text'
 import { $createParagraphNode, $createTextNode, $getRoot } from 'lexical'
 import * as React from 'react'
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 
 import { useSettings } from '../context/SettingsContext'
 import { useSharedHistoryContext } from '../context/SharedHistoryContext'
@@ -51,6 +51,7 @@ import ToolbarPlugin from '../plugins/ToolbarPlugin'
 import TreeViewPlugin from '../plugins/TreeViewPlugin'
 import TwitterPlugin from '../plugins/TwitterPlugin'
 import YouTubePlugin from '../plugins/YouTubePlugin'
+import { useCurrentEditorContext } from '../providers/CurrentEditorProvider'
 import ContentEditable from '../ui/ContentEditable'
 import Placeholder from '../ui/Placeholder'
 
@@ -130,6 +131,7 @@ function prepopulatedRichText() {
 export default function Editor(): React$Node {
   const { historyState } = useSharedHistoryContext()
   const [editor] = useLexicalComposerContext()
+  const { setEditor } = useCurrentEditorContext()
   const {
     settings: {
       isCollab,
@@ -149,7 +151,9 @@ export default function Editor(): React$Node {
   const placeholder = <Placeholder>{text}</Placeholder>
   const scrollRef = useRef(null)
 
-  console.log(editor.getEditorState())
+  useEffect(() => {
+    setEditor(editor)
+  }, [editor])
 
   return (
     <>

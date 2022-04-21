@@ -6,17 +6,16 @@ import { LOCAL_STORAGE_KEY_GITHUB_TOKEN } from '../configs'
 import { initialNotes } from '../utils/data/initialNotes'
 import { initialCategories } from '../utils/data/initialCategories'
 import { useSyncData } from '../hooks'
+import { useCurrentEditorContext } from '../providers/CurrentEditorProvider'
 
 export const HomePage: FC = () => {
   const auth = getAuth()
   const [, , remove] = useLocalStorage(LOCAL_STORAGE_KEY_GITHUB_TOKEN)
   const { syncData, isLoading, isError, isSuccess } = useSyncData()
+  const { editor } = useCurrentEditorContext()
 
   const onClick = () => {
-    syncData({
-      noteItems: initialNotes,
-      categoryItems: initialCategories
-    })
+    console.log(editor?.getEditorState())
   }
 
   return (
