@@ -7,7 +7,6 @@ import {
   ReactNode
 } from 'react'
 import { LexicalEditor } from 'lexical'
-import { RouterBreadcrumbs } from '../components/RouterBreadcrumbs'
 import { initialCategories } from '../utils/data/initialCategories'
 import { initialNotes } from '../utils/data/initialNotes'
 import { useGetCategories, useGetNotes } from '../hooks'
