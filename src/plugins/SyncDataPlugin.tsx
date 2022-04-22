@@ -13,7 +13,7 @@ export const SyncDataPlugin: FC = () => {
     })
   }
 
-  useInterval(sync, 10000)
+  // useInterval(sync, 10000)
 
   return null
 }
