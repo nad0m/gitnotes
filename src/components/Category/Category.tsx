@@ -7,7 +7,7 @@ import {
   Edit,
   ArrowDropDown,
   Check,
-  Cancel
+  Close
 } from '@mui/icons-material'
 import { CategoryItem } from '../../types'
 
@@ -20,7 +20,7 @@ type CategoryProps = {
 
 const Wrapper = styled.div`
   display: flex;
-  padding: 3px;
+  padding: 16px;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
@@ -90,7 +90,7 @@ export const Category: FC<CategoryProps> = ({
     setIsRenaming(true)
   }
 
-  const handleOnClickAway = () => {
+  const handleEditConfirm = () => {
     setIsRenaming(false)
     onEditCategoryName(
       categoryItem.id,
@@ -106,27 +106,28 @@ export const Category: FC<CategoryProps> = ({
         <ArrowDropDown className="arrow-icon" />
         <Folder fontSize="inherit" sx={{ ml: 1, mr: 1 }} />
         {isRenaming ? (
-          <ClickAwayListener onClickAway={handleOnClickAway}>
-            <span style={{ display: 'flex', position: 'relative' }}>
+          <ClickAwayListener onClickAway={handleEditConfirm}>
+            <span
+              style={{ display: 'flex', position: 'relative' }}
+              onClick={(e) => e.stopPropagation()}>
               <input
                 ref={inputRef}
                 defaultValue={categoryItem.name}
-                onClick={(e) => e.stopPropagation()}
                 autoFocus
               />
               <span
                 style={{
                   display: 'flex',
                   position: 'absolute',
-                  right: '0',
-                  top: '100%',
-                  gap: '5px'
+                  right: '-32px',
+                  top: '120%',
+                  gap: '10px'
                 }}>
-                <ButtonWrapper filled>
+                <ButtonWrapper onClick={handleEditConfirm} filled>
                   <Check fontSize="inherit" color="success" />
                 </ButtonWrapper>
-                <ButtonWrapper filled>
-                  <Cancel fontSize="inherit" color="error" />
+                <ButtonWrapper onClick={() => setIsRenaming(false)} filled>
+                  <Close fontSize="inherit" color="error" />
                 </ButtonWrapper>
               </span>
             </span>
