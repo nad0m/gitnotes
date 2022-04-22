@@ -1,7 +1,14 @@
 import { FC, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { ClickAwayListener } from '@mui/material'
-import { Folder, NoteAdd, Edit, ArrowDropDown } from '@mui/icons-material'
+import {
+  Folder,
+  NoteAdd,
+  Edit,
+  ArrowDropDown,
+  Check,
+  Cancel
+} from '@mui/icons-material'
 import { CategoryItem } from '../../types'
 
 type CategoryProps = {
@@ -35,17 +42,30 @@ const Wrapper = styled.div`
   }
 `
 
-const ButtonWrapper = styled.span`
+const ButtonWrapper = styled.span<{ filled?: boolean }>`
   display: flex;
   cursor: pointer;
   padding: 6px;
-  border-radius: 4px;
-  :hover {
-    background-color: rgba(209, 210, 211, 0.1);
-  }
-  :active {
-    background-color: rgba(209, 210, 211, 0.08);
-  }
+  border-radius: 3px;
+  ${({ filled }) =>
+    filled
+      ? `
+      background-color: rgb(230, 230, 230);
+      :hover {
+        background-color: rgb(193, 193, 193);
+      }
+      :active {
+        background-color: rgb(169, 169, 169);
+      }
+      `
+      : `
+    :hover {
+      background-color: rgba(209, 210, 211, 0.1);
+    }
+    :active {
+      background-color: rgba(209, 210, 211, 0.08);
+    }
+  `}
 `
 
 const ArrowIconWrapper = styled.span<{ isExpanded: boolean }>`
@@ -87,12 +107,29 @@ export const Category: FC<CategoryProps> = ({
         <Folder fontSize="inherit" sx={{ ml: 1, mr: 1 }} />
         {isRenaming ? (
           <ClickAwayListener onClickAway={handleOnClickAway}>
-            <input
-              ref={inputRef}
-              defaultValue={categoryItem.name}
-              onClick={(e) => e.stopPropagation()}
-              autoFocus
-            />
+            <span style={{ display: 'flex', position: 'relative' }}>
+              <input
+                ref={inputRef}
+                defaultValue={categoryItem.name}
+                onClick={(e) => e.stopPropagation()}
+                autoFocus
+              />
+              <span
+                style={{
+                  display: 'flex',
+                  position: 'absolute',
+                  right: '0',
+                  top: '100%',
+                  gap: '5px'
+                }}>
+                <ButtonWrapper filled>
+                  <Check fontSize="inherit" color="success" />
+                </ButtonWrapper>
+                <ButtonWrapper filled>
+                  <Cancel fontSize="inherit" color="error" />
+                </ButtonWrapper>
+              </span>
+            </span>
           </ClickAwayListener>
         ) : (
           <span>{categoryItem.name}</span>
