@@ -1,12 +1,8 @@
 import { FC, useRef, useState } from 'react'
 import styled from 'styled-components'
-import FolderIcon from '@mui/icons-material/Folder'
-import NoteAddIcon from '@mui/icons-material/NoteAdd'
-import EditIcon from '@mui/icons-material/Edit'
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
-import { CategoryItem } from '../../types'
-import { Button, IconButton, Input } from '@mui/material'
 import { ClickAwayListener } from '@mui/material'
+import { Folder, NoteAdd, Edit, ArrowDropDown } from '@mui/icons-material'
+import { CategoryItem } from '../../types'
 
 type CategoryProps = {
   categoryItem: CategoryItem
@@ -87,8 +83,8 @@ export const Category: FC<CategoryProps> = ({
       <ArrowIconWrapper
         onClick={() => setIsExpanded(!isExpanded)}
         isExpanded={isExpanded}>
-        <ArrowDropDownIcon className="arrow-icon" />
-        <FolderIcon fontSize="inherit" sx={{ ml: 1, mr: 1 }} />
+        <ArrowDropDown className="arrow-icon" />
+        <Folder fontSize="inherit" sx={{ ml: 1, mr: 1 }} />
         {isRenaming ? (
           <ClickAwayListener onClickAway={handleOnClickAway}>
             <input
@@ -104,10 +100,10 @@ export const Category: FC<CategoryProps> = ({
       </ArrowIconWrapper>
       <span className="button-wrapper">
         <ButtonWrapper onClick={handleRenameClick}>
-          <EditIcon fontSize="inherit" />
+          <Edit fontSize="inherit" />
         </ButtonWrapper>
         <ButtonWrapper>
-          <NoteAddIcon fontSize="inherit" />
+          <NoteAdd fontSize="inherit" />
         </ButtonWrapper>
       </span>
     </Wrapper>
