@@ -17,13 +17,10 @@ import { Types } from '../utils/reducers'
 export const HomePage: FC = () => {
   const auth = getAuth()
   const [, , remove] = useLocalStorage(LOCAL_STORAGE_KEY_GITHUB_TOKEN)
-  const { dispatch } = useDataSyncContext()
+  const { handleSyncData } = useDataSyncContext()
 
   const onClick = () => {
-    dispatch({
-      type: Types.AddNote,
-      payload: { ...initialNotes[0], title: 'New Note' }
-    })
+    handleSyncData()
   }
 
   return (

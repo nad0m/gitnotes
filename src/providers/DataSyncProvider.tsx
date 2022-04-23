@@ -3,9 +3,15 @@ import React, {
   useReducer,
   Dispatch,
   useContext,
-  useEffect
+  useEffect,
+  useCallback
 } from 'react'
-import { useGetCategories, useGetNotes } from '../hooks'
+import {
+  useGetCategories,
+  useGetCategoriesAndNotes,
+  useGetNotes,
+  useSyncData
+} from '../hooks'
 import { CategoryItem, NoteItem } from '../types'
 import { NoteAction } from '../types/enums'
 import {
@@ -29,9 +35,11 @@ const initialState = {
 const DataSyncContext = createContext<{
   state: InitialStateType
   dispatch: Dispatch<CategoryActions | NoteActions>
+  handleSyncData: () => void
 }>({
   state: initialState,
-  dispatch: () => null
+  dispatch: () => null,
+  handleSyncData: () => null
 })
 
 const mainReducer = (
@@ -44,8 +52,16 @@ const mainReducer = (
 
 export const DataSyncProvider: React.FC = ({ children }) => {
   const [state, dispatch] = useReducer(mainReducer, initialState)
-  const { categoryItems } = useGetCategories()
-  const { noteItems } = useGetNotes()
+  const { syncData } = useSyncData()
+  const { categoriesAndNotes } = useGetCategoriesAndNotes()
+  const { categoryItems = [], noteItems = [] } = categoriesAndNotes ?? {}
+
+  const handleSyncData = useCallback(() => {
+    syncData({
+      categoryItems: state.categoryItems,
+      noteItems: state.noteItems
+    })
+  }, [state.categoryItems, state.noteItems, syncData])
 
   useEffect(() => {
     if (categoryItems && noteItems) {
@@ -57,10 +73,10 @@ export const DataSyncProvider: React.FC = ({ children }) => {
         }
       })
     }
-  }, [categoryItems, noteItems])
+  }, [categoryItems, noteItems, dispatch])
 
   return (
-    <DataSyncContext.Provider value={{ state, dispatch }}>
+    <DataSyncContext.Provider value={{ state, dispatch, handleSyncData }}>
       {children}
     </DataSyncContext.Provider>
   )

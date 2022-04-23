@@ -25,12 +25,11 @@ export const SDK = (
   })
 }
 
-export const getGitHubtUsername = async (
+export const getGitHubUsername = async (
   accessToken: string
 ): Promise<string | null> => {
   try {
     const user = await SDK(Method.GET, `/user`, accessToken)
-    console.log({ user })
     return user.data?.login ?? null
   } catch (error) {
     console.error(error)
@@ -39,10 +38,48 @@ export const getGitHubtUsername = async (
 }
 
 export const Queries = {
+  getCategoriesAndNotes: async ({
+    accessToken,
+    username
+  }: {
+    accessToken: string
+    username: string
+  }): Promise<SyncPayload | undefined> => {
+    try {
+      const [{ data: categoryData }, { data: noteData }] = await Promise.all([
+        SDK(
+          Method.GET,
+          `/repos/${username}/${REPO_NAME}/contents/categoryItems.json`,
+          accessToken
+        ),
+        SDK(
+          Method.GET,
+          `/repos/${username}/${REPO_NAME}/contents/noteItems.json`,
+          accessToken
+        )
+      ])
+
+      const categories = Buffer.from(categoryData.content, 'base64').toString()
+      const notes = Buffer.from(noteData.content, 'base64').toString()
+
+      try {
+        const categoryItems = JSON.parse(categories) as CategoryItem[]
+        const noteItems = JSON.parse(notes) as NoteItem[]
+        return {
+          categoryItems,
+          noteItems
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  },
   getCategories: async (
     accessToken: string
   ): Promise<CategoryItem[] | undefined> => {
-    const username = await getGitHubtUsername(accessToken)
+    const username = await getGitHubUsername(accessToken)
     try {
       const { data } = await SDK(
         Method.GET,
@@ -63,7 +100,7 @@ export const Queries = {
     }
   },
   getNotes: async (accessToken: string): Promise<NoteItem[] | undefined> => {
-    const username = await getGitHubtUsername(accessToken)
+    const username = await getGitHubUsername(accessToken)
     try {
       const { data } = await SDK(
         Method.GET,
@@ -140,12 +177,15 @@ export const Mutations = {
       console.error(error)
     }
   },
-  syncData: async (options: { data: SyncPayload; authState: IAuthState }) => {
-    const { data, authState } = options
+  syncData: async (options: {
+    data: SyncPayload
+    authState: IAuthState
+    username: string
+  }) => {
+    const { data, authState, username } = options
     const noteItems = data.noteItems
     const categoryItems = data.categoryItems
     const accessToken = authState.token
-    const username = await getGitHubtUsername(accessToken)
 
     try {
       // Get a reference

@@ -13,6 +13,7 @@ import { useGetCategories, useGetNotes } from '../hooks'
 import { useDataSyncContext } from './DataSyncProvider'
 import { Category } from '../components/Category'
 import { Types } from '../utils/reducers'
+import { NoteList } from '../components/NoteList'
 
 type CurrentEditorContextT = {
   editor: LexicalEditor | null
@@ -45,6 +46,18 @@ export const CurrentEditorProvider: FC<{ children: ReactNode }> = ({
     })
   }
 
+  const onEditNoteName = (noteId: string, title: string) => {
+    dispatch({
+      type: Types.UpdateNote,
+      payload: {
+        id: noteId,
+        fields: {
+          title
+        }
+      }
+    })
+  }
+
   return (
     <CurrentEditorContext.Provider value={{ editor, setEditor }}>
       <div
@@ -52,15 +65,22 @@ export const CurrentEditorProvider: FC<{ children: ReactNode }> = ({
           width: '300px',
           padding: '24px',
           backgroundColor: '#25283d',
-          color: '#fff'
+          color: '#fff',
+          fontSize: '14px',
+          fontWeight: 'bold'
         }}>
         {state.categoryItems.map((categoryItem) => {
           return (
             <Category
               key={categoryItem.id}
               categoryItem={categoryItem}
-              onEditCategoryName={onEditCategoryName}
-            />
+              onEditCategoryName={onEditCategoryName}>
+              <NoteList
+                categoryId={categoryItem.id}
+                noteItems={state.noteItems}
+                onEditNoteName={onEditNoteName}
+              />
+            </Category>
           )
         })}
       </div>
