@@ -12,6 +12,7 @@ import {
 import { CategoryItem } from '../../types'
 
 type CategoryProps = {
+  children?: React.ReactNode
   categoryItem: CategoryItem
   onAddNoteClick?: (categoryId: string) => void
   onEditCategoryName: (categoryId: string, name: string) => void

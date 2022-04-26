@@ -58,6 +58,7 @@ import { useDataSyncContext } from '../providers/DataSyncProvider'
 import ContentEditable from '../ui/ContentEditable'
 import Placeholder from '../ui/Placeholder'
 import { initialNotes } from '../utils/data/initialNotes'
+import { Types } from '../utils/reducers'
 
 function prepopulatedRichText() {
   const root = $getRoot()
@@ -134,7 +135,7 @@ function prepopulatedRichText() {
 
 export default function Editor(): React$Node {
   const { noteId } = useParams()
-  const { state } = useDataSyncContext()
+  const { state, dispatch } = useDataSyncContext()
   const { historyState } = useSharedHistoryContext()
   const [editor] = useLexicalComposerContext()
   const { setEditor } = useCurrentEditorContext()
@@ -165,6 +166,19 @@ export default function Editor(): React$Node {
       editor.setEditorState(parsedEditorState)
     }
   }, [editor, state?.noteItems, noteId])
+
+  useEffect(() => {
+    return () =>
+      dispatch({
+        type: Types.UpdateNote,
+        payload: {
+          id: noteId,
+          fields: {
+            editorState: JSON.stringify(editor.getEditorState())
+          }
+        }
+      })
+  }, [dispatch, noteId, editor])
 
   return (
     <>

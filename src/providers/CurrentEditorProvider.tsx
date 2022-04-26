@@ -7,13 +7,12 @@ import {
   ReactNode
 } from 'react'
 import { LexicalEditor } from 'lexical'
-import { initialCategories } from '../utils/data/initialCategories'
-import { initialNotes } from '../utils/data/initialNotes'
 import { useGetCategories, useGetNotes } from '../hooks'
 import { useDataSyncContext } from './DataSyncProvider'
 import { Category } from '../components/Category'
 import { Types } from '../utils/reducers'
 import { NoteList } from '../components/NoteList'
+import { useParams } from 'react-router-dom'
 
 type CurrentEditorContextT = {
   editor: LexicalEditor | null
@@ -33,6 +32,7 @@ export const CurrentEditorProvider: FC<{ children: ReactNode }> = ({
 }) => {
   const [editor, setEditor] = useState<LexicalEditor | null>(null)
   const { state, dispatch } = useDataSyncContext()
+  const { noteId: currentNoteId } = useParams()
 
   const onEditCategoryName = (categoryId: string, name: string) => {
     dispatch({
@@ -79,6 +79,7 @@ export const CurrentEditorProvider: FC<{ children: ReactNode }> = ({
                 categoryId={categoryItem.id}
                 noteItems={state.noteItems}
                 onEditNoteName={onEditNoteName}
+                currentNoteId={currentNoteId ?? ''}
               />
             </Category>
           )

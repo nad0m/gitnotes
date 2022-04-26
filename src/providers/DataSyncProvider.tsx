@@ -6,6 +6,7 @@ import React, {
   useEffect,
   useCallback
 } from 'react'
+import { useParams } from 'react-router-dom'
 import {
   useGetCategories,
   useGetCategoriesAndNotes,
@@ -50,7 +51,9 @@ const mainReducer = (
   noteItems: noteItemsReducer(noteItems, action)
 })
 
-export const DataSyncProvider: React.FC = ({ children }) => {
+export const DataSyncProvider: React.FC<{ children: React.ReactNode }> = ({
+  children
+}) => {
   const [state, dispatch] = useReducer(mainReducer, initialState)
   const { syncData } = useSyncData()
   const { categoriesAndNotes } = useGetCategoriesAndNotes()
